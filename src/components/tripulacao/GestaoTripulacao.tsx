@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTripulacao } from '../../hooks/useTripulacao';
 import { 
   Card, 
   CardContent, 
@@ -384,7 +385,7 @@ function TripulacaoCard({ tripulante }: { tripulante: Tripulante }) {
   );
 }
 
-function TripulanteModal({ trigger }: { trigger?: React.ReactNode }) {
+function TripulanteModal({ trigger, onSave }: { trigger?: React.ReactNode; onSave?: (tripulante: any) => void }) {
   const [formData, setFormData] = useState({
     nome: "",
     cargo: "",
@@ -395,14 +396,79 @@ function TripulanteModal({ trigger }: { trigger?: React.ReactNode }) {
     categoria: "",
     dataNascimento: "",
     localNascimento: "",
-    status: "ativo",
+    status: "ativo" as const,
     observacoes: "",
-    foto: ""
+    foto: "",
+    horasVoo: 0,
+    cht: {
+      numero: "",
+      validade: "",
+      status: "valido" as const
+    },
+    cma: {
+      numero: "",
+      validade: "",
+      status: "valido" as const
+    },
+    habilitacoes: [] as Array<{
+      tipo: string;
+      validade: string;
+      status: 'valido' | 'proximo_vencimento' | 'vencido';
+    }>,
+    ingles: {
+      nivel: "",
+      validade: "",
+      status: "valido" as const
+    }
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Dados do tripulante:", formData);
+    setIsSubmitting(true);
+    
+    try {
+      if (onSave) {
+        await onSave(formData);
+        // Limpar formulário após salvar
+        setFormData({
+          nome: "",
+          cargo: "",
+          cpf: "",
+          telefone: "",
+          email: "",
+          codigoANAC: "",
+          categoria: "",
+          dataNascimento: "",
+          localNascimento: "",
+          status: "ativo" as const,
+          observacoes: "",
+          foto: "",
+          horasVoo: 0,
+          cht: {
+            numero: "",
+            validade: "",
+            status: "valido" as const
+          },
+          cma: {
+            numero: "",
+            validade: "",
+            status: "valido" as const
+          },
+          habilitacoes: [],
+          ingles: {
+            nivel: "",
+            validade: "",
+            status: "valido" as const
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao salvar tripulante:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -592,6 +658,174 @@ function TripulanteModal({ trigger }: { trigger?: React.ReactNode }) {
             </div>
           </div>
 
+          {/* Certificados */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Certificados</h3>
+            
+            {/* CHT */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="chtNumero">Número CHT</Label>
+                <Input
+                  id="chtNumero"
+                  placeholder="CHT-123456-AB"
+                  value={formData.cht.numero}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    cht: { ...formData.cht, numero: e.target.value }
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="chtValidade">Validade CHT</Label>
+                <Input
+                  id="chtValidade"
+                  type="date"
+                  value={formData.cht.validade}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    cht: { ...formData.cht, validade: e.target.value }
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="chtStatus">Status CHT</Label>
+                <Select 
+                  value={formData.cht.status} 
+                  onValueChange={(value) => setFormData({ 
+                    ...formData, 
+                    cht: { ...formData.cht, status: value as 'valido' | 'proximo_vencimento' | 'vencido' }
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="valido">Válido</SelectItem>
+                    <SelectItem value="proximo_vencimento">Próximo Vencimento</SelectItem>
+                    <SelectItem value="vencido">Vencido</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* CMA */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cmaNumero">Número CMA</Label>
+                <Input
+                  id="cmaNumero"
+                  placeholder="CMA-123456-1"
+                  value={formData.cma.numero}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    cma: { ...formData.cma, numero: e.target.value }
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cmaValidade">Validade CMA</Label>
+                <Input
+                  id="cmaValidade"
+                  type="date"
+                  value={formData.cma.validade}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    cma: { ...formData.cma, validade: e.target.value }
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cmaStatus">Status CMA</Label>
+                <Select 
+                  value={formData.cma.status} 
+                  onValueChange={(value) => setFormData({ 
+                    ...formData, 
+                    cma: { ...formData.cma, status: value as 'valido' | 'proximo_vencimento' | 'vencido' }
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="valido">Válido</SelectItem>
+                    <SelectItem value="proximo_vencimento">Próximo Vencimento</SelectItem>
+                    <SelectItem value="vencido">Vencido</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Inglês */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="inglesNivel">Nível Inglês</Label>
+                <Select 
+                  value={formData.ingles.nivel} 
+                  onValueChange={(value) => setFormData({ 
+                    ...formData, 
+                    ingles: { ...formData.ingles, nivel: value }
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Nível" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ICAO 1">ICAO 1</SelectItem>
+                    <SelectItem value="ICAO 2">ICAO 2</SelectItem>
+                    <SelectItem value="ICAO 3">ICAO 3</SelectItem>
+                    <SelectItem value="ICAO 4">ICAO 4</SelectItem>
+                    <SelectItem value="ICAO 5">ICAO 5</SelectItem>
+                    <SelectItem value="ICAO 6">ICAO 6</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="inglesValidade">Validade Inglês</Label>
+                <Input
+                  id="inglesValidade"
+                  type="date"
+                  value={formData.ingles.validade}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    ingles: { ...formData.ingles, validade: e.target.value }
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="inglesStatus">Status Inglês</Label>
+                <Select 
+                  value={formData.ingles.status} 
+                  onValueChange={(value) => setFormData({ 
+                    ...formData, 
+                    ingles: { ...formData.ingles, status: value as 'valido' | 'proximo_vencimento' | 'vencido' }
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="valido">Válido</SelectItem>
+                    <SelectItem value="proximo_vencimento">Próximo Vencimento</SelectItem>
+                    <SelectItem value="vencido">Vencido</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Horas de Voo */}
+            <div className="space-y-2">
+              <Label htmlFor="horasVoo">Horas de Voo</Label>
+              <Input
+                id="horasVoo"
+                type="number"
+                placeholder="0"
+                value={formData.horasVoo}
+                onChange={(e) => setFormData({ ...formData, horasVoo: parseInt(e.target.value) || 0 })}
+              />
+            </div>
+          </div>
+
           {/* Observações */}
           <div className="space-y-2">
             <Label htmlFor="observacoes">Observações</Label>
@@ -608,8 +842,8 @@ function TripulanteModal({ trigger }: { trigger?: React.ReactNode }) {
             <Button type="button" variant="outline">
               Cancelar
             </Button>
-            <Button type="submit">
-              Salvar Tripulante
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Salvando..." : "Salvar Tripulante"}
             </Button>
           </div>
         </form>
@@ -619,7 +853,7 @@ function TripulanteModal({ trigger }: { trigger?: React.ReactNode }) {
 }
 
 export default function GestaoTripulacao() {
-  const [tripulantes] = useState<Tripulante[]>(mockTripulantes);
+  const { tripulantes, loading, error, estatisticas, adicionarTripulante } = useTripulacao();
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredTripulantes = tripulantes.filter(tripulante =>
@@ -629,29 +863,36 @@ export default function GestaoTripulacao() {
     tripulante.codigoANAC.includes(searchTerm)
   );
 
-  const getStatusCounts = () => {
-    let totalVencidos = 0;
-    let totalProximoVenc = 0;
-    let chtVencidos = 0;
-    let cmaVencidos = 0;
-
-    tripulantes.forEach(tripulante => {
-      tripulante.habilitacoes.forEach(hab => {
-        if (hab.status === 'vencido') {
-          totalVencidos++;
-          if (hab.tipo === 'CHT') chtVencidos++;
-          if (hab.tipo === 'CMA') cmaVencidos++;
-        }
-        if (hab.status === 'proximo_vencimento') {
-          totalProximoVenc++;
-        }
-      });
-    });
-    
-    return { totalVencidos, totalProximoVenc, chtVencidos, cmaVencidos };
+  // Usar estatísticas do Firebase
+  const { totalVencidos, totalProximoVenc, chtVencidos, cmaVencidos } = {
+    totalVencidos: estatisticas.chtVencidos + estatisticas.cmaVencidos,
+    totalProximoVenc: estatisticas.proximosVencimentos,
+    chtVencidos: estatisticas.chtVencidos,
+    cmaVencidos: estatisticas.cmaVencidos
   };
 
-  const { totalVencidos, totalProximoVenc, chtVencidos, cmaVencidos } = getStatusCounts();
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Carregando tripulantes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Erro ao carregar dados</h2>
+          <p className="text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -663,7 +904,7 @@ export default function GestaoTripulacao() {
               Gerencie os dados e vencimentos da sua equipe
             </p>
           </div>
-          <TripulanteModal />
+          <TripulanteModal onSave={adicionarTripulante} />
         </div>
 
         {/* Cards de Resumo */}
