@@ -1,5 +1,5 @@
 // Serviço para API do Meteoblue
-const METEOBLUE_API_KEY = "T6V34x0KMBHoAJ8P";
+const METEOBLUE_API_KEY = import.meta.env.VITE_METEOBLUE_API_KEY || "T6V34x0KMBHoAJ8P";
 const BASE_URL = "https://my.meteoblue.com/packages/basic-1h_1d";
 
 export interface WeatherData {
@@ -178,12 +178,17 @@ export const getWeatherData = async (lat: number, lon: number): Promise<WeatherD
   const url = `${BASE_URL}?lat=${lat}&lon=${lon}&apikey=${METEOBLUE_API_KEY}&format=json`;
   
   try {
+    console.log("Buscando dados meteorológicos para:", lat, lon);
     const response = await fetch(url);
+    
     if (!response.ok) {
-      throw new Error(`Erro na API: ${response.status}`);
+      const errorText = await response.text();
+      console.error("Erro na API Meteoblue:", response.status, errorText);
+      throw new Error(`Erro na API: ${response.status} - ${errorText}`);
     }
     
     const data = await response.json();
+    console.log("Dados meteorológicos recebidos:", data);
     return data;
   } catch (error) {
     console.error("Erro ao buscar dados meteorológicos:", error);

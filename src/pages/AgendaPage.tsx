@@ -752,14 +752,45 @@ export default function AgendaPage() {
                                         <Badge variant="outline" className="text-xs">
                                           {item.icai} {/* ICAO */}
                                         </Badge>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={() => handleEditAbastecimento(item)}
-                                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                          <Edit className="h-3 w-3" />
-                                        </Button>
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleEditAbastecimento(item)}
+                                            className="h-6 w-6 p-0"
+                                          >
+                                            <Edit className="h-3 w-3" />
+                                          </Button>
+                                          <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setDeletingContact(item as any)}
+                                                className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                                              >
+                                                <Trash2 className="h-3 w-3" />
+                                              </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                              <AlertDialogHeader>
+                                                <AlertDialogTitle>Excluir contato de abastecimento</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                  Tem certeza que deseja excluir o contato de abastecimento "{item.cidade}"? Esta ação não pode ser desfeita.
+                                                </AlertDialogDescription>
+                                              </AlertDialogHeader>
+                                              <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                <AlertDialogAction
+                                                  onClick={() => handleDeleteContact(item as any)}
+                                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                >
+                                                  Excluir
+                                                </AlertDialogAction>
+                                              </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                          </AlertDialog>
+                                        </div>
                                       </div>
                                       <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                         <span>{item.telefone}</span>

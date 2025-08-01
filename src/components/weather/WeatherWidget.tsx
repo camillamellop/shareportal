@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   Eye,
   Loader2
 } from "lucide-react";
+import { getCurrentWeather, CurrentWeather } from "@/services/meteoblue";
 
 interface WeatherWidgetProps {
   lat?: number;
@@ -20,21 +21,34 @@ interface WeatherWidgetProps {
   className?: string;
 }
 
-export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
+export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }: WeatherWidgetProps) => {
   const [showDetails, setShowDetails] = useState(false);
+  const [weather, setWeather] = useState<CurrentWeather | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Dados mockados temporariamente para evitar erros de API
-  const mockWeather = {
-    temperature: 24,
-    humidity: 65,
-    windSpeed: 12,
-    windDirection: 180,
-    pressure: 1013,
-    uv: 5,
-    precipitation: 0,
-    pictocode: 1,
-    description: "Céu limpo"
-  };
+  useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        setLoading(true);
+        const weatherData = await getCurrentWeather(lat, lon);
+        setWeather(weatherData);
+        setError(null);
+      } catch (err) {
+        console.error("Erro ao buscar dados meteorológicos:", err);
+        setError("Erro ao carregar dados meteorológicos");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWeather();
+    
+    // Atualizar a cada 30 minutos
+    const interval = setInterval(fetchWeather, 30 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [lat, lon]);
 
   const getWeatherIcon = (pictocode: number) => {
     if (pictocode <= 4) return <Sun className="h-4 w-4 text-yellow-500" />;
@@ -50,6 +64,24 @@ export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
     return directions[index];
   };
 
+  if (loading) {
+    return (
+      <div className={`flex items-center gap-2 p-2 ${className}`}>
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span className="text-sm">Carregando...</span>
+      </div>
+    );
+  }
+
+  if (error || !weather) {
+    return (
+      <div className={`flex items-center gap-2 p-2 ${className}`}>
+        <Cloud className="h-4 w-4 text-gray-400" />
+        <span className="text-sm text-muted-foreground">Clima indisponível</span>
+      </div>
+    );
+  }
+
   return (
     <div className={`relative ${className}`}>
       <Button
@@ -58,13 +90,13 @@ export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
         onClick={() => setShowDetails(!showDetails)}
         className="flex items-center gap-2 h-auto p-2"
       >
-        {getWeatherIcon(mockWeather.pictocode)}
+        {getWeatherIcon(weather.pictocode)}
         <div className="flex flex-col items-start">
           <span className="text-sm font-medium">
-            {Math.round(mockWeather.temperature)}°C
+            {Math.round(weather.temperature)}°C
           </span>
           <span className="text-xs text-muted-foreground">
-            {mockWeather.description}
+            {weather.description}
           </span>
         </div>
       </Button>
@@ -75,7 +107,7 @@ export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Clima Atual</span>
               <Badge variant="outline" className="text-xs">
-                {mockWeather.description}
+                {weather.description}
               </Badge>
             </div>
 
@@ -84,7 +116,7 @@ export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
                 <Thermometer className="h-4 w-4 text-red-500" />
                 <span>Temperatura</span>
                 <span className="font-medium">
-                  {Math.round(mockWeather.temperature)}°C
+                  {Math.round(weather.temperature)}°C
                 </span>
               </div>
 
@@ -92,7 +124,7 @@ export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
                 <Droplets className="h-4 w-4 text-blue-500" />
                 <span>Umidade</span>
                 <span className="font-medium">
-                  {Math.round(mockWeather.humidity)}%
+                  {Math.round(weather.humidity)}%
                 </span>
               </div>
 
@@ -100,7 +132,7 @@ export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
                 <Wind className="h-4 w-4 text-gray-500" />
                 <span>Vento</span>
                 <span className="font-medium">
-                  {Math.round(mockWeather.windSpeed)} km/h
+                  {Math.round(weather.windSpeed)} km/h
                 </span>
               </div>
 
@@ -108,7 +140,7 @@ export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
                 <Eye className="h-4 w-4 text-purple-500" />
                 <span>Pressão</span>
                 <span className="font-medium">
-                  {Math.round(mockWeather.pressure)} hPa
+                  {Math.round(weather.pressure)} hPa
                 </span>
               </div>
             </div>
@@ -117,20 +149,20 @@ export const WeatherWidget = ({ className = "" }: WeatherWidgetProps) => {
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Direção do vento</span>
                 <span className="font-medium">
-                  {getWindDirection(mockWeather.windDirection)}
+                  {getWindDirection(weather.windDirection)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Índice UV</span>
                 <span className="font-medium">
-                  {Math.round(mockWeather.uv)}
+                  {Math.round(weather.uv)}
                 </span>
               </div>
-              {mockWeather.precipitation > 0 && (
+              {weather.precipitation > 0 && (
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Precipitação</span>
                   <span className="font-medium">
-                    {Math.round(mockWeather.precipitation)} mm
+                    {Math.round(weather.precipitation)} mm
                   </span>
                 </div>
               )}
