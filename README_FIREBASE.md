@@ -1,4 +1,4 @@
-# Configuração do Firebase - Portal Share Brasil
+# Configuração do Firebase - Aeroportal Brasil
 
 ## 🔥 Configuração do Firebase
 
@@ -6,7 +6,7 @@
 
 1. Acesse [Firebase Console](https://console.firebase.google.com/)
 2. Clique em "Adicionar projeto"
-3. Digite o nome: **Portal Share Brasil**
+3. Digite o nome: **Aeroportal Brasil**
 4. Siga os passos de configuração
 
 ### 2. Configurar Firestore Database
@@ -35,11 +35,11 @@ Crie um arquivo `.env.local` na raiz do projeto:
 
 ```env
 VITE_FIREBASE_API_KEY=sua_api_key_aqui
-VITE_FIREBASE_AUTH_DOMAIN=portal-share-brasil.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=portal-share-brasil
-VITE_FIREBASE_STORAGE_BUCKET=portal-share-brasil.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
-VITE_FIREBASE_APP_ID=1:123456789012:web:abcdefghijklmnop
+VITE_FIREBASE_AUTH_DOMAIN=aeroportal-brasil.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=aeroportal-brasil
+VITE_FIREBASE_STORAGE_BUCKET=aeroportal-brasil.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=136549004745
+VITE_FIREBASE_APP_ID=1:136549004745:web:e78ee54833482bdcfde418
 ```
 
 ### 6. Regras de Segurança do Firestore

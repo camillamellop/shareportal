@@ -3,14 +3,14 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
-// Configuração do Firebase para Portal Share Brasil
+// Configuração do Firebase para Aeroportal Brasil
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "portal-share-brasil.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "portal-share-brasil",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "portal-share-brasil.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789012",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789012:web:abcdefghijklmnop"
+  apiKey: "AIzaSyCvI99h6xutWyZ-SlMDCvbS7p-xp604aro",
+  authDomain: "aeroportal-brasil.firebaseapp.com",
+  projectId: "aeroportal-brasil",
+  storageBucket: "aeroportal-brasil.firebasestorage.app",
+  messagingSenderId: "136549004745",
+  appId: "1:136549004745:web:e78ee54833482bdcfde418"
 };
 
 // Inicializar Firebase

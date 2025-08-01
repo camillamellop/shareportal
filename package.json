@@ -1,7 +1,7 @@
 {
-  "name": "portal-share-brasil",
+  "name": "aeroportal-brasil",
   "version": "1.0.0",
-  "description": "Sistema de Gestão de Tripulação - Portal Share Brasil",
+  "description": "Sistema de Gestão de Tripulação - Aeroportal Brasil",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
@@ -29,12 +29,12 @@
     "tsx": "^4.20.3"
   },
   "keywords": [
-    "portal-share",
+    "aeroportal",
     "tripulação",
     "aviação",
     "firebase",
     "react"
   ],
-  "author": "Portal Share Brasil",
+  "author": "Aeroportal Brasil",
   "license": "MIT"
 }
