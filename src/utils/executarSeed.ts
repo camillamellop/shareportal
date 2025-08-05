@@ -3,6 +3,7 @@ import { seedVoos } from "./seedVoos";
 import { seedBirthdays } from "./seedBirthdays";
 import { seedHotels } from "./seedHotels";
 import { seedTripulacao } from "./seedTripulacao";
+import { seedSolicitacoesVoo } from "./seedSolicitacoesVoo";
 import { aeronaveService, vooService, birthdayService, hotelService } from "@/services/firestore";
 import { tripulacaoService } from "@/services/tripulacaoService";
 
@@ -28,6 +29,9 @@ export const executarSeedCompleto = async () => {
     
     // Executar seed de tripulação
     await seedTripulacao();
+    
+    // Executar seed de solicitações de voo
+    await seedSolicitacoesVoo();
     
     console.log("=== SEED COMPLETO FINALIZADO ===");
   } catch (error) {

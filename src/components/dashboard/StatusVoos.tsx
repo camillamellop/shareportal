@@ -15,6 +15,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { vooService } from "@/services/vooService";
 import { SolicitacaoVoo, PlanoVoo, STATUS_VOO_CONFIG } from "@/types/voo";
+import { seedSolicitacoesVoo } from "@/utils/seedSolicitacoesVoo";
+import { toast } from "sonner";
 
 interface StatusVoosProps {
   userType?: 'cotista' | 'coordenador' | 'piloto';
@@ -23,6 +25,7 @@ interface StatusVoosProps {
 export function StatusVoos({ userType = 'cotista' }: StatusVoosProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [executandoSeed, setExecutandoSeed] = useState(false);
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoVoo[]>([]);
   const [planosVoo, setPlanosVoo] = useState<PlanoVoo[]>([]);
   const [stats, setStats] = useState({
@@ -64,6 +67,24 @@ export function StatusVoos({ userType = 'cotista' }: StatusVoosProps) {
       console.error("Erro ao carregar dados:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Função para executar seed de solicitações
+  const executarSeedSolicitacoes = async () => {
+    setExecutandoSeed(true);
+    try {
+      console.log("Executando seed de solicitações de voo...");
+      await seedSolicitacoesVoo();
+      toast.success("Solicitações de voo carregadas com sucesso!");
+      
+      // Recarregar dados
+      await loadData();
+    } catch (error) {
+      console.error("Erro ao executar seed:", error);
+      toast.error("Erro ao carregar solicitações de voo");
+    } finally {
+      setExecutandoSeed(false);
     }
   };
 
@@ -174,12 +195,21 @@ export function StatusVoos({ userType = 'cotista' }: StatusVoosProps) {
             <div className="text-center py-8 text-muted-foreground">
               <Plane className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Nenhuma solicitação encontrada</p>
-              <Button 
-                className="mt-4" 
-                onClick={() => navigate('/agendamento')}
-              >
-                Solicitar Primeiro Voo
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2 mt-4 justify-center">
+                <Button 
+                  onClick={executarSeedSolicitacoes}
+                  disabled={executandoSeed}
+                  className="flex items-center gap-2"
+                >
+                  {executandoSeed ? "Carregando..." : "Carregar Dados de Exemplo"}
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/agendamento')}
+                >
+                  Solicitar Primeiro Voo
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-3">

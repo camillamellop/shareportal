@@ -1,4 +1,4 @@
-const CACHE_NAME = 'portal-share-brasil-v2';
+const CACHE_NAME = 'portal-share-brasil-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -17,6 +17,11 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

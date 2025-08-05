@@ -16,8 +16,8 @@ export function MainContent() {
       gradient: "from-primary to-primary-dark",
     },
     {
-      title: "Agenda & Contatos",
-      description: "Acesso à agenda de contatos",
+      title: "Acessar Portal Cliente",
+      description: "Acesso ao portal do cliente",
       icon: Calendar,
       href: "/agenda/contatos",
     },
