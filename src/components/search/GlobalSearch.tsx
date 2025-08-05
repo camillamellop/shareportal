@@ -31,7 +31,6 @@ const searchData: SearchResult[] = [
   
   // Cartões
   { id: '11', title: 'Cartão Alimentação', description: 'Saldo e gastos do vale alimentação', type: 'page', path: '/cartao/alimentacao', icon: Receipt },
-  { id: '12', title: 'Cartão Refeição', description: 'Saldo e gastos do vale refeição', type: 'page', path: '/cartao/refeicao', icon: Receipt },
   { id: '13', title: 'Cartão Combustível', description: 'Saldo e gastos do cartão combustível', type: 'page', path: '/cartao/combustivel', icon: Receipt },
   
   // Agenda

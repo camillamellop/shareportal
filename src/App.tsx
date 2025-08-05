@@ -7,7 +7,6 @@ import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import ValeAlimentacao from "./pages/ValeAlimentacao";
-import ValeRefeicao from "./pages/ValeRefeicao";
 import ValeCombustivel from "./pages/ValeCombustivel";
 import ConciliacaoBancaria from "./pages/ConciliacaoBancaria";
 import AgendaPage from "./pages/AgendaPage";
@@ -115,11 +114,6 @@ const App = () => {
             <Route path="/cartao/alimentacao" element={
               <ProtectedRoute>
                 <ValeAlimentacao />
-              </ProtectedRoute>
-            } />
-            <Route path="/cartao/refeicao" element={
-              <ProtectedRoute>
-                <ValeRefeicao />
               </ProtectedRoute>
             } />
             <Route path="/cartao/combustivel" element={
