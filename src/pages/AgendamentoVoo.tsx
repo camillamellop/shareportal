@@ -69,15 +69,18 @@ export default function AgendamentoVoo() {
   const loadData = async () => {
     try {
       setLoading(true);
+      console.log("Carregando dados do agendamento...");
       
       // Carregar aeronaves
       const aeronavesData = await aeronaveService.getAll();
+      console.log("Aeronaves carregadas:", aeronavesData.length);
       setAeronaves(aeronavesData.filter(a => a.status === 'ativa'));
 
       // Carregar minhas solicitações (simulando com cotista fixo por enquanto)
       const solicitacoes = await vooService.obterSolicitacoes({ 
         cotista: user?.email || 'cotista_demo' 
       });
+      console.log("Solicitações carregadas:", solicitacoes.length);
       setMinhasSolicitacoes(solicitacoes);
 
     } catch (error) {

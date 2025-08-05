@@ -164,6 +164,51 @@ export interface Abastecimento {
   updatedAt: Timestamp;
 }
 
+export interface Despesa {
+  categoria: string;
+  descricao: string;
+  valor: number;
+  pago_por: 'Tripulante' | 'Cotista' | 'Share Brasil';
+  comprovante_url?: string;
+}
+
+export interface RelatorioViagem {
+  id: string;
+  cotista: string;
+  aeronave: string;
+  tripulante: string;
+  destino: string;
+  data_inicio: string;
+  data_fim: string;
+  despesas: Despesa[];
+  total_combustivel: number;
+  total_hospedagem: number;
+  total_alimentacao: number;
+  total_transporte: number;
+  total_outros: number;
+  total_tripulante: number;
+  total_cotista: number;
+  total_share_brasil: number;
+  valor_total: number;
+  observacoes?: string;
+  status: 'pendente' | 'aprovado' | 'rejeitado';
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface Ressarcimento {
+  id: string;
+  relatorio_id: string;
+  tipo: 'pagar' | 'cobrar';
+  destinatario: string;
+  valor: number;
+  descricao: string;
+  status: 'pendente' | 'pago' | 'cancelado';
+  data_vencimento: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 // Serviço genérico para CRUD
 export class FirestoreService<T> {
   constructor(private collectionName: string) {}
@@ -244,6 +289,8 @@ export const fuelStationService = new FirestoreService<FuelStation>('fuelStation
 export const hotelService = new FirestoreService<Hotel>('hotels');
 export const birthdayService = new FirestoreService<Birthday>('birthdays');
 export const abastecimentoService = new FirestoreService<Abastecimento>('abastecimento');
+export const relatorioViagemService = new FirestoreService<RelatorioViagem>('relatorios_viagem');
+export const ressarcimentoService = new FirestoreService<Ressarcimento>('ressarcimentos');
 
 // Funções específicas para cada entidade
 export const userServiceSpecific = {
@@ -328,9 +375,15 @@ export const vooServiceSpecific = {
   // Buscar voos por aeronave
   async getByAeronave(aeronaveId: string): Promise<Voo[]> {
     console.log("getByAeronave chamado com aeronaveId:", aeronaveId);
-    const voos = await vooService.query([{ field: 'aeronave_id', operator: '==', value: aeronaveId }]);
-    console.log("Resultado da query getByAeronave:", voos);
-    return voos;
+    try {
+      const voos = await vooService.query([{ field: 'aeronave_id', operator: '==', value: aeronaveId }]);
+      console.log("Resultado da query getByAeronave:", voos);
+      return voos;
+    } catch (error) {
+      console.error("Erro na query getByAeronave (índice necessário):", error);
+      // Retornar lista vazia temporariamente
+      return [];
+    }
   },
   
   // Buscar voos por data
@@ -497,5 +550,98 @@ export const hotelServiceSpecific = {
       { field: 'preco_sgl', operator: '>=', value: minPrice },
       { field: 'preco_sgl', operator: '<=', value: maxPrice }
     ]);
+  }
+};
+
+export const relatorioViagemServiceSpecific = {
+  ...relatorioViagemService,
+  
+  // Buscar relatórios por tripulante
+  async getByTripulante(tripulante: string): Promise<RelatorioViagem[]> {
+    return relatorioViagemService.query([{ field: 'tripulante', operator: '==', value: tripulante }]);
+  },
+  
+  // Buscar relatórios por cotista
+  async getByCotista(cotista: string): Promise<RelatorioViagem[]> {
+    return relatorioViagemService.query([{ field: 'cotista', operator: '==', value: cotista }]);
+  },
+  
+  // Buscar relatórios por aeronave
+  async getByAeronave(aeronave: string): Promise<RelatorioViagem[]> {
+    return relatorioViagemService.query([{ field: 'aeronave', operator: '==', value: aeronave }]);
+  },
+  
+  // Buscar relatórios por status
+  async getByStatus(status: RelatorioViagem['status']): Promise<RelatorioViagem[]> {
+    return relatorioViagemService.query([{ field: 'status', operator: '==', value: status }]);
+  },
+  
+  // Buscar relatórios pendentes
+  async getPendentes(): Promise<RelatorioViagem[]> {
+    return relatorioViagemService.query([{ field: 'status', operator: '==', value: 'pendente' }]);
+  }
+};
+
+export const ressarcimentoServiceSpecific = {
+  ...ressarcimentoService,
+  
+  // Buscar ressarcimentos por relatório
+  async getByRelatorio(relatorioId: string): Promise<Ressarcimento[]> {
+    return ressarcimentoService.query([{ field: 'relatorio_id', operator: '==', value: relatorioId }]);
+  },
+  
+  // Buscar ressarcimentos por tipo
+  async getByTipo(tipo: 'pagar' | 'cobrar'): Promise<Ressarcimento[]> {
+    return ressarcimentoService.query([{ field: 'tipo', operator: '==', value: tipo }]);
+  },
+  
+  // Buscar ressarcimentos por status
+  async getByStatus(status: Ressarcimento['status']): Promise<Ressarcimento[]> {
+    return ressarcimentoService.query([{ field: 'status', operator: '==', value: status }]);
+  },
+  
+  // Buscar ressarcimentos pendentes
+  async getPendentes(): Promise<Ressarcimento[]> {
+    return ressarcimentoService.query([{ field: 'status', operator: '==', value: 'pendente' }]);
+  },
+  
+  // Criar ressarcimentos automaticamente
+  async criarRessarcimentos(relatorioId: string, totalTripulante: number, totalCotista: number): Promise<void> {
+    const ressarcimentos = [];
+    
+    // Se o tripulante pagou algo, criar ressarcimento a pagar
+    if (totalTripulante > 0) {
+      ressarcimentos.push({
+        relatorio_id: relatorioId,
+        tipo: 'pagar' as const,
+        destinatario: 'Tripulante',
+        valor: totalTripulante,
+        descricao: `Ressarcimento de despesas da viagem - Relatório ${relatorioId}`,
+        status: 'pendente' as const,
+        data_vencimento: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 dias
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+    }
+    
+    // Se o cotista pagou algo, criar ressarcimento a cobrar
+    if (totalCotista > 0) {
+      ressarcimentos.push({
+        relatorio_id: relatorioId,
+        tipo: 'cobrar' as const,
+        destinatario: 'Cotista',
+        valor: totalCotista,
+        descricao: `Cobrança de despesas da viagem - Relatório ${relatorioId}`,
+        status: 'pendente' as const,
+        data_vencimento: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 dias
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+    }
+    
+    // Criar todos os ressarcimentos
+    for (const ressarcimento of ressarcimentos) {
+      await ressarcimentoService.create(ressarcimento);
+    }
   }
 }; 

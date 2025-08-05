@@ -20,8 +20,10 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
   const loadNotificacoes = async () => {
     try {
       setLoading(true);
-      const notifs = await vooService.obterNotificacoes(userId, userType);
-      setNotificacoes(notifs);
+      // Temporariamente desabilitado devido a erro de índice
+      // const notifs = await vooService.obterNotificacoes(userId, userType);
+      // setNotificacoes(notifs);
+      setNotificacoes([]); // Lista vazia temporariamente
     } catch (error) {
       console.error("Erro ao carregar notificações:", error);
     } finally {

@@ -132,23 +132,27 @@ export function Header() {
       </div>
 
       {/* Barra de Pesquisa Central */}
-      <GlobalSearch />
+      <div className="hidden md:block flex-1 max-w-md mx-4">
+        <GlobalSearch />
+      </div>
 
       {/* Área de Status e Perfil */}
       <div className="flex items-center space-x-2 lg:space-x-4">
         {/* Widget de Clima */}
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <WeatherWidget />
         </div>
 
         {/* Notificações de Voo */}
-        <NotificacaoVoos 
-          userId={user?.email || 'demo_user'} 
-          userType="coordenador" 
-        />
+        <div className="hidden sm:block">
+          <NotificacaoVoos 
+            userId={user?.email || 'demo_user'} 
+            userType="coordenador" 
+          />
+        </div>
 
         {/* Localização */}
-        <div className="hidden lg:flex items-center space-x-2 text-sm">
+        <div className="hidden xl:flex items-center space-x-2 text-sm">
           <MapPin className="h-4 w-4 text-primary" />
           <span className="text-muted-foreground">São Paulo</span>
         </div>

@@ -1,9 +1,25 @@
-import { Clock, Calendar, Plane, MapPin, Users, Settings, Wrench, CheckCircle, FileText, Fuel, AlertTriangle, Tool } from "lucide-react";
+import { Clock, Calendar, Plane, MapPin, Users, Settings, Wrench, CheckCircle, FileText, Fuel, AlertTriangle, WrenchIcon, Folder, Plus, Edit2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+interface DocumentFolder {
+  id: string;
+  name: string;
+  documents: DocumentFile[];
+  isEditing: boolean;
+}
+
+interface DocumentFile {
+  id: string;
+  name: string;
+  size: string;
+  uploadedAt: Date;
+  url: string;
+}
 
 export function RightSidebar() {
   const navigate = useNavigate();
@@ -19,6 +35,43 @@ export function RightSidebar() {
     month: 'long',
     day: 'numeric'
   }));
+
+  const [documentFolders, setDocumentFolders] = useState<DocumentFolder[]>([
+    {
+      id: '1',
+      name: 'Manuais Técnicos',
+      documents: [
+        {
+          id: 'doc1',
+          name: 'Manual_Citation_CJ3.pdf',
+          size: '2.5 MB',
+          uploadedAt: new Date('2024-01-15'),
+          url: '#'
+        }
+      ],
+      isEditing: false
+    },
+    {
+      id: '2',
+      name: 'Certificações',
+      documents: [
+        {
+          id: 'doc2',
+          name: 'Cert_ANAC_2024.pdf',
+          size: '1.8 MB',
+          uploadedAt: new Date('2024-01-10'),
+          url: '#'
+        }
+      ],
+      isEditing: false
+    },
+    {
+      id: '3',
+      name: 'Relatórios de Voo',
+      documents: [],
+      isEditing: false
+    }
+  ]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -38,6 +91,58 @@ export function RightSidebar() {
 
     return () => clearInterval(timer);
   }, []);
+
+  const addNewFolder = () => {
+    const newFolder: DocumentFolder = {
+      id: `folder_${Date.now()}`,
+      name: 'Nova Pasta',
+      documents: [],
+      isEditing: true
+    };
+    setDocumentFolders(prev => [...prev, newFolder]);
+  };
+
+  const updateFolderName = (folderId: string, newName: string) => {
+    setDocumentFolders(prev => 
+      prev.map(folder => 
+        folder.id === folderId 
+          ? { ...folder, name: newName, isEditing: false }
+          : folder
+      )
+    );
+  };
+
+  const toggleFolderEdit = (folderId: string) => {
+    setDocumentFolders(prev => 
+      prev.map(folder => 
+        folder.id === folderId 
+          ? { ...folder, isEditing: !folder.isEditing }
+          : folder
+      )
+    );
+  };
+
+  const deleteFolder = (folderId: string) => {
+    setDocumentFolders(prev => prev.filter(folder => folder.id !== folderId));
+  };
+
+  const handleFileUpload = (folderId: string, file: File) => {
+    const newDocument: DocumentFile = {
+      id: `doc_${Date.now()}`,
+      name: file.name,
+      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+      uploadedAt: new Date(),
+      url: URL.createObjectURL(file)
+    };
+
+    setDocumentFolders(prev => 
+      prev.map(folder => 
+        folder.id === folderId 
+          ? { ...folder, documents: [...folder.documents, newDocument] }
+          : folder
+      )
+    );
+  };
 
   const flightOperations = [{
     label: "Solicitar Voo",
@@ -70,6 +175,7 @@ export function RightSidebar() {
     color: "accent",
     onClick: () => navigate("/documentos")
   }];
+
   const aircraftMaintenance = [
     {
       registration: "PR-MDL",
@@ -98,51 +204,6 @@ export function RightSidebar() {
       hours: 890,
       priority: "normal"
     },
-    {
-      registration: "PT-JPK",
-      model: "Legacy 650",
-      status: "active",
-      lastMaintenance: "2024-10-15",
-      nextMaintenance: "2025-01-15",
-      hours: 1850,
-      priority: "urgent"
-    },
-    {
-      registration: "PT-OJG",
-      model: "Citation Latitude",
-      status: "maintenance",
-      lastMaintenance: "2024-12-10",
-      nextMaintenance: "2025-01-10",
-      hours: 1450,
-      priority: "urgent"
-    },
-    {
-      registration: "PT-RVJ",
-      model: "Falcon 2000",
-      status: "active",
-      lastMaintenance: "2024-11-05",
-      nextMaintenance: "2025-02-05",
-      hours: 3200,
-      priority: "normal"
-    },
-    {
-      registration: "PT-WSR",
-      model: "Citation XLS+",
-      status: "active",
-      lastMaintenance: "2024-12-20",
-      nextMaintenance: "2025-03-20",
-      hours: 1100,
-      priority: "normal"
-    },
-    {
-      registration: "PT-TOR",
-      model: "King Air 250",
-      status: "active",
-      lastMaintenance: "2024-11-30",
-      nextMaintenance: "2025-02-28",
-      hours: 950,
-      priority: "normal"
-    }
   ];
 
   const getStatusColor = (status: string) => {
@@ -150,7 +211,9 @@ export function RightSidebar() {
       case 'active':
         return 'bg-green-100 text-green-800 border-green-300';
       case 'maintenance':
-        return 'bg-orange-100 text-orange-800 border-orange-300';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'inactive':
+        return 'bg-red-100 text-red-800 border-red-300';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-300';
     }
@@ -158,121 +221,208 @@ export function RightSidebar() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent':
-        return 'text-red-600';
+      case 'high':
+        return 'bg-red-100 text-red-800 border-red-300';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
       case 'normal':
-        return 'text-green-600';
+        return 'bg-green-100 text-green-800 border-green-300';
       default:
-        return 'text-gray-600';
+        return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   };
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case 'urgent':
-        return AlertTriangle;
+      case 'high':
+        return <AlertTriangle className="w-4 h-4" />;
+      case 'medium':
+        return <Wrench className="w-4 h-4" />;
       case 'normal':
-        return CheckCircle;
+        return <CheckCircle className="w-4 h-4" />;
       default:
-        return Tool;
+        return <CheckCircle className="w-4 h-4" />;
     }
   };
-  return <aside className="w-80 bg-background border-l border-border p-4 space-y-6">
-      {/* Horário do Sistema */}
-      <Card className="bg-gradient-card border-border shadow-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-            <Clock className="mr-2 h-4 w-4 text-primary" />
-            Horário do Sistema
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-primary mb-1">{currentTime}</div>
-            <div className="text-sm text-muted-foreground capitalize">{currentDate}</div>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Operações de Voo */}
-      <Card className="bg-gradient-card border-border shadow-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-foreground flex items-center">
-            <Plane className="mr-2 h-4 w-4 text-primary" />
-            Operações de Voo
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0 space-y-2">
-          {flightOperations.map((operation, index) => <Button key={index} variant="outline" className="w-full justify-start border-border hover:bg-accent hover:border-primary transition-smooth" onClick={operation.onClick}>
-              <operation.icon className="mr-3 h-4 w-4 text-primary" />
-              <span className="text-sm">{operation.label}</span>
-            </Button>)}
-        </CardContent>
-      </Card>
+  return (
+    <aside className="hidden xl:block w-80 bg-background border-l border-border shadow-card min-h-screen">
+      <div className="p-4 space-y-6">
+        {/* Relógio e Data */}
+        <Card className="bg-gradient-card border-border">
+          <CardContent className="p-4">
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <Clock className="w-5 h-5 text-primary" />
+                <span className="text-2xl font-bold text-foreground">{currentTime}</span>
+              </div>
+              <p className="text-sm text-muted-foreground">{currentDate}</p>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Painel de Manutenções */}
-      <Card className="bg-gradient-card border-border shadow-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-foreground flex items-center">
-            <Wrench className="mr-2 h-4 w-4 text-primary" />
-            Painel de Manutenções
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0 space-y-3">
-          <div className="text-xs text-muted-foreground mb-2">
-            {aircraftMaintenance.filter(a => a.priority === 'urgent').length} aeronaves com manutenção urgente
-          </div>
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {aircraftMaintenance.map((aircraft, index) => {
-              const PriorityIcon = getPriorityIcon(aircraft.priority);
-              return (
-                <div key={index} className="p-3 border border-border rounded-lg hover:bg-accent/20 transition-smooth">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center">
-                      <Plane className="mr-2 h-4 w-4 text-primary" />
-                      <span className="font-medium text-sm">{aircraft.registration}</span>
-                    </div>
-                    <Badge className={`text-xs ${getStatusColor(aircraft.status)}`}>
-                      {aircraft.status === 'active' ? 'Ativa' : 'Manutenção'}
-                    </Badge>
+        {/* Operações de Voo */}
+        <Card className="bg-gradient-card border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Plane className="w-5 h-5 text-primary" />
+              Operações de Voo
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {flightOperations.map((operation, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="w-full justify-start border-border hover:bg-accent hover:border-primary transition-colors"
+                onClick={operation.onClick}
+              >
+                <operation.icon className="mr-3 h-4 w-4" />
+                {operation.label}
+              </Button>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Manutenção de Aeronaves */}
+        <Card className="bg-gradient-card border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <WrenchIcon className="w-5 h-5 text-primary" />
+              Manutenção de Aeronaves
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {aircraftMaintenance.map((aircraft, index) => (
+              <div key={index} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-foreground">{aircraft.registration}</h4>
+                  <Badge className={getStatusColor(aircraft.status)}>
+                    {aircraft.status === 'active' ? 'Ativo' : 'Manutenção'}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">{aircraft.model}</p>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{aircraft.hours}h</span>
+                  <div className="flex items-center gap-1">
+                    {getPriorityIcon(aircraft.priority)}
+                    <span className={getPriorityColor(aircraft.priority).split(' ')[1]}>
+                      {aircraft.priority === 'normal' ? 'Normal' : 'Urgente'}
+                    </span>
                   </div>
-                  
-                  <div className="text-xs text-muted-foreground mb-2">
-                    {aircraft.model}
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="text-muted-foreground">Horas:</span>
-                      <span className="ml-1 font-medium">{aircraft.hours}h</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Próxima:</span>
-                      <span className="ml-1 font-medium">{new Date(aircraft.nextMaintenance).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center">
-                      <PriorityIcon className={`h-3 w-3 mr-1 ${getPriorityColor(aircraft.priority)}`} />
-                      <span className={`text-xs ${getPriorityColor(aircraft.priority)}`}>
-                        {aircraft.priority === 'urgent' ? 'Urgente' : 'Normal'}
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Documentos */}
+        <Card className="bg-gradient-card border-border">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                Documentos
+              </CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={addNewFolder}
+                className="h-8 px-2"
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {documentFolders.map((folder) => (
+              <div key={folder.id} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 flex-1">
+                    <Folder className="h-4 w-4 text-muted-foreground" />
+                    {folder.isEditing ? (
+                      <Input
+                        value={folder.name}
+                        onChange={(e) => updateFolderName(folder.id, e.target.value)}
+                        onBlur={() => toggleFolderEdit(folder.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            toggleFolderEdit(folder.id);
+                          }
+                        }}
+                        className="h-6 text-sm"
+                        autoFocus
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-foreground truncate">
+                        {folder.name}
                       </span>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-6 px-2 text-xs"
-                      onClick={() => navigate(`/manutencao/${aircraft.registration}`)}
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toggleFolderEdit(folder.id)}
+                      className="h-6 w-6 p-0"
+                      title="Editar nome"
                     >
-                      Detalhes
+                      <Edit2 className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteFolder(folder.id)}
+                      className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                      title="Excluir pasta"
+                    >
+                      <X className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </aside>;
+                
+                <div className="space-y-2">
+                  {folder.documents.length > 0 ? (
+                    folder.documents.map((doc) => (
+                      <div key={doc.id} className="flex items-center gap-2 p-2 bg-background rounded text-xs">
+                        <FileText className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-muted-foreground truncate flex-1">{doc.name}</span>
+                        <span className="text-muted-foreground">{doc.size}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-2 text-xs text-muted-foreground">
+                      Nenhum documento
+                    </div>
+                  )}
+                  
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id={`upload-${folder.id}`}
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleFileUpload(folder.id, file);
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={`upload-${folder.id}`}
+                      className="flex items-center justify-center gap-1 w-full h-8 px-2 border border-border rounded bg-background hover:bg-accent transition-colors cursor-pointer text-xs text-muted-foreground"
+                    >
+                      <Upload className="h-3 w-3" />
+                      Anexar
+                    </label>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    </aside>
+  );
 }

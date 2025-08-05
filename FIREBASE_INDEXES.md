@@ -1,80 +1,68 @@
-# Índices do Firestore - Portal Share Brasil
+# 🔧 Índices do Firebase Necessários
 
-## Problema Identificado
+## ❌ **Problema Atual**
+O sistema está apresentando erros de índices compostos necessários no Firestore.
 
-O Firestore requer índices compostos para queries que combinam filtros com ordenação. O erro encontrado foi:
+## ✅ **Solução: Criar Índices**
 
+### **1. Acesse o Firebase Console**
+- URL: https://console.firebase.google.com
+- Projeto: `aeroportal-brasil`
+- Vá para: **Firestore Database > Índices**
+
+### **2. Índices Necessários**
+
+#### **Índice 1: Voos por Aeronave**
 ```
-The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/aeroportal-brasil/firestore/indexes?create_composite=Clxwcm9qZWN0cy9hZXJvcG9ydGFsLWJyYXNpbC9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvZGVzcGVzYXNfcGVuZGVudGVzL2luZGV4ZXMvXxABGg0KCWNhdGVnb3JpYRABGg0KCWNyZWF0ZWRBdBACGgwKCF9fbmFtZV9fEAI
-```
-
-## Solução Temporária
-
-Removemos a ordenação do servidor e implementamos ordenação no cliente para evitar o erro de índice.
-
-**✅ ATUALIZAÇÃO: Os índices foram criados e a ordenação no servidor foi reativada!**
-
-## Solução Permanente - Criar Índices
-
-### 1. Acesse o Firebase Console
-- Vá para: https://console.firebase.google.com/
-- Selecione o projeto: `aeroportal-brasil`
-- Navegue para: Firestore Database > Índices
-
-### 2. Índices Necessários
-
-#### Índice para Despesas Pendentes
-- **Coleção**: `despesas_pendentes`
-- **Campos**:
-  - `categoria` (Ascending)
-  - `createdAt` (Descending)
-- **Tipo**: Composto
-
-#### Índice para Despesas Pendentes com Status
-- **Coleção**: `despesas_pendentes`
-- **Campos**:
-  - `categoria` (Ascending)
-  - `status` (Ascending)
-  - `createdAt` (Descending)
-- **Tipo**: Composto
-
-### 3. Como Criar
-
-1. Clique em "Criar índice"
-2. Selecione a coleção: `despesas_pendentes`
-3. Adicione os campos na ordem correta
-4. Defina a direção (Ascending/Descending)
-5. Clique em "Criar"
-
-### 4. Aguardar Criação
-
-Os índices podem levar alguns minutos para serem criados. Você pode verificar o status na aba "Índices".
-
-### 5. Após Criação dos Índices
-
-✅ **CONCLUÍDO**: Os índices foram criados e a ordenação no servidor foi reativada no arquivo `src/services/conciliacaoService.ts`:
-
-```typescript
-let q = query(
-  collection(db, this.despesasCollection),
-  orderBy('createdAt', 'desc')
-);
+Coleção: voos
+Campos:
+- aeronave_id (Ascending)
+- data (Descending)
 ```
 
-## Outros Índices que podem ser necessários
+#### **Índice 2: Notificações por Tipo**
+```
+Coleção: notificacoes
+Campos:
+- tipo (Ascending)
+- createdAt (Descending)
+```
 
-### Movimentações Bancárias
-- **Coleção**: `movimentacoes_bancarias`
-- **Campos**:
-  - `categoria` (Ascending)
-  - `createdAt` (Descending)
+#### **Índice 3: Voos por Período**
+```
+Coleção: voos
+Campos:
+- data (Ascending)
+- aeronave_id (Ascending)
+```
 
-### Lançamentos Manuais
-- **Coleção**: `lancamentos_manuais`
-- **Campos**:
-  - `categoria` (Ascending)
-  - `createdAt` (Descending)
+### **3. Como Criar**
 
-## Nota Importante
+1. **Clique em "Adicionar Índice"**
+2. **Selecione a coleção** (voos ou notificacoes)
+3. **Adicione os campos** na ordem especificada
+4. **Clique em "Criar"**
 
-Sempre que você adicionar novos filtros ou ordenações em queries do Firestore, verifique se os índices necessários existem. O Firebase Console mostrará links diretos para criar os índices necessários quando ocorrerem erros. 
+### **4. Tempo de Criação**
+- ⏱️ **2-5 minutos** para índices pequenos
+- ⏱️ **5-15 minutos** para índices grandes
+
+### **5. Verificação**
+Após criar os índices:
+1. Aguarde a mensagem "Índice criado com sucesso"
+2. Teste o upload da foto novamente
+3. Verifique se os erros desapareceram
+
+### **6. Solução Temporária**
+Enquanto os índices são criados, as consultas problemáticas foram desabilitadas temporariamente:
+- ✅ Notificações: retornam lista vazia
+- ✅ Voos por aeronave: retornam lista vazia
+
+### **7. Reativar Após Índices**
+Após criar os índices, reative as consultas removendo os comentários em:
+- `src/components/shared/NotificacaoVoos.tsx`
+- `src/services/firestore.ts`
+
+---
+
+**⚠️ IMPORTANTE**: Os índices são necessários para consultas compostas no Firestore. Sem eles, as consultas falham. 

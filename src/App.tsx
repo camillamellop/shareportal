@@ -15,7 +15,8 @@ import Contatos from "./pages/agenda/Contatos";
 import Aniversarios from "./pages/Aniversarios";
 import ConfigEmpresa from "./pages/financeiro/ConfigEmpresa";
 import EmissaoRecibo from "./pages/financeiro/EmissaoRecibo";
-import RelatorioViagem from "./pages/financeiro/RelatorioViagem";
+import RelatoriosViagem from "./pages/RelatoriosViagem";
+
 import Cobranca from "./pages/financeiro/Cobranca";
 import SolicitacaoCompras from "./pages/financeiro/SolicitacaoCompras";
 import Recados from "./pages/Recados";
@@ -96,9 +97,9 @@ const App = () => {
                 <EmissaoRecibo />
               </ProtectedRoute>
             } />
-            <Route path="/financeiro/viagem" element={
+            <Route path="/financeiro/relatorios-viagem" element={
               <ProtectedRoute>
-                <RelatorioViagem />
+                <RelatoriosViagem />
               </ProtectedRoute>
             } />
             <Route path="/financeiro/cobranca" element={
