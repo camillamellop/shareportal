@@ -1,9 +1,10 @@
-const CACHE_NAME = 'portal-share-brasil-v3';
+const CACHE_NAME = 'portal-share-brasil-v4';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.ico'
+  '/favicon.ico',
+  '/icon.svg'
 ];
 
 self.addEventListener('install', (event) => {
