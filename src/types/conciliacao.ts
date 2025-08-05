@@ -18,8 +18,8 @@ export interface DespesaPendente {
   data_pagamento?: string;
   conta_bancaria?: string;
   forma_pagamento?: 'pix' | 'ted' | 'doc' | 'cheque' | 'dinheiro';
-  createdAt: any;
-  updatedAt: any;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface MovimentacaoBancaria {
@@ -34,7 +34,7 @@ export interface MovimentacaoBancaria {
   despesa_id?: string; // Vinculação com despesa
   conciliado: boolean;
   observacoes?: string;
-  createdAt: any;
+  createdAt: Date | string;
 }
 
 export interface LancamentoManual {
@@ -49,8 +49,8 @@ export interface LancamentoManual {
   observacoes?: string;
   arquivos?: string[];
   gerar_despesa: boolean; // Se deve gerar uma despesa pendente
-  createdAt: any;
-  updatedAt: any;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface ConciliacaoRelatorio {

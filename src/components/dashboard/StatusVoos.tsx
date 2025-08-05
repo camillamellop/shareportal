@@ -32,10 +32,6 @@ export function StatusVoos({ userType = 'cotista' }: StatusVoosProps) {
     concluidos: 0
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
     try {
       setLoading(true);
@@ -70,6 +66,10 @@ export function StatusVoos({ userType = 'cotista' }: StatusVoosProps) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadData();
+  }, [userType, loadData]);
 
   const getStatusBadge = (status: string) => {
     const config = STATUS_VOO_CONFIG[status];

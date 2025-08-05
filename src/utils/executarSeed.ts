@@ -2,7 +2,9 @@ import { seedAeronaves } from "./seedAeronaves";
 import { seedVoos } from "./seedVoos";
 import { seedBirthdays } from "./seedBirthdays";
 import { seedHotels } from "./seedHotels";
+import { seedTripulacao } from "./seedTripulacao";
 import { aeronaveService, vooService, birthdayService, hotelService } from "@/services/firestore";
+import { tripulacaoService } from "@/services/tripulacaoService";
 
 export const executarSeedCompleto = async () => {
   try {
@@ -23,6 +25,9 @@ export const executarSeedCompleto = async () => {
     
     // Executar seed de hotéis
     await seedHotels();
+    
+    // Executar seed de tripulação
+    await seedTripulacao();
     
     console.log("=== SEED COMPLETO FINALIZADO ===");
   } catch (error) {
@@ -60,6 +65,13 @@ export const limparDadosExistentes = async () => {
       await hotelService.delete(hotel.id);
     }
     console.log("Hotéis limpos");
+    
+    // Limpar tripulação
+    const tripulantes = await tripulacaoService.buscarTripulantes();
+    for (const tripulante of tripulantes) {
+      await tripulacaoService.excluirTripulante(tripulante.id!);
+    }
+    console.log("Tripulação limpa");
   } catch (error) {
     console.error("Erro ao limpar dados:", error);
   }

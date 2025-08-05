@@ -10,7 +10,7 @@ import {
   serverTimestamp,
   getDoc
 } from 'firebase/firestore';
-import { db } from '@/config/firebase';
+import { db } from '@/integrations/firebase/config';
 import { SolicitacaoVoo, PlanoVoo, NotificacaoVoo } from '@/types/voo';
 
 export class VooService {

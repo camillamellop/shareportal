@@ -10,7 +10,7 @@ import {
   serverTimestamp,
   getDoc
 } from 'firebase/firestore';
-import { db } from '@/config/firebase';
+import { db } from '@/integrations/firebase/config';
 import { DespesaPendente, MovimentacaoBancaria, LancamentoManual, ConciliacaoRelatorio } from '@/types/conciliacao';
 
 export class ConciliacaoService {
@@ -54,10 +54,13 @@ export class ConciliacaoService {
       }
 
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({
+      
+      const result = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       } as DespesaPendente));
+      
+      return result;
     } catch (error) {
       console.error('Erro ao obter despesas pendentes:', error);
       throw error;

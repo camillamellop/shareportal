@@ -47,10 +47,10 @@ export function DiarioBordoCard({
 
   return (
     <Card 
-      className="bg-card border-border shadow-card hover:shadow-lg transition-all duration-300 cursor-pointer group"
+      className="bg-card border-border shadow-card hover:shadow-lg transition-all duration-300 cursor-pointer group h-full"
       onClick={onClick}
     >
-      <CardContent className="p-4">
+      <CardContent className="p-4 h-full flex flex-col">
         {/* Header com ícone e matrícula */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -65,7 +65,7 @@ export function DiarioBordoCard({
         </div>
 
         {/* Informações do diário */}
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2 mb-4 flex-1">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="w-4 h-4" />
             <span>Diário {anoDiario}</span>
@@ -76,10 +76,10 @@ export function DiarioBordoCard({
           </div>
         </div>
 
-        {/* Status */}
-        <div className="flex justify-end">
+        {/* Status - posicionado no final */}
+        <div className="flex justify-end mt-auto">
           <Badge 
-            className={`${getStatusColor(status)} text-white font-semibold px-3 py-1 rounded-md`}
+            className={`${getStatusColor(status)} text-white font-semibold px-3 py-1 rounded-md text-xs`}
           >
             {getStatusText(status)}
           </Badge>

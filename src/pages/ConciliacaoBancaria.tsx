@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,66 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Filter, Download } from "lucide-react";
 import { ConciliacaoClientes } from "@/components/conciliacao/ConciliacaoClientes";
 import { ConciliacaoColaborador } from "@/components/conciliacao/ConciliacaoColaborador";
+import { toast } from "sonner";
+import { db, auth } from "@/integrations/firebase/config";
+import { collection, getDocs } from "firebase/firestore";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ConciliacaoBancaria() {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
+  const [firebaseStatus, setFirebaseStatus] = useState<string>("Verificando...");
+  const { user, loading } = useAuth();
+
+  // Teste de conexão com Firebase
+  useEffect(() => {
+    const testFirebaseConnection = async () => {
+      try {
+        console.log("Testando conexão com Firebase...");
+        console.log("Status da autenticação:", user ? "Logado" : "Não logado");
+        console.log("Usuário:", user);
+        
+        const testCollection = collection(db, 'test');
+        await getDocs(testCollection);
+        console.log("Conexão com Firebase OK");
+        setFirebaseStatus("Conectado");
+        toast.success("Conexão com Firebase estabelecida");
+      } catch (error) {
+        console.error("Erro na conexão com Firebase:", error);
+        setFirebaseStatus("Erro na conexão");
+        toast.error(`Erro na conexão com Firebase: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      }
+    };
+
+    if (!loading) {
+      testFirebaseConnection();
+    }
+  }, [user, loading]);
 
   return (
     <Layout>
       <div className="p-4 lg:p-6 space-y-6">
+        {/* Status do Firebase */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Status do Firebase</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p className="text-sm">
+                Conexão: <span className={firebaseStatus === "Conectado" ? "text-green-600" : "text-red-600"}>{firebaseStatus}</span>
+              </p>
+              <p className="text-sm">
+                Autenticação: <span className={user ? "text-green-600" : "text-red-600"}>{user ? "Logado" : "Não logado"}</span>
+              </p>
+              {user && (
+                <p className="text-sm">
+                  Usuário ID: <span className="text-blue-600">{user.uid}</span>
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>

@@ -13,8 +13,8 @@ export interface SolicitacaoVoo {
   observacoes?: string;
   status: 'solicitado' | 'aprovado' | 'programado' | 'em_andamento' | 'concluido' | 'cancelado';
   prioridade: 'baixa' | 'media' | 'alta' | 'urgente';
-  createdAt: any;
-  updatedAt: any;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface PlanoVoo {
@@ -31,8 +31,8 @@ export interface PlanoVoo {
   combustivel_estimado: number;
   observacoes_coordenador?: string;
   status: 'programado' | 'confirmado' | 'em_andamento' | 'concluido' | 'cancelado';
-  createdAt: any;
-  updatedAt: any;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface NotificacaoVoo {
@@ -45,7 +45,7 @@ export interface NotificacaoVoo {
   destinatario_tipo: 'coordenador' | 'cotista' | 'piloto';
   destinatario_id: string;
   lida: boolean;
-  createdAt: any;
+  createdAt: Date | string;
 }
 
 export interface StatusVoo {

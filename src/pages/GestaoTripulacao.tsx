@@ -4,36 +4,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { TripulacaoCard } from "@/components/tripulacao/TripulacaoCard";
-import { TripulanteModal } from "@/components/tripulacao/TripulanteModal";
 import { Plus, Search, Users } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { tripulacaoService } from "@/services/tripulacaoService";
 
-interface Tripulante {
-  id: string;
-  nome: string;
-  cargo: string;
-  cpf: string;
-  telefone: string;
-  email: string;
-  cht: {
-    numero: string;
-    vencimento: string;
-    status: 'valido' | 'vencido' | 'proximo_vencimento';
-  };
-  cma: {
-    numero: string;
-    vencimento: string;
-    status: 'valido' | 'vencido' | 'proximo_vencimento';
-  };
-  foto?: string;
-  status: 'ativo' | 'inativo' | 'afastado';
-}
+import { Tripulante } from "@/services/tripulacaoService";
 
 const mockTripulantes: Tripulante[] = [];
 
 export default function GestaoTripulacao() {
-  const [tripulantes] = useState<Tripulante[]>(mockTripulantes);
+  const [tripulantes, setTripulantes] = useState<Tripulante[]>(mockTripulantes);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Carregar tripulantes do Firebase ao montar o componente
+  useEffect(() => {
+    const carregarTripulantes = async () => {
+      try {
+        setLoading(true);
+        const tripulantesFirebase = await tripulacaoService.buscarTripulantes();
+        setTripulantes(tripulantesFirebase);
+        console.log("Tripulantes carregados do Firebase:", tripulantesFirebase);
+      } catch (error) {
+        console.error("Erro ao carregar tripulantes do Firebase:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarTripulantes();
+  }, []);
 
   const filteredTripulantes = tripulantes.filter(tripulante =>
     tripulante.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -42,31 +42,47 @@ export default function GestaoTripulacao() {
   );
 
   function getStatusCounts() {
-    const chtVencidos = tripulantes.filter(t => t.cht.status === 'vencido').length;
-    const cmaVencidos = tripulantes.filter(t => t.cma.status === 'vencido').length;
-    const chtProximoVenc = tripulantes.filter(t => t.cht.status === 'proximo_vencimento').length;
-    const cmaProximoVenc = tripulantes.filter(t => t.cma.status === 'proximo_vencimento').length;
+    const chtVencidos = tripulantes.filter(t => t.cht?.status === 'vencido').length;
+    const cmaVencidos = tripulantes.filter(t => t.cma?.status === 'vencido').length;
+    const chtProximoVenc = tripulantes.filter(t => t.cht?.status === 'proximo_vencimento').length;
+    const cmaProximoVenc = tripulantes.filter(t => t.cma?.status === 'proximo_vencimento').length;
 
     return { chtVencidos, cmaVencidos, chtProximoVenc, cmaProximoVenc };
   }
 
   const { chtVencidos, cmaVencidos, chtProximoVenc, cmaProximoVenc } = getStatusCounts();
 
+  if (loading) {
+    return (
+      <Layout>
+        <div className="max-w-7xl mx-auto p-6">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-6"></div>
+              <p className="text-lg text-muted-foreground font-medium">Carregando tripulantes...</p>
+              <p className="text-sm text-muted-foreground mt-2">Aguarde enquanto buscamos os dados</p>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Gestão de Tripulação</h1>
             <p className="text-muted-foreground mt-2">
               Gerencie os dados e vencimentos da sua equipe
             </p>
           </div>
-          <TripulanteModal />
         </div>
 
         {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -123,10 +139,10 @@ export default function GestaoTripulacao() {
         </div>
 
         {/* Filtros e Busca */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Tripulantes</CardTitle>
+        <Card className="shadow-sm">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <CardTitle className="text-xl">Tripulantes</CardTitle>
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -134,25 +150,25 @@ export default function GestaoTripulacao() {
                     placeholder="Buscar tripulante..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64"
+                    className="pl-10 w-full sm:w-64"
                   />
                 </div>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredTripulantes.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-muted-foreground">
-                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg mb-2">Nenhum tripulante cadastrado</p>
-                  <p className="text-sm">Clique em "Novo Tripulante" para começar</p>
-                </div>
-              ) : (
-                filteredTripulantes.map((tripulante) => (
-                  <TripulacaoCard key={tripulante.id} tripulante={tripulante} />
-                ))
-              )}
+                     <CardContent className="pt-0">
+             <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8">
+                             {filteredTripulantes.length === 0 ? (
+                                   <div className="col-span-full text-center py-16 text-muted-foreground">
+                    <Users className="h-16 w-16 mx-auto mb-6 opacity-50" />
+                    <p className="text-xl font-medium mb-3">Nenhum tripulante encontrado</p>
+                    <p className="text-sm max-w-md mx-auto">Não há tripulantes cadastrados no sistema</p>
+                  </div>
+               ) : (
+                 filteredTripulantes.map((tripulante) => (
+                   <TripulacaoCard key={tripulante.id} tripulante={tripulante} />
+                 ))
+               )}
             </div>
           </CardContent>
         </Card>

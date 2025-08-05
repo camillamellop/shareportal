@@ -6,15 +6,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Cake, Users, Plus, Trash2, Edit, Settings } from "lucide-react";
+import { Calendar, Cake, Users, Plus, Trash2, Edit, Settings, Gift, Building, User } from "lucide-react";
 import { useState, useEffect } from "react";
+import { seedBirthdays } from "@/utils/seedBirthdays";
+import { birthdayService } from "@/services/firestore";
+import { toast } from "sonner";
 
 interface Contact {
   id: string;
   nome: string;
   data_aniversario: string;
-  empresa: string;
-  categoria: string;
+  empresa?: string;
+  categoria: "Colaborador" | "Cliente";
 }
 
 export default function Aniversarios() {
@@ -25,6 +28,43 @@ export default function Aniversarios() {
   const [showColaboradores, setShowColaboradores] = useState(false);
   const [showProximos7Dias, setShowProximos7Dias] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>("Todos");
+  const [executandoSeed, setExecutandoSeed] = useState(false);
+  const [aniversariosFirebase, setAniversariosFirebase] = useState<any[]>([]);
+
+  // Função para executar seed de aniversários
+  const executarSeedAniversarios = async () => {
+    setExecutandoSeed(true);
+    try {
+      console.log("Executando seed de aniversários...");
+      await seedBirthdays();
+      toast.success("Aniversários carregados no Firebase com sucesso!");
+      
+      // Recarregar aniversários do Firebase
+      await carregarAniversariosFirebase();
+    } catch (error) {
+      console.error("Erro ao executar seed:", error);
+      toast.error("Erro ao carregar aniversários no Firebase");
+    } finally {
+      setExecutandoSeed(false);
+    }
+  };
+
+  // Função para carregar aniversários do Firebase
+  const carregarAniversariosFirebase = async () => {
+    try {
+      const aniversarios = await birthdayService.getAll();
+      setAniversariosFirebase(aniversarios);
+      console.log("Aniversários carregados do Firebase:", aniversarios);
+    } catch (error) {
+      console.error("Erro ao carregar aniversários do Firebase:", error);
+    }
+  };
+
+  // Carregar aniversários do Firebase ao montar o componente
+  useEffect(() => {
+    carregarAniversariosFirebase();
+  }, []);
+
   const [newContact, setNewContact] = useState({
     nome: "",
     data_aniversario: "",

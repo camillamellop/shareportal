@@ -9,7 +9,7 @@ import {
   uploadBytes, 
   getDownloadURL 
 } from 'firebase/storage';
-import { db, storage } from '@/config/firebase';
+import { db, storage } from '@/integrations/firebase/config';
 
 export interface ConfigEmpresa {
   razaoSocial: string;

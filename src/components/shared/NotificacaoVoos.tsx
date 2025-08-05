@@ -17,15 +17,6 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
   const [showNotificacoes, setShowNotificacoes] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadNotificacoes();
-    
-    // Polling para novas notificações a cada 30 segundos
-    const interval = setInterval(loadNotificacoes, 30000);
-    
-    return () => clearInterval(interval);
-  }, [userId, userType]);
-
   const loadNotificacoes = async () => {
     try {
       setLoading(true);
@@ -37,6 +28,15 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadNotificacoes();
+    
+    // Polling para novas notificações a cada 30 segundos
+    const interval = setInterval(loadNotificacoes, 30000);
+    
+    return () => clearInterval(interval);
+  }, [userId, userType, loadNotificacoes]);
 
   const handleMarcarComoLida = async (id: string) => {
     try {
@@ -68,7 +68,7 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
     }
   };
 
-  const formatTimeAgo = (timestamp: any) => {
+  const formatTimeAgo = (timestamp: Date | string | { toDate: () => Date }) => {
     if (!timestamp) return '';
     
     const now = new Date();
