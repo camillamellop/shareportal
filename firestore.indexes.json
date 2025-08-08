@@ -1,0 +1,62 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "voos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "aeronave_id", "order": "ASCENDING"},
+        {"fieldPath": "data", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "voos",
+      "queryScope": "COLLECTION", 
+      "fields": [
+        {"fieldPath": "pic_anac", "order": "ASCENDING"},
+        {"fieldPath": "data", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "voos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "data", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "tasks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "assignedTo", "order": "ASCENDING"},
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "dueDate", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "messages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "recipients", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "relatorios_viagem",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "ressarcimentos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "relatorio_id", "order": "ASCENDING"},
+        {"fieldPath": "status", "order": "ASCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
