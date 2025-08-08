@@ -454,7 +454,11 @@ export default function AdicionarVoo() {
                         <SelectValue placeholder="Selecione o copiloto..." />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-800 border-slate-700 text-white">
+<<<<<<< HEAD
                         <SelectItem value="nenhum" className="hover:bg-slate-700">Nenhum</SelectItem>
+=======
+                        <SelectItem value="" className="hover:bg-slate-700">Nenhum</SelectItem>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                         {PILOTOS.map(piloto => (
                           <SelectItem key={piloto} value={piloto} className="hover:bg-slate-700">
                             {piloto}

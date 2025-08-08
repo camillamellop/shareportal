@@ -6,17 +6,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Download, Plus } from "lucide-react";
+<<<<<<< HEAD
 import { conciliacaoService } from "@/services/conciliacaoService";
 import { toast } from "sonner";
 import { PDFGenerator } from "@/utils/pdfGenerator";
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
 interface CobrancaModalProps {
   trigger?: React.ReactNode;
 }
 
 export function CobrancaModal({ trigger }: CobrancaModalProps) {
+<<<<<<< HEAD
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   const [formData, setFormData] = useState({
     nomeCliente: "",
     referencia: "",
@@ -26,6 +32,7 @@ export function CobrancaModal({ trigger }: CobrancaModalProps) {
     observacoes: ""
   });
 
+<<<<<<< HEAD
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -111,6 +118,23 @@ export function CobrancaModal({ trigger }: CobrancaModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
+=======
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Aqui você implementaria a lógica para salvar a cobrança
+    console.log("Dados da cobrança:", formData);
+    // Gerar PDF da cobrança
+    generatePDF();
+  };
+
+  const generatePDF = () => {
+    // Implementar geração de PDF
+    console.log("Gerando PDF da cobrança...");
+  };
+
+  return (
+    <Dialog>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       <DialogTrigger asChild>
         {trigger || (
           <Button className="flex items-center gap-2">
@@ -200,6 +224,7 @@ export function CobrancaModal({ trigger }: CobrancaModalProps) {
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
+<<<<<<< HEAD
             <Button 
               type="button" 
               variant="outline"
@@ -224,6 +249,14 @@ export function CobrancaModal({ trigger }: CobrancaModalProps) {
                   Criar e Baixar PDF
                 </>
               )}
+=======
+            <Button type="button" variant="outline">
+              Cancelar
+            </Button>
+            <Button type="submit" className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Criar e Baixar PDF
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
             </Button>
           </div>
         </form>

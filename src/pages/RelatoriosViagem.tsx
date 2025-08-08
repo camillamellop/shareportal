@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+<<<<<<< HEAD
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -53,12 +54,24 @@ const AERONAVES_LIST = [
 export default function RelatoriosViagem() {
   console.log("RelatoriosViagem component loaded");
   
+=======
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Plane, Plus, Search, Filter, Eye, Download, Calendar, User, MapPin, Mail } from "lucide-react";
+import { relatorioViagemService, RelatorioViagem } from "@/services/firestore";
+import { AERONAVES } from "@/types/viagem";
+import RelatorioViagemForm from "@/pages/financeiro/RelatorioViagem";
+import { toast } from "sonner";
+
+export default function RelatoriosViagem() {
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   const [relatorios, setRelatorios] = useState<RelatorioViagem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterAeronave, setFilterAeronave] = useState("todas");
   const [filterStatus, setFilterStatus] = useState("todos");
+<<<<<<< HEAD
   const [formData, setFormData] = useState<RelatorioViagemForm>({
     numero: '',
     cotista: '',
@@ -84,6 +97,11 @@ export default function RelatoriosViagem() {
     };
     
     initializeData();
+=======
+
+  useEffect(() => {
+    loadRelatorios();
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   }, []);
 
   const loadRelatorios = async () => {
@@ -99,6 +117,7 @@ export default function RelatoriosViagem() {
     }
   };
 
+<<<<<<< HEAD
   const generateNextNumber = async () => {
     try {
       const todosRelatorios = await relatorioViagemService.getAll();
@@ -431,6 +450,16 @@ export default function RelatoriosViagem() {
     } catch (error) {
       console.error('Erro ao gerar PDF do relatório:', error);
       toast.error('Erro ao gerar PDF do relatório');
+=======
+  const handleCreateRelatorio = async (data: RelatorioViagem) => {
+    try {
+      setShowForm(false);
+      await loadRelatorios();
+      toast.success("Relatório criado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao criar relatório:", error);
+      toast.error("Erro ao criar relatório");
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     }
   };
 
@@ -485,6 +514,7 @@ export default function RelatoriosViagem() {
     return new Date(timestamp).toLocaleDateString('pt-BR');
   };
 
+<<<<<<< HEAD
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -492,23 +522,44 @@ export default function RelatoriosViagem() {
     }).format(value);
   };
 
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   return (
     <Layout>
       <div className="p-6 space-y-6">
         {!showForm ? (
           <>
+<<<<<<< HEAD
+=======
+            {/* Header */}
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-foreground">Relatórios de Viagem</h1>
                 <p className="text-muted-foreground">Gerencie relatórios de viagem e despesas</p>
               </div>
               
+<<<<<<< HEAD
               <Button onClick={() => setShowForm(true)} className="bg-green-600 hover:bg-green-700">
                 <Plus className="w-4 h-4 mr-2" />
                 Criar Relatório
               </Button>
             </div>
 
+=======
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => window.open('https://webmail-seguro.com.br/?_task=mail&_mbox=INBOX', '_blank')}
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Enviar por Email
+                </Button>
+              </div>
+            </div>
+
+            {/* Filtros */}
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -540,7 +591,11 @@ export default function RelatoriosViagem() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="todas">Todas as aeronaves</SelectItem>
+<<<<<<< HEAD
                         {AERONAVES_LIST.map(aeronave => (
+=======
+                        {AERONAVES.map(aeronave => (
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                           <SelectItem key={aeronave} value={aeronave}>{aeronave}</SelectItem>
                         ))}
                       </SelectContent>
@@ -565,13 +620,21 @@ export default function RelatoriosViagem() {
               </CardContent>
             </Card>
 
+<<<<<<< HEAD
+=======
+            {/* Lista de Relatórios */}
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
                 <p className="text-muted-foreground mt-4">Carregando relatórios...</p>
               </div>
             ) : filteredRelatorios.length > 0 ? (
+<<<<<<< HEAD
               <div className="space-y-4">
+=======
+              <div className="grid gap-4">
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                 {filteredRelatorios.map((relatorio) => (
                   <Card key={relatorio.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
@@ -580,7 +643,11 @@ export default function RelatoriosViagem() {
                           <div className="flex items-center gap-2">
                             <Plane className="w-5 h-5 text-primary" />
                             <h3 className="text-lg font-semibold">
+<<<<<<< HEAD
                               {relatorio.numero || relatorio.id} - {relatorio.cotista} - {relatorio.destino}
+=======
+                              {relatorio.cotista} - {relatorio.destino}
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                             </h3>
                             <Badge className={getStatusColor(relatorio.status)}>
                               {getStatusText(relatorio.status)}
@@ -607,7 +674,11 @@ export default function RelatoriosViagem() {
                           </div>
                           
                           <div className="flex items-center gap-4 text-sm">
+<<<<<<< HEAD
                             <span className="font-medium">Total: {formatCurrency(relatorio.valor_total)}</span>
+=======
+                            <span className="font-medium">Total: R$ {relatorio.valor_total.toFixed(2)}</span>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                             <span className="text-muted-foreground">
                               {formatDate(relatorio.createdAt)}
                             </span>
@@ -619,11 +690,15 @@ export default function RelatoriosViagem() {
                             <Eye className="w-4 h-4 mr-2" />
                             Ver Detalhes
                           </Button>
+<<<<<<< HEAD
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={() => handleDownloadPDF(relatorio)}
                           >
+=======
+                          <Button variant="outline" size="sm">
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                             <Download className="w-4 h-4 mr-2" />
                             Exportar
                           </Button>
@@ -656,6 +731,10 @@ export default function RelatoriosViagem() {
           </>
         ) : (
           <>
+<<<<<<< HEAD
+=======
+            {/* Header do Formulário */}
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-foreground">Novo Relatório de Viagem</h1>
@@ -670,6 +749,7 @@ export default function RelatoriosViagem() {
               </Button>
             </div>
 
+<<<<<<< HEAD
             <form onSubmit={handleSubmit} className="space-y-6">
               <Card>
                 <CardHeader>
@@ -965,6 +1045,10 @@ export default function RelatoriosViagem() {
                 </Button>
               </div>
             </form>
+=======
+            {/* Formulário */}
+            <RelatorioViagemForm />
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
           </>
         )}
       </div>

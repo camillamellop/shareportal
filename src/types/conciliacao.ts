@@ -11,7 +11,7 @@ export interface DespesaPendente {
   valor: number;
   data_criacao: string;
   data_vencimento?: string;
-  status: 'criada' | 'faltando_envio' | 'enviada' | 'pendente_pagamento' | 'pago';
+  status: 'pendente_envio' | 'enviado' | 'pendente_pagamento' | 'pago' | 'cancelado';
   observacoes?: string;
   comprovante_envio?: string;
   comprovante_pagamento?: string;
@@ -78,35 +78,35 @@ export interface ConciliacaoRelatorio {
 }
 
 export const STATUS_DESPESA_CONFIG = {
-  criada: {
-    label: 'Criada',
-    color: '#3B82F6', // Azul
-    bgColor: 'bg-blue-50',
-    icon: '📝'
-  },
-  faltando_envio: {
-    label: 'Faltando Envio',
-    color: '#F59E0B', // Amarelo/Laranja
-    bgColor: 'bg-orange-50',
-    icon: '⚠️'
-  },
-  enviada: {
-    label: 'Enviada',
-    color: '#8B5CF6', // Roxo
-    bgColor: 'bg-purple-50',
+  pendente_envio: {
+    label: 'Pendente de Envio',
+    color: 'text-orange-800',
+    bgColor: 'bg-orange-100',
     icon: '📤'
   },
+  enviado: {
+    label: 'Enviado',
+    color: 'text-blue-800',
+    bgColor: 'bg-blue-100',
+    icon: '📨'
+  },
   pendente_pagamento: {
-    label: 'Pendente Pagamento',
-    color: '#EF4444', // Vermelho
-    bgColor: 'bg-red-50',
+    label: 'Pendente de Pagamento',
+    color: 'text-yellow-800',
+    bgColor: 'bg-yellow-100',
     icon: '⏳'
   },
   pago: {
     label: 'Pago',
-    color: '#10B981', // Verde
-    bgColor: 'bg-green-50',
+    color: 'text-green-800',
+    bgColor: 'bg-green-100',
     icon: '✅'
+  },
+  cancelado: {
+    label: 'Cancelado',
+    color: 'text-red-800',
+    bgColor: 'bg-red-100',
+    icon: '❌'
   }
 };
 

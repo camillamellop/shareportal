@@ -14,7 +14,10 @@ import {
 } from "firebase/firestore";
 import { db } from "@/integrations/firebase/config";
 import { auth } from "@/integrations/firebase/config";
+<<<<<<< HEAD
 import { RelatorioViagem, Ressarcimento, Despesa } from '@/types/viagem';
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
 // Tipos básicos
 export interface User {
@@ -184,6 +187,41 @@ export interface SolicitacaoCompra {
   updatedAt: Timestamp;
 }
 
+export interface Despesa {
+  categoria: string;
+  descricao: string;
+  valor: number;
+  pago_por: 'Tripulante' | 'Cotista' | 'Share Brasil';
+  comprovante_url?: string;
+}
+
+export interface RelatorioViagem {
+  id: string;
+  cotista: string;
+  aeronave: string;
+  tripulante: string;
+  destino: string;
+  data_inicio: string;
+  data_fim: string;
+  despesas: Despesa[];
+  total_combustivel: number;
+  total_hospedagem: number;
+  total_alimentacao: number;
+  total_transporte: number;
+  total_outros: number;
+  total_tripulante: number;
+  total_cotista: number;
+  total_share_brasil: number;
+  valor_total: number;
+  observacoes?: string;
+  status: 'pendente' | 'aprovado' | 'rejeitado';
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export interface ValeBeneficio {
   id: string;
   tipo: 'alimentacao' | 'combustivel';
@@ -205,7 +243,18 @@ export interface ValeDespesa {
   createdAt: Timestamp;
 }
 
-
+export interface Ressarcimento {
+  id: string;
+  relatorio_id: string;
+  tipo: 'pagar' | 'cobrar';
+  destinatario: string;
+  valor: number;
+  descricao: string;
+  status: 'pendente' | 'pago' | 'cancelado';
+  data_vencimento: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
 // Serviço genérico para CRUD
 export class FirestoreService<T> {
   constructor(private collectionName: string) {}
@@ -316,7 +365,10 @@ export const userServiceSpecific = {
         name: userData.name || user.displayName || "Usuário",
         email: userData.email || user.email || "",
         role: userData.role || "user",
+<<<<<<< HEAD
         dataNascimento: userData.dataNascimento,
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
         photoURL: userData.photoURL,
         photoPath: userData.photoPath,
         createdAt: Timestamp.now(),
@@ -334,6 +386,7 @@ export const userServiceSpecific = {
       photoURL,
       photoPath
     } as Partial<User>);
+<<<<<<< HEAD
   },
 
   // Atualizar perfil do usuário atual
@@ -345,6 +398,8 @@ export const userServiceSpecific = {
       ...userData,
       updatedAt: Timestamp.now()
     } as Partial<User>);
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   }
 };
 
@@ -653,6 +708,7 @@ export const ressarcimentoServiceSpecific = {
       await ressarcimentoService.create(ressarcimento);
     }
   }
+<<<<<<< HEAD
 }; 
 
 // Serviços para Solicitações de Compras
@@ -703,4 +759,6 @@ export const solicitacaoCompraServiceSpecific = {
       await solicitacaoCompraService.delete(solicitacao.id);
     }
   }
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 }; 

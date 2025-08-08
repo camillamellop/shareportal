@@ -56,7 +56,7 @@ interface DespesaPendente {
 3. **Sistema cria automaticamente despesa pendente para o cliente**
 4. Despesa aparece na conciliação com status "Pendente de Envio"
 
-### **2. Relatório de Viagem** (`/financeiro/relatorios-viagem`)  
+### **2. Relatório de Viagem** (`/financeiro/relatorios-viagem`)
 ✅ **Funcionalidades Implementadas:**
 - Formulário para dados da viagem (colaborador, destino, período)
 - **Sistema de despesas por categoria** (Hospedagem, Transporte, etc.)

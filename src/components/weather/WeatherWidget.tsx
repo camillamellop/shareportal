@@ -13,7 +13,11 @@ import {
   Eye,
   Loader2
 } from "lucide-react";
+<<<<<<< HEAD
 import { getCurrentWeather, CurrentWeather } from "@/services/openweather";
+=======
+import { getCurrentWeather, CurrentWeather } from "@/services/meteoblue";
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
 interface WeatherWidgetProps {
   lat?: number;
@@ -50,6 +54,7 @@ export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }
     return () => clearInterval(interval);
   }, [lat, lon]);
 
+<<<<<<< HEAD
   const getWeatherIcon = (weatherId: number) => {
     // Códigos da OpenWeatherMap
     if (weatherId >= 200 && weatherId < 300) return <CloudRain className="h-4 w-4 text-blue-400" />;
@@ -59,6 +64,13 @@ export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }
     if (weatherId >= 700 && weatherId < 800) return <Cloud className="h-4 w-4 text-gray-400" />;
     if (weatherId === 800) return <Sun className="h-4 w-4 text-yellow-500" />;
     if (weatherId >= 801 && weatherId <= 804) return <Cloud className="h-4 w-4 text-gray-400" />;
+=======
+  const getWeatherIcon = (pictocode: number) => {
+    if (pictocode <= 4) return <Sun className="h-4 w-4 text-yellow-500" />;
+    if (pictocode <= 20) return <Cloud className="h-4 w-4 text-gray-400" />;
+    if (pictocode <= 30) return <CloudRain className="h-4 w-4 text-blue-400" />;
+    if (pictocode <= 40) return <CloudSnow className="h-4 w-4 text-blue-300" />;
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     return <Cloud className="h-4 w-4 text-gray-400" />;
   };
 

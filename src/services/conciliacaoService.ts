@@ -40,7 +40,10 @@ export class ConciliacaoService {
     periodo_fim?: string 
   }): Promise<DespesaPendente[]> {
     try {
-      let q = query(collection(db, this.despesasCollection));
+      let q = query(
+        collection(db, this.despesasCollection),
+        orderBy('createdAt', 'desc')
+      );
 
       if (filtros?.categoria) {
         q = query(q, where('categoria', '==', filtros.categoria));
@@ -57,12 +60,7 @@ export class ConciliacaoService {
         ...doc.data()
       } as DespesaPendente));
       
-      // Ordenar no cliente por createdAt (mais recente primeiro)
-      return result.sort((a, b) => {
-        const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt);
-        const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
+      return result;
     } catch (error) {
       console.error('Erro ao obter despesas pendentes:', error);
       throw error;
@@ -163,6 +161,7 @@ export class ConciliacaoService {
 
       // Se deve gerar despesa, criar automaticamente
       if (lancamento.gerar_despesa) {
+<<<<<<< HEAD
         const dadosDespesa: any = {
           tipo: 'lancamento_manual',
           categoria: lancamento.categoria,
@@ -204,6 +203,20 @@ export class ConciliacaoService {
         }
 
         await this.criarDespesaPendente(dadosDespesa);
+=======
+        await this.criarDespesaPendente({
+          tipo: 'lancamento_manual',
+          categoria: lancamento.categoria,
+          origem_id: docRef.id,
+          cliente_nome: lancamento.categoria === 'cliente' ? lancamento.pessoa_nome : undefined,
+          colaborador_nome: lancamento.categoria === 'colaborador' ? lancamento.pessoa_nome : undefined,
+          descricao: lancamento.descricao,
+          valor: lancamento.valor,
+          data_criacao: new Date().toISOString().split('T')[0],
+          status: 'pendente_envio',
+          observacoes: lancamento.observacoes
+        });
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       }
 
       return docRef.id;

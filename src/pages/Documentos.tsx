@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -583,6 +584,15 @@ export default function Documentos() {
             </div>
           </DialogContent>
         </Dialog>
+=======
+import { DocumentManager } from "@/components/documents/DocumentManager";
+
+export default function Documentos() {
+  return (
+    <Layout>
+      <div className="p-6">
+        <DocumentManager />
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       </div>
     </Layout>
   );

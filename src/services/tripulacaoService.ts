@@ -73,11 +73,14 @@ class TripulacaoService {
     }
   }
 
+<<<<<<< HEAD
   // Criar novo tripulante (alias para adicionarTripulante)
   async criarTripulante(tripulante: Omit<Tripulante, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     return this.adicionarTripulante(tripulante);
   }
 
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   // Buscar todos os tripulantes
   async buscarTripulantes(): Promise<Tripulante[]> {
     try {

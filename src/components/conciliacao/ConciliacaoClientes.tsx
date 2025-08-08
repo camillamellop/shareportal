@@ -12,17 +12,26 @@ import { CheckCircle, AlertCircle, Clock, Send, FileText, Users, Plus, Edit, Eye
 import { toast } from "sonner";
 import { conciliacaoService } from "@/services/conciliacaoService";
 import { DespesaPendente, STATUS_DESPESA_CONFIG, FORMAS_PAGAMENTO } from "@/types/conciliacao";
+<<<<<<< HEAD
 import { clienteService } from "@/services/firestore";
 import { Cliente } from "@/services/firestore";
 
 export function ConciliacaoClientes() {
   const [despesasClientes, setDespesasClientes] = useState<DespesaPendente[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
+=======
+
+export function ConciliacaoClientes() {
+  const [despesasClientes, setDespesasClientes] = useState<DespesaPendente[]>([]);
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   const [loading, setLoading] = useState(true);
   const [selectedDespesa, setSelectedDespesa] = useState<DespesaPendente | null>(null);
   const [showLancamentoModal, setShowLancamentoModal] = useState(false);
   const [showAtualizarModal, setShowAtualizarModal] = useState(false);
+<<<<<<< HEAD
   const [showDetalhesModal, setShowDetalhesModal] = useState(false);
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   // Formulário para lançamento manual
   const [lancamentoForm, setLancamentoForm] = useState({
@@ -30,15 +39,20 @@ export function ConciliacaoClientes() {
     descricao: '',
     valor: 0,
     data_ocorrencia: new Date().toISOString().split('T')[0],
+<<<<<<< HEAD
     numero_documento_aeronave: '',
     numero_documento: '',
     data_vencimento: '',
     observacoes: '',
     arquivos: [] as File[]
+=======
+    observacoes: ''
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   });
 
   // Formulário para atualizar status
   const [statusForm, setStatusForm] = useState({
+<<<<<<< HEAD
     status: 'criada' as DespesaPendente['status'],
     data_envio: '',
     data_pagamento: '',
@@ -46,6 +60,13 @@ export function ConciliacaoClientes() {
     observacoes: '',
     comprovante_envio: null as File | null,
     comprovante_pagamento: null as File | null
+=======
+    status: 'pendente_envio' as DespesaPendente['status'],
+    data_envio: '',
+    data_pagamento: '',
+    forma_pagamento: '',
+    observacoes: ''
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   });
 
   useEffect(() => {
@@ -56,7 +77,10 @@ export function ConciliacaoClientes() {
     try {
       setLoading(true);
       const despesas = await conciliacaoService.obterDespesasPendentes({ categoria: 'cliente' });
+<<<<<<< HEAD
       console.log('Despesas carregadas:', despesas);
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       setDespesasClientes(despesas);
     } catch (error) {
       console.error('Erro ao carregar despesas de clientes:', error);
@@ -75,6 +99,7 @@ export function ConciliacaoClientes() {
     }
 
     try {
+<<<<<<< HEAD
       console.log('Criando lançamento com dados:', {
         categoria: 'cliente',
         tipo: 'despesa',
@@ -90,6 +115,8 @@ export function ConciliacaoClientes() {
         gerar_despesa: true
       });
 
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       await conciliacaoService.criarLancamentoManual({
         categoria: 'cliente',
         tipo: 'despesa',
@@ -97,11 +124,15 @@ export function ConciliacaoClientes() {
         descricao: lancamentoForm.descricao,
         valor: lancamentoForm.valor,
         data_ocorrencia: lancamentoForm.data_ocorrencia,
+<<<<<<< HEAD
         numero_documento_aeronave: lancamentoForm.numero_documento_aeronave,
         numero_documento: lancamentoForm.numero_documento,
         data_vencimento: lancamentoForm.data_vencimento,
         observacoes: lancamentoForm.observacoes,
         arquivos: lancamentoForm.arquivos,
+=======
+        observacoes: lancamentoForm.observacoes,
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
         gerar_despesa: true
       });
 
@@ -112,11 +143,15 @@ export function ConciliacaoClientes() {
         descricao: '',
         valor: 0,
         data_ocorrencia: new Date().toISOString().split('T')[0],
+<<<<<<< HEAD
         numero_documento_aeronave: '',
         numero_documento: '',
         data_vencimento: '',
         observacoes: '',
         arquivos: []
+=======
+        observacoes: ''
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       });
       
       setShowLancamentoModal(false);
@@ -178,6 +213,7 @@ export function ConciliacaoClientes() {
     if (!config) return null;
     
     return (
+<<<<<<< HEAD
       <div className="flex items-center gap-2">
         <div 
           className="w-3 h-3 rounded-full"
@@ -185,6 +221,11 @@ export function ConciliacaoClientes() {
         />
         <span className="text-sm">{config.label}</span>
       </div>
+=======
+      <Badge className={`${config.bgColor} ${config.color}`}>
+        {config.icon} {config.label}
+      </Badge>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     );
   };
 
@@ -214,7 +255,11 @@ export function ConciliacaoClientes() {
   const { totalPago, totalPendente } = calcularResumo();
 
   return (
+<<<<<<< HEAD
     <div className="space-y-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-400">
+=======
+    <div className="space-y-6">
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       {/* Resumo Clientes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
@@ -275,7 +320,11 @@ export function ConciliacaoClientes() {
                   Lançamento Manual
                 </Button>
               </DialogTrigger>
+<<<<<<< HEAD
               <DialogContent className="max-w-md sm:max-w-lg md:max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+=======
+              <DialogContent>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                 <DialogHeader>
                   <DialogTitle>Novo Lançamento - Cliente</DialogTitle>
                 </DialogHeader>
@@ -298,7 +347,11 @@ export function ConciliacaoClientes() {
                       placeholder="Descrição da despesa..."
                     />
                   </div>
+<<<<<<< HEAD
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+=======
+                  <div className="grid grid-cols-2 gap-4">
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                     <div className="space-y-2">
                       <Label htmlFor="valor">Valor (R$) *</Label>
                       <Input 
@@ -319,6 +372,7 @@ export function ConciliacaoClientes() {
                       />
                     </div>
                   </div>
+<<<<<<< HEAD
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="numero_documento_aeronave">AERONAVE</Label>
@@ -364,6 +418,8 @@ export function ConciliacaoClientes() {
                       Formatos aceitos: PDF, DOC, DOCX, JPG, JPEG, PNG
                     </p>
                   </div>
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                   <div className="space-y-2">
                     <Label htmlFor="observacoes">Observações</Label>
                     <Textarea 
@@ -373,6 +429,7 @@ export function ConciliacaoClientes() {
                       placeholder="Observações adicionais..."
                     />
                   </div>
+<<<<<<< HEAD
                   <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
                     <Button 
                       type="button" 
@@ -386,6 +443,13 @@ export function ConciliacaoClientes() {
                       type="submit"
                       className="w-full sm:w-auto"
                     >
+=======
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setShowLancamentoModal(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit">
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                       Criar Lançamento
                     </Button>
                   </div>
@@ -405,6 +469,7 @@ export function ConciliacaoClientes() {
               <p>Nenhuma despesa de cliente encontrada</p>
             </div>
           ) : (
+<<<<<<< HEAD
             <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100 hover:scrollbar-thumb-blue-600">
               <Table>
               <TableHeader>
@@ -437,31 +502,66 @@ export function ConciliacaoClientes() {
                         {getStatusBadge(despesa.status)}
                       </div>
                     </TableCell>
+=======
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead>Valor</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {despesasClientes.map((despesa) => (
+                  <TableRow key={despesa.id}>
+                    <TableCell>{formatDate(despesa.data_criacao)}</TableCell>
+                    <TableCell className="font-medium">{despesa.cliente_nome}</TableCell>
+                    <TableCell>{despesa.descricao}</TableCell>
+                    <TableCell className="font-semibold">{formatCurrency(despesa.valor)}</TableCell>
+                    <TableCell>{getStatusBadge(despesa.status)}</TableCell>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                     <TableCell>
                       <div className="flex gap-2">
                         <Button 
                           variant="outline" 
                           size="sm"
                           onClick={() => abrirModalAtualizar(despesa)}
+<<<<<<< HEAD
                           className="hover:bg-blue-50 hover:border-blue-300"
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
+<<<<<<< HEAD
                                       </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
             </div>
+=======
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
           )}
         </CardContent>
       </Card>
 
       {/* Modal para Atualizar Status */}
       <Dialog open={showAtualizarModal} onOpenChange={setShowAtualizarModal}>
+<<<<<<< HEAD
         <DialogContent className="max-w-md sm:max-w-lg md:max-w-xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+=======
+        <DialogContent>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
           <DialogHeader>
             <DialogTitle>Atualizar Status - {selectedDespesa?.cliente_nome}</DialogTitle>
           </DialogHeader>

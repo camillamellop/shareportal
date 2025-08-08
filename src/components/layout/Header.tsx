@@ -124,6 +124,7 @@ export function Header() {
     setSelectedFile(null);
   };
 
+<<<<<<< HEAD
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -135,6 +136,8 @@ export function Header() {
     }
   };
 
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   return (
     <header className="h-16 bg-gradient-card border-b border-border px-4 lg:px-6 flex items-center justify-between shadow-card">
       {/* Logo e Título */}
@@ -208,11 +211,15 @@ export function Header() {
               className="hidden"
             />
             <DropdownMenuSeparator className="bg-border" />
+<<<<<<< HEAD
             <DropdownMenuItem 
               className="text-destructive hover:bg-destructive/10 cursor-pointer"
               onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" />
+=======
+            <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
               Sair
             </DropdownMenuItem>
           </DropdownMenuContent>

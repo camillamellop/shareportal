@@ -535,7 +535,11 @@ export default function CoordenacaoVoos() {
                       <SelectValue placeholder="Selecione o copiloto" />
                     </SelectTrigger>
                     <SelectContent>
+<<<<<<< HEAD
                                               <SelectItem value="nenhum">Nenhum</SelectItem>
+=======
+                      <SelectItem value="">Nenhum</SelectItem>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                       {PILOTOS.map(piloto => (
                         <SelectItem key={piloto} value={piloto}>{piloto}</SelectItem>
                       ))}

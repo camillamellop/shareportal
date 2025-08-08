@@ -11,7 +11,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { User, FileText, Camera, Save, Lock, Mail, Phone, MapPin, Calendar, Plus, CheckCircle, Clock, AlertTriangle, Heart, GraduationCap, Folder, Upload, Download, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { FirebaseStorageService } from "@/services/firebase-storage";
+<<<<<<< HEAD
 import { userServiceSpecific, birthdayService } from "@/services/firestore";
+=======
+import { userServiceSpecific } from "@/services/firestore";
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 import { auth } from "@/integrations/firebase/config";
 import { toast } from "sonner";
 import { PhotoConfirmDialog } from "@/components/PhotoConfirmDialog";
@@ -20,19 +24,29 @@ export default function Perfil() {
   const [profilePhoto, setProfilePhoto] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+<<<<<<< HEAD
   const [cpf, setCpf] = useState("");
   const [telefone, setTelefone] = useState("");
   const [cargo, setCargo] = useState("");
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [previewPhoto, setPreviewPhoto] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [holerites, setHolerites] = useState<any[]>([]);
   const [uploadingHolerite, setUploadingHolerite] = useState(false);
   const [feriasData, setFeriasData] = useState({
+<<<<<<< HEAD
     totalDias: 0,
     diasTirou: 0,
     diasRestantes: 0,
     proximoVencimento: "",
+=======
+    totalDias: 30,
+    diasTirou: 15,
+    diasRestantes: 15,
+    proximoVencimento: "2024-08-15",
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     feriasSolicitadas: []
   });
   const [showSolicitarFerias, setShowSolicitarFerias] = useState(false);
@@ -91,6 +105,7 @@ export default function Perfil() {
           if (user.photoURL) {
             setProfilePhoto(user.photoURL);
           }
+<<<<<<< HEAD
           setCpf(user.cpf || "");
           setTelefone(user.telefone || "");
           setCargo(user.cargo || "");
@@ -110,6 +125,16 @@ export default function Perfil() {
               setUserData(newUser);
             }
           }
+=======
+        } else {
+          console.log("Usuário não encontrado, criando...");
+          // Criar usuário se não existir
+          await userServiceSpecific.createOrUpdateCurrentUser({
+            name: "Usuário Demo",
+            email: "demo@sharebrasil.com",
+            role: "cotista"
+          });
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
         }
       } catch (error) {
         console.error("Erro ao carregar dados do usuário:", error);
@@ -174,6 +199,7 @@ export default function Perfil() {
     setSelectedFile(null);
   };
 
+<<<<<<< HEAD
   const addToBirthdayList = async (user: any) => {
     try {
       // Converter data de YYYY-MM-DD para DD/MM/YYYY
@@ -236,6 +262,8 @@ export default function Perfil() {
     }
   };
 
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   const handleHoleriteUpload = async (file: File) => {
     // Validar tamanho do arquivo (máximo 10MB)
     if (file.size > 10 * 1024 * 1024) {
@@ -511,8 +539,12 @@ export default function Perfil() {
                     <Label htmlFor="nome" className="text-foreground">Nome Completo</Label>
                     <Input 
                       id="nome" 
+<<<<<<< HEAD
                       value={userData?.name || ""}
                       onChange={(e) => setUserData(prev => prev ? {...prev, name: e.target.value} : null)}
+=======
+                      defaultValue="João Silva" 
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                       className="bg-input border-border text-foreground"
                     />
                   </div>
@@ -521,8 +553,12 @@ export default function Perfil() {
                     <Input 
                       id="email" 
                       type="email" 
+<<<<<<< HEAD
                       value={userData?.email || ""}
                       onChange={(e) => setUserData(prev => prev ? {...prev, email: e.target.value} : null)}
+=======
+                      defaultValue="joao.silva@sharebrasil.com" 
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                       className="bg-input border-border text-foreground"
                     />
                   </div>
@@ -532,9 +568,13 @@ export default function Perfil() {
                     <Label htmlFor="telefone" className="text-foreground">Telefone</Label>
                     <Input 
                       id="telefone" 
+<<<<<<< HEAD
                       value={telefone}
                       onChange={(e) => setTelefone(e.target.value)}
                       placeholder="Digite seu telefone"
+=======
+                      defaultValue="(11) 99999-9999" 
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                       className="bg-input border-border text-foreground"
                     />
                   </div>
@@ -542,10 +582,16 @@ export default function Perfil() {
                     <Label htmlFor="cpf" className="text-foreground">CPF</Label>
                     <Input 
                       id="cpf" 
+<<<<<<< HEAD
                       value={cpf}
                       onChange={(e) => setCpf(e.target.value)}
                       placeholder="Digite seu CPF"
                       className="bg-input border-border text-foreground"
+=======
+                      defaultValue="123.456.789-00" 
+                      disabled 
+                      className="bg-muted border-border text-muted-foreground"
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                     />
                   </div>
                 </div>
@@ -554,9 +600,13 @@ export default function Perfil() {
                     <Label htmlFor="cargo" className="text-foreground">Cargo</Label>
                     <Input 
                       id="cargo" 
+<<<<<<< HEAD
                       value={cargo}
                       onChange={(e) => setCargo(e.target.value)}
                       placeholder="Digite seu cargo"
+=======
+                      defaultValue="Piloto Comercial" 
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                       className="bg-input border-border text-foreground"
                     />
                   </div>
@@ -565,11 +615,16 @@ export default function Perfil() {
                     <Input 
                       id="data-admissao" 
                       type="date" 
+<<<<<<< HEAD
                       placeholder="Selecione a data"
+=======
+                      defaultValue="2020-03-01" 
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                       className="bg-input border-border text-foreground"
                     />
                   </div>
                 </div>
+<<<<<<< HEAD
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="data-nascimento" className="text-foreground">Data de Nascimento</Label>
@@ -591,6 +646,8 @@ export default function Perfil() {
                     {loading ? "Salvando..." : "Salvar Alterações"}
                   </Button>
                 </div>
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
               </CardContent>
             </Card>
           </TabsContent>
@@ -604,17 +661,29 @@ export default function Perfil() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="banco" className="text-foreground">Banco</Label>
+<<<<<<< HEAD
                     <Input id="banco" placeholder="Digite o nome do banco" className="bg-input border-border" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="agencia" className="text-foreground">Agência</Label>
                     <Input id="agencia" placeholder="Digite a agência" className="bg-input border-border" />
+=======
+                    <Input id="banco" defaultValue="Banco do Brasil" className="bg-input border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="agencia" className="text-foreground">Agência</Label>
+                    <Input id="agencia" defaultValue="1234-5" className="bg-input border-border" />
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="conta" className="text-foreground">Conta</Label>
+<<<<<<< HEAD
                     <Input id="conta" placeholder="Digite o número da conta" className="bg-input border-border" />
+=======
+                    <Input id="conta" defaultValue="12345-6" className="bg-input border-border" />
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="chave-pix" className="text-foreground">Chave PIX</Label>

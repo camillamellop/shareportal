@@ -206,4 +206,4 @@ export function useErrorHandler() {
     // Integração com serviços de monitoramento
     // Sentry.captureException(error);
   };
-} 
+}

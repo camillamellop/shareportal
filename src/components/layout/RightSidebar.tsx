@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 import { Clock, Calendar, Plane, MapPin, Users, Settings, Wrench, CheckCircle, FileText, Fuel, AlertTriangle, WrenchIcon, Folder, Plus, Edit2, Upload, X, Trash2 } from "lucide-react";
+=======
+import { Clock, Calendar, Plane, MapPin, Users, Settings, Wrench, CheckCircle, FileText, Fuel, AlertTriangle, WrenchIcon, Folder, Plus, Edit2, Upload, X } from "lucide-react";
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import { useToast } from "@/components/ui/use-toast";
 
 
@@ -12,6 +17,26 @@ import { useToast } from "@/components/ui/use-toast";
 export function RightSidebar() {
   const navigate = useNavigate();
   const { toast } = useToast();
+=======
+
+interface DocumentFolder {
+  id: string;
+  name: string;
+  documents: DocumentFile[];
+  isEditing: boolean;
+}
+
+interface DocumentFile {
+  id: string;
+  name: string;
+  size: string;
+  uploadedAt: Date;
+  url: string;
+}
+
+export function RightSidebar() {
+  const navigate = useNavigate();
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString('pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
@@ -25,7 +50,46 @@ export function RightSidebar() {
     day: 'numeric'
   }));
 
+<<<<<<< HEAD
 
+=======
+  const [documentFolders, setDocumentFolders] = useState<DocumentFolder[]>([
+    {
+      id: '1',
+      name: 'Manuais Técnicos',
+      documents: [
+        {
+          id: 'doc1',
+          name: 'Manual_Citation_CJ3.pdf',
+          size: '2.5 MB',
+          uploadedAt: new Date('2024-01-15'),
+          url: '#'
+        }
+      ],
+      isEditing: false
+    },
+    {
+      id: '2',
+      name: 'Certificações',
+      documents: [
+        {
+          id: 'doc2',
+          name: 'Cert_ANAC_2024.pdf',
+          size: '1.8 MB',
+          uploadedAt: new Date('2024-01-10'),
+          url: '#'
+        }
+      ],
+      isEditing: false
+    },
+    {
+      id: '3',
+      name: 'Relatórios de Voo',
+      documents: [],
+      isEditing: false
+    }
+  ]);
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -51,6 +115,7 @@ export function RightSidebar() {
       id: `folder_${Date.now()}`,
       name: 'Nova Pasta',
       documents: [],
+<<<<<<< HEAD
       isEditing: true,
       createdAt: new Date()
     };
@@ -82,6 +147,21 @@ export function RightSidebar() {
       title: "Sucesso",
       description: "Nome da pasta atualizado!",
     });
+=======
+      isEditing: true
+    };
+    setDocumentFolders(prev => [...prev, newFolder]);
+  };
+
+  const updateFolderName = (folderId: string, newName: string) => {
+    setDocumentFolders(prev => 
+      prev.map(folder => 
+        folder.id === folderId 
+          ? { ...folder, name: newName, isEditing: false }
+          : folder
+      )
+    );
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   };
 
   const toggleFolderEdit = (folderId: string) => {
@@ -95,6 +175,7 @@ export function RightSidebar() {
   };
 
   const deleteFolder = (folderId: string) => {
+<<<<<<< HEAD
     const folder = documentFolders.find(f => f.id === folderId);
     if (folder && folder.documents.length > 0) {
       if (!confirm(`Tem certeza que deseja excluir a pasta "${folder.name}" com ${folder.documents.length} documento(s)?`)) {
@@ -133,13 +214,23 @@ export function RightSidebar() {
       return;
     }
 
+=======
+    setDocumentFolders(prev => prev.filter(folder => folder.id !== folderId));
+  };
+
+  const handleFileUpload = (folderId: string, file: File) => {
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     const newDocument: DocumentFile = {
       id: `doc_${Date.now()}`,
       name: file.name,
       size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
       uploadedAt: new Date(),
+<<<<<<< HEAD
       url: URL.createObjectURL(file),
       type: fileExtension
+=======
+      url: URL.createObjectURL(file)
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     };
 
     setDocumentFolders(prev => 
@@ -149,6 +240,7 @@ export function RightSidebar() {
           : folder
       )
     );
+<<<<<<< HEAD
     toast({
       title: "Sucesso",
       description: `Arquivo "${file.name}" enviado com sucesso!`,
@@ -187,6 +279,8 @@ export function RightSidebar() {
       default:
         return <FileText className="h-3 w-3 text-muted-foreground" />;
     }
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   };
 
   const flightOperations = [{
@@ -221,7 +315,39 @@ export function RightSidebar() {
     onClick: () => navigate("/documentos")
   }];
 
+<<<<<<< HEAD
   const aircraftMaintenance = [];
+=======
+  const aircraftMaintenance = [
+    {
+      registration: "PR-MDL",
+      model: "Citation CJ3+",
+      status: "active",
+      lastMaintenance: "2024-12-15",
+      nextMaintenance: "2025-03-15",
+      hours: 1250,
+      priority: "normal"
+    },
+    {
+      registration: "PT-OPC",
+      model: "King Air 350",
+      status: "active",
+      lastMaintenance: "2024-11-20",
+      nextMaintenance: "2025-02-20",
+      hours: 2100,
+      priority: "normal"
+    },
+    {
+      registration: "PS-AVE",
+      model: "Phenom 300E",
+      status: "active",
+      lastMaintenance: "2024-12-01",
+      nextMaintenance: "2025-03-01",
+      hours: 890,
+      priority: "normal"
+    },
+  ];
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -310,6 +436,7 @@ export function RightSidebar() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+<<<<<<< HEAD
             {aircraftMaintenance.length > 0 ? (
               aircraftMaintenance.map((aircraft, index) => (
                 <div key={index} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
@@ -342,6 +469,137 @@ export function RightSidebar() {
         </Card>
 
 
+=======
+            {aircraftMaintenance.map((aircraft, index) => (
+              <div key={index} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-foreground">{aircraft.registration}</h4>
+                  <Badge className={getStatusColor(aircraft.status)}>
+                    {aircraft.status === 'active' ? 'Ativo' : 'Manutenção'}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">{aircraft.model}</p>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{aircraft.hours}h</span>
+                  <div className="flex items-center gap-1">
+                    {getPriorityIcon(aircraft.priority)}
+                    <span className={getPriorityColor(aircraft.priority).split(' ')[1]}>
+                      {aircraft.priority === 'normal' ? 'Normal' : 'Urgente'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Documentos */}
+        <Card className="bg-gradient-card border-border">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                Documentos
+              </CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={addNewFolder}
+                className="h-8 px-2"
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {documentFolders.map((folder) => (
+              <div key={folder.id} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 flex-1">
+                    <Folder className="h-4 w-4 text-muted-foreground" />
+                    {folder.isEditing ? (
+                      <Input
+                        value={folder.name}
+                        onChange={(e) => updateFolderName(folder.id, e.target.value)}
+                        onBlur={() => toggleFolderEdit(folder.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            toggleFolderEdit(folder.id);
+                          }
+                        }}
+                        className="h-6 text-sm"
+                        autoFocus
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-foreground truncate">
+                        {folder.name}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toggleFolderEdit(folder.id)}
+                      className="h-6 w-6 p-0"
+                      title="Editar nome"
+                    >
+                      <Edit2 className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteFolder(folder.id)}
+                      className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                      title="Excluir pasta"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  {folder.documents.length > 0 ? (
+                    folder.documents.map((doc) => (
+                      <div key={doc.id} className="flex items-center gap-2 p-2 bg-background rounded text-xs">
+                        <FileText className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-muted-foreground truncate flex-1">{doc.name}</span>
+                        <span className="text-muted-foreground">{doc.size}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-2 text-xs text-muted-foreground">
+                      Nenhum documento
+                    </div>
+                  )}
+                  
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id={`upload-${folder.id}`}
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleFileUpload(folder.id, file);
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={`upload-${folder.id}`}
+                      className="flex items-center justify-center gap-1 w-full h-8 px-2 border border-border rounded bg-background hover:bg-accent transition-colors cursor-pointer text-xs text-muted-foreground"
+                    >
+                      <Upload className="h-3 w-3" />
+                      Anexar
+                    </label>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       </div>
     </aside>
   );

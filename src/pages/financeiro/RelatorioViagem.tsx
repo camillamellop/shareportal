@@ -8,7 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+<<<<<<< HEAD
 import { PDFGenerator } from '@/utils/pdfGenerator';
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 import { 
   Plane, 
   MapPin, 
@@ -241,6 +244,7 @@ export default function RelatorioViagemCompleto() {
   };
 
   const gerarPDF = async (relatorio: RelatorioViagemForm) => {
+<<<<<<< HEAD
     try {
       await PDFGenerator.generateRelatorioViagemPDF({
         numero: relatorio.numero,
@@ -264,6 +268,50 @@ export default function RelatorioViagemCompleto() {
       toast.error('Erro ao gerar PDF do relatório');
       throw error;
     }
+=======
+    // Simulação da geração de PDF
+    // Em produção, usar biblioteca como jsPDF ou enviar para backend
+    
+    const pdfContent = `
+      SHARE BRASIL - RELATÓRIO DE DESPESA DE VIAGEM
+      
+      Número: ${relatorio.numero}
+      Cotista: ${relatorio.cotista}
+      Aeronave: ${relatorio.aeronave}
+      Tripulante: ${relatorio.tripulante}
+      Destino: ${relatorio.destino}
+      Período: ${formatDate(relatorio.data_inicio)} a ${formatDate(relatorio.data_fim)}
+      
+      DESPESAS:
+      ${relatorio.despesas.map(d => 
+        `${d.data} - ${d.categoria} - ${d.descricao} - ${formatCurrency(d.valor)} (${d.pago_por})`
+      ).join('\n')}
+      
+      TOTAIS:
+      Tripulante: ${formatCurrency(relatorio.total_tripulante)}
+      Cotista: ${formatCurrency(relatorio.total_cotista)}
+      Share Brasil: ${formatCurrency(relatorio.total_share_brasil)}
+      TOTAL GERAL: ${formatCurrency(relatorio.valor_total)}
+      
+      Observações: ${relatorio.observacoes}
+      
+      Criado por: ${relatorio.criado_por}
+      Data: ${new Date().toLocaleDateString('pt-BR')}
+    `;
+
+    // Simular download do PDF
+    const blob = new Blob([pdfContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${relatorio.numero}_Relatorio_Viagem.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    return `pdf_${relatorio.numero}_${Date.now()}.pdf`;
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   };
 
   const criarDespesasConciliacao = async (relatorio: RelatorioViagemForm) => {
@@ -381,6 +429,7 @@ export default function RelatorioViagemCompleto() {
     return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR');
   };
 
+<<<<<<< HEAD
   const downloadPDF = async (relatorio: RelatorioSalvo) => {
     try {
       // Buscar dados completos do relatório (aqui você pode implementar a busca no Firebase)
@@ -400,6 +449,11 @@ export default function RelatorioViagemCompleto() {
       console.error('Erro ao gerar PDF do relatório:', error);
       toast.error('Erro ao gerar PDF do relatório');
     }
+=======
+  const downloadPDF = (relatorio: RelatorioSalvo) => {
+    alert(`Download do PDF do relatório ${relatorio.numero}`);
+    // Implementar download real do PDF salvo
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   };
 
   return (

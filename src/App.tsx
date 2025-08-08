@@ -92,109 +92,154 @@ const ProtectedRoute = React.memo(({ children }: { children: React.ReactNode }) 
     return <Navigate to="/login" replace />;
   }
 
-  return (
-    <ErrorBoundary
-      onError={(error, errorInfo) => {
-        console.error('Protected route error:', error, errorInfo);
-      }}
-    >
-      <Suspense fallback={<PageLoader />}>
-        {children}
-      </Suspense>
-    </ErrorBoundary>
-  );
+  return <>{children}</>;
 });
 
-const App = () => {
-  const clearAll = useAppStore(state => state.clearAll);
-  
-  // Cleanup do store quando o app desmonta
-  React.useEffect(() => {
-    return () => {
-      // Cleanup apenas em desenvolvimento para não atrapalhar HMR
-      if (process.env.NODE_ENV === 'development') {
-        return;
-      }
-      clearAll();
-    };
-  }, [clearAll]);
-  
+ProtectedRoute.displayName = 'ProtectedRoute';
+
+function App() {
   return (
-    <ErrorBoundary
-      onError={(error, errorInfo) => {
-        console.error('Application Error:', error, errorInfo);
-        // Integração com Sentry ou outro serviço de monitoramento
-        // Sentry.captureException(error, { contexts: { errorInfo } });
-      }}
-    >
+    <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Sonner 
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: 'hsl(var(--background))',
-                border: '1px solid hsl(var(--border))',
-                color: 'hsl(var(--foreground))',
-              },
-            }}
-          />
           <BrowserRouter>
-            <Routes>
-              {/* Rota pública de login */}
-              <Route 
-                path="/login" 
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <Login />
-                  </Suspense>
-                } 
-              />
-              
-              {/* Rotas protegidas */}
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/agenda" element={<ProtectedRoute><AgendaPage /></ProtectedRoute>} />
-              <Route path="/agenda/contatos" element={<ProtectedRoute><Contatos /></ProtectedRoute>} />
-              <Route path="/agenda/aniversarios" element={<ProtectedRoute><Aniversarios /></ProtectedRoute>} />
-              <Route path="/financeiro/conciliacao" element={<ProtectedRoute><ConciliacaoBancaria /></ProtectedRoute>} />
-              <Route path="/financeiro/config" element={<ProtectedRoute><ConfigEmpresa /></ProtectedRoute>} />
-              <Route path="/financeiro/recibo" element={<ProtectedRoute><EmissaoRecibo /></ProtectedRoute>} />
-              <Route path="/financeiro/relatorios-viagem" element={<ProtectedRoute><RelatoriosViagem /></ProtectedRoute>} />
-              <Route path="/financeiro/cobranca" element={<ProtectedRoute><Cobranca /></ProtectedRoute>} />
-              <Route path="/financeiro/compras" element={<ProtectedRoute><SolicitacaoCompras /></ProtectedRoute>} />
-              <Route path="/cartao/alimentacao" element={<ProtectedRoute><ValeAlimentacao /></ProtectedRoute>} />
-              <Route path="/cartao/combustivel" element={<ProtectedRoute><ValeCombustivel /></ProtectedRoute>} />
-              <Route path="/recados" element={<ProtectedRoute><Recados /></ProtectedRoute>} />
-              <Route path="/tarefas" element={<ProtectedRoute><Tarefas /></ProtectedRoute>} />
-              <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
-              <Route path="/tripulacao" element={<ProtectedRoute><GestaoTripulacao /></ProtectedRoute>} />
-              <Route path="/diario" element={<ProtectedRoute><DiarioAeronaves /></ProtectedRoute>} />
-              <Route path="/diario/nova-aeronave" element={<ProtectedRoute><NovaAeronave /></ProtectedRoute>} />
-              <Route path="/diario/detalhes/:matricula" element={<ProtectedRoute><DiarioDetalhes /></ProtectedRoute>} />
-              <Route path="/diario/adicionar-voo/:matricula" element={<ProtectedRoute><AdicionarVoo /></ProtectedRoute>} />
-              <Route path="/agendamento" element={<ProtectedRoute><AgendamentoVoo /></ProtectedRoute>} />
-              <Route path="/coordenacao" element={<ProtectedRoute><CoordenacaoVoos /></ProtectedRoute>} />
-              <Route path="/abastecimento" element={<ProtectedRoute><ControleAbastecimento /></ProtectedRoute>} />
-<Route path="/documentos" element={<ProtectedRoute><Documentos /></ProtectedRoute>} />
-<Route path="*" element={
-                <Suspense fallback={<PageLoader />}>
-                  <NotFound />
-                </Suspense>
-              } />
-            </Routes>
-          </BrowserRouter>
-          
-          {/* React Query DevTools apenas em desenvolvimento */}
-          {process.env.NODE_ENV === 'development' && (
-            <Suspense fallback={null}>
-              <ReactQueryDevtools initialIsOpen={false} />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                } />
+                <Route path="/vale-alimentacao" element={
+                  <ProtectedRoute>
+                    <ValeAlimentacao />
+                  </ProtectedRoute>
+                } />
+                <Route path="/vale-combustivel" element={
+                  <ProtectedRoute>
+                    <ValeCombustivel />
+                  </ProtectedRoute>
+                } />
+                <Route path="/conciliacao-bancaria" element={
+                  <ProtectedRoute>
+                    <ConciliacaoBancaria />
+                  </ProtectedRoute>
+                } />
+                <Route path="/agenda" element={
+                  <ProtectedRoute>
+                    <AgendaPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/contatos" element={
+                  <ProtectedRoute>
+                    <Contatos />
+                  </ProtectedRoute>
+                } />
+                <Route path="/aniversarios" element={
+                  <ProtectedRoute>
+                    <Aniversarios />
+                  </ProtectedRoute>
+                } />
+                <Route path="/financeiro/config-empresa" element={
+                  <ProtectedRoute>
+                    <ConfigEmpresa />
+                  </ProtectedRoute>
+                } />
+                <Route path="/financeiro/recibo" element={
+                  <ProtectedRoute>
+                    <EmissaoRecibo />
+                  </ProtectedRoute>
+                } />
+                <Route path="/relatorios-viagem" element={
+                  <ProtectedRoute>
+                    <RelatoriosViagem />
+                  </ProtectedRoute>
+                } />
+                <Route path="/financeiro/cobranca" element={
+                  <ProtectedRoute>
+                    <Cobranca />
+                  </ProtectedRoute>
+                } />
+                <Route path="/financeiro/solicitacao-compras" element={
+                  <ProtectedRoute>
+                    <SolicitacaoCompras />
+                  </ProtectedRoute>
+                } />
+                <Route path="/recados" element={
+                  <ProtectedRoute>
+                    <Recados />
+                  </ProtectedRoute>
+                } />
+                <Route path="/tarefas" element={
+                  <ProtectedRoute>
+                    <Tarefas />
+                  </ProtectedRoute>
+                } />
+                <Route path="/perfil" element={
+                  <ProtectedRoute>
+                    <Perfil />
+                  </ProtectedRoute>
+                } />
+                <Route path="/gestao-tripulacao" element={
+                  <ProtectedRoute>
+                    <GestaoTripulacao />
+                  </ProtectedRoute>
+                } />
+                <Route path="/diario-aeronaves" element={
+                  <ProtectedRoute>
+                    <DiarioAeronaves />
+                  </ProtectedRoute>
+                } />
+                <Route path="/nova-aeronave" element={
+                  <ProtectedRoute>
+                    <NovaAeronave />
+                  </ProtectedRoute>
+                } />
+                <Route path="/diario-detalhes/:id" element={
+                  <ProtectedRoute>
+                    <DiarioDetalhes />
+                  </ProtectedRoute>
+                } />
+                <Route path="/adicionar-voo" element={
+                  <ProtectedRoute>
+                    <AdicionarVoo />
+                  </ProtectedRoute>
+                } />
+                <Route path="/agendamento-voo" element={
+                  <ProtectedRoute>
+                    <AgendamentoVoo />
+                  </ProtectedRoute>
+                } />
+                <Route path="/coordenacao-voos" element={
+                  <ProtectedRoute>
+                    <CoordenacaoVoos />
+                  </ProtectedRoute>
+                } />
+                <Route path="/controle-abastecimento" element={
+                  <ProtectedRoute>
+                    <ControleAbastecimento />
+                  </ProtectedRoute>
+                } />
+                <Route path="/documentos" element={
+                  <ProtectedRoute>
+                    <Documentos />
+                  </ProtectedRoute>
+                } />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
             </Suspense>
-          )}
+            <Sonner />
+            {process.env.NODE_ENV === 'development' && (
+              <Suspense fallback={null}>
+                <ReactQueryDevtools />
+              </Suspense>
+            )}
+          </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
-};
+}
 
 export default App;

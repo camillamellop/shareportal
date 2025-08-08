@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useEffect, useCallback } from "react";
+=======
+import { useState, useEffect } from "react";
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +21,11 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
   const [showNotificacoes, setShowNotificacoes] = useState(false);
   const [loading, setLoading] = useState(false);
 
+<<<<<<< HEAD
   const loadNotificacoes = useCallback(async () => {
+=======
+  const loadNotificacoes = async () => {
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     try {
       setLoading(true);
       // Temporariamente desabilitado devido a erro de índice
@@ -29,7 +37,11 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
     } finally {
       setLoading(false);
     }
+<<<<<<< HEAD
   }, [userId, userType]);
+=======
+  };
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   useEffect(() => {
     loadNotificacoes();
@@ -38,7 +50,11 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
     const interval = setInterval(loadNotificacoes, 30000);
     
     return () => clearInterval(interval);
+<<<<<<< HEAD
   }, [loadNotificacoes]);
+=======
+  }, [userId, userType, loadNotificacoes]);
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   const handleMarcarComoLida = async (id: string) => {
     try {

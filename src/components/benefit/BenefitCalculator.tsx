@@ -31,7 +31,10 @@ interface BenefitCalculatorProps {
   month: string;
   initialBalance: number;
   onInitialBalanceChange: (value: number) => void;
+<<<<<<< HEAD
   onMonthChange?: (month: string) => void;
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   editable?: boolean;
 }
 
@@ -40,7 +43,10 @@ export function BenefitCalculator({
   month, 
   initialBalance, 
   onInitialBalanceChange,
+<<<<<<< HEAD
   onMonthChange,
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   editable = false
 }: BenefitCalculatorProps) {
   const [expenses, setExpenses] = useState<Expense[]>([]);

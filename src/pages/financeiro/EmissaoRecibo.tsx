@@ -13,7 +13,10 @@ import { Receipt, Download, Eye, Plus, Save, CheckCircle, FileText } from "lucid
 import { toast } from "sonner";
 import { conciliacaoService } from "@/services/conciliacaoService";
 import { empresaService } from "@/services/empresaService";
+<<<<<<< HEAD
 import { PDFGenerator } from "@/utils/pdfGenerator";
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
 interface ReciboForm {
   numero: string;
@@ -154,6 +157,7 @@ export default function EmissaoRecibo() {
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
+<<<<<<< HEAD
   const generateReciboPDF = async () => {
     try {
       await PDFGenerator.generateReciboPDF({
@@ -172,6 +176,8 @@ export default function EmissaoRecibo() {
     }
   };
 
+=======
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   return (
     <Layout>
       <div className="p-6 space-y-6">
@@ -367,6 +373,7 @@ export default function EmissaoRecibo() {
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
+<<<<<<< HEAD
                               <Button 
                                 variant="outline" 
                                 size="sm"
@@ -375,6 +382,9 @@ export default function EmissaoRecibo() {
                                   toast.info('Funcionalidade será implementada em breve');
                                 }}
                               >
+=======
+                              <Button variant="outline" size="sm">
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                                 <Download className="h-4 w-4" />
                               </Button>
                               <Button variant="outline" size="sm">
@@ -505,9 +515,17 @@ export default function EmissaoRecibo() {
               <Button variant="outline" onClick={() => setShowPreview(false)}>
                 Fechar
               </Button>
+<<<<<<< HEAD
               <Button onClick={generateReciboPDF}>
                 <FileText className="h-4 w-4 mr-2" />
                 Gerar PDF
+=======
+              <Button onClick={() => {
+                toast.info('Função de impressão será implementada em breve');
+              }}>
+                <FileText className="h-4 w-4 mr-2" />
+                Imprimir
+>>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
               </Button>
             </div>
           </DialogContent>
