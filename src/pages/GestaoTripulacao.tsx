@@ -674,4 +674,7 @@ export default function GestaoTripulacao() {
       </div>
     </Layout>
   );
-}
+};
+
+
+
