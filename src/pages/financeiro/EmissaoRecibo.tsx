@@ -1,4 +1,8 @@
-import { useState, useEffect } from "react";
+// Função para valor por extenso simplificada (para a pré-visualização)
+function valorPorExtensoDisplay(numero: number): string {
+  if (!numero) return "";
+  return `${numero.toFixed(2).replace(".", ",")} reais`;
+}import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +17,7 @@ import { Receipt, Download, Eye, Save, CheckCircle, FileText } from "lucide-reac
 import { toast } from "sonner";
 import { conciliacaoService } from "@/services/conciliacaoService";
 import { empresaService } from "@/services/empresaService";
-import { PDFGenerator } from "@/utils/pdfGenerator";
+import { generateReciboPDF as generatePDF, ReciboData, EmpresaInfo, PagadorInfo, ItemRecibo } from "@/utils/reciboPDFGenerator";
 
 interface ReciboForm {
   numero: string;
@@ -37,6 +41,60 @@ interface ReciboEmitido {
   createdAt: Date;
 }
 
+// Função para gerar PDF usando o arquivo reciboPDFGenerator.ts
+const generateReciboPDF = async (formData: ReciboForm, configEmpresa: any) => {
+  try {
+    if (!configEmpresa) {
+      toast.error("Configuração da empresa não encontrada");
+      return;
+    }
+
+    // Mapeia os dados do formulário para o formato esperado pelo gerador
+    const empresaInfo: EmpresaInfo = {
+      razaoSocial: configEmpresa.razaoSocial || "",
+      cnpj: configEmpresa.cnpj || "",
+      telefone: configEmpresa.telefone || "",
+      endereco: configEmpresa.endereco || "",
+      cidade: configEmpresa.cidade || "",
+      estado: configEmpresa.estado || "",
+      cep: configEmpresa.cep || "",
+      logoUrl: configEmpresa.logo || undefined,
+    };
+
+    const pagadorInfo: PagadorInfo = {
+      nome: formData.cliente_nome,
+      documento: formData.cliente_documento || "",
+    };
+
+    // Cria um item único com a descrição do recibo
+    const item: ItemRecibo = {
+      descricao: formData.descricao,
+      quantidade: 1,
+      preco: formData.valor,
+      total: formData.valor,
+    };
+
+    const reciboData: ReciboData = {
+      numero: formData.numero,
+      dataEmissao: formData.data,
+      pagador: pagadorInfo,
+      itens: [item],
+      observacao: formData.observacoes || undefined,
+      subtotal: formData.valor,
+      desconto: 0,
+      total: formData.valor,
+    };
+
+    // Usa a função do arquivo reciboPDFGenerator.ts
+    generatePDF(reciboData, empresaInfo);
+    
+    return true;
+  } catch (error) {
+    console.error("Erro ao gerar PDF:", error);
+    throw error;
+  }
+};
+
 export default function EmissaoRecibo() {
   const [formData, setFormData] = useState<ReciboForm>({
     numero: "",
@@ -53,19 +111,16 @@ export default function EmissaoRecibo() {
   const [showPreview, setShowPreview] = useState(false);
   const [configEmpresa, setConfigEmpresa] = useState<any>(null);
 
-  // Carrega configurações e histórico (se houver) ao montar
   useEffect(() => {
     loadRecibos();
     loadConfigEmpresa();
   }, []);
 
-  // Atualiza automaticamente o próximo número quando o histórico mudar
   useEffect(() => {
     generateNextNumber();
   }, [recibosEmitidos]);
 
   const loadRecibos = async () => {
-    // TODO: substituir por fetch real quando o serviço estiver pronto
     setRecibosEmitidos([]);
   };
 
@@ -74,14 +129,12 @@ export default function EmissaoRecibo() {
       const config = await empresaService.getConfig();
       setConfigEmpresa(config);
     } catch (error) {
-      // Apenas log técnico; não exibimos mensagens genéricas
       console.error("Erro ao carregar configuração da empresa:", error);
     }
   };
 
   const generateNextNumber = () => {
     const year = new Date().getFullYear();
-    // Busca o maior seq. do ano atual no histórico local
     const sequenciasDoAno = recibosEmitidos
       .filter((r) => r.numero?.includes(`/${year}`))
       .map((r) => {
@@ -94,9 +147,8 @@ export default function EmissaoRecibo() {
     setFormData((prev) => ({ ...prev, numero: `${nextSeq}/${year}` }));
   };
 
-  const valorPorExtenso = (valor: number): string => {
+  const valorPorExtensoForPreview = (valor: number): string => {
     if (!valor) return "";
-    // Mantendo simples conforme seu original
     return `${valor.toFixed(2).replace(".", ",")} reais`;
   };
 
@@ -124,7 +176,6 @@ export default function EmissaoRecibo() {
         data: formData.data,
       });
 
-      // Adiciona ao histórico local para manter o sequencial
       setRecibosEmitidos((prev) => [
         ...prev,
         {
@@ -142,7 +193,6 @@ export default function EmissaoRecibo() {
 
       toast.success("Recibo emitido e despesa pendente criada!");
 
-      // Reset do formulário (o número é recalculado pelo useEffect acima)
       setFormData({
         numero: "",
         data: new Date().toISOString().split("T")[0],
@@ -165,16 +215,14 @@ export default function EmissaoRecibo() {
 
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("pt-BR");
 
-  const generateReciboPDF = async () => {
+  const handleGenerateReciboPDF = async () => {
     try {
-      await PDFGenerator.generateReciboPDF({
-        numero: formData.numero,
-        cliente_nome: formData.cliente_nome,
-        valor: formData.valor,
-        descricao: formData.descricao,
-        data: formData.data,
-        forma_pagamento: "Transferência Bancária",
-      });
+      if (!formData.cliente_nome || !formData.valor || !formData.descricao) {
+        toast.error("Preencha todos os campos obrigatórios");
+        return;
+      }
+      
+      await generateReciboPDF(formData, configEmpresa);
       toast.success("PDF do recibo gerado com sucesso!");
     } catch (error) {
       console.error("Erro ao gerar PDF do recibo:", error);
@@ -265,7 +313,7 @@ export default function EmissaoRecibo() {
 
                     <div className="space-y-2">
                       <Label htmlFor="valor-extenso">Valor por Extenso</Label>
-                      <Input id="valor-extenso" value={valorPorExtenso(formData.valor)} readOnly className="bg-muted" />
+                      <Input id="valor-extenso" value={valorPorExtensoForPreview(formData.valor)} readOnly className="bg-muted" />
                     </div>
                   </CardContent>
                 </Card>
@@ -316,7 +364,10 @@ export default function EmissaoRecibo() {
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => setShowPreview(true)}
+                        onClick={() => {
+                          console.log("Dados do formulário:", formData);
+                          setShowPreview(true);
+                        }}
                         disabled={!formData.cliente_nome || !formData.valor || !formData.descricao}
                       >
                         <Eye className="h-4 w-4 mr-2" />
@@ -372,7 +423,6 @@ export default function EmissaoRecibo() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  // placeholder
                                   toast.info("Funcionalidade será implementada em breve");
                                 }}
                               >
@@ -401,10 +451,10 @@ export default function EmissaoRecibo() {
 
             <div className="bg-white p-8 border rounded-lg" style={{ fontFamily: "Arial, sans-serif" }}>
               {configEmpresa && (
-                <div className="text-center mb-8 pb-6 border-b-2 border-black-300">
+                <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
                   <div className="flex justify-between items-start">
                     <div className="flex-1 text-left">
-                      <h1 className="text-xl font-bold text-black-900 mb-3">{configEmpresa.razaoSocial}</h1>
+                      <h1 className="text-xl font-bold text-gray-900 mb-3">{configEmpresa.razaoSocial}</h1>
                       <div className="text-sm text-gray-700 space-y-1">
                         <p>
                           <strong>CNPJ:</strong> {configEmpresa.cnpj}{" "}
@@ -435,42 +485,42 @@ export default function EmissaoRecibo() {
 
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">RECIBO</h2>
-                <p className="text-lg text-gray-700">Nº {formData.numero}</p>
+                <p className="text-lg text-gray-700">Nº {formData?.numero || "000/2025"}</p>
               </div>
 
               <div className="space-y-6 mb-8">
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Data de Emissão:</p>
-                    <p className="font-semibold">{new Date(formData.data).toLocaleDateString("pt-BR")}</p>
+                    <p className="font-semibold">{formData?.data ? new Date(formData.data).toLocaleDateString("pt-BR") : new Date().toLocaleDateString("pt-BR")}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Valor:</p>
-                    <p className="font-semibold text-xl">{formatCurrency(formData.valor)}</p>
+                    <p className="font-semibold text-xl">{formatCurrency(formData?.valor || 0)}</p>
                   </div>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Cliente:</p>
-                  <p className="font-semibold">{formData.cliente_nome}</p>
-                  {formData.cliente_documento && (
+                  <p className="font-semibold">{formData?.cliente_nome || "Nome do cliente"}</p>
+                  {formData?.cliente_documento && (
                     <p className="text-sm text-gray-600">CPF/CNPJ: {formData.cliente_documento}</p>
                   )}
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Valor por Extenso:</p>
-                  <p className="font-semibold">{valorPorExtenso(formData.valor)}</p>
+                  <p className="font-semibold">{valorPorExtensoForPreview(formData?.valor || 0)}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Referente a:</p>
                   <div className="border border-gray-300 rounded p-4 min-h-[100px]">
-                    <p>{formData.descricao}</p>
+                    <p>{formData?.descricao || "Descrição do serviço"}</p>
                   </div>
                 </div>
 
-                {formData.observacoes && (
+                {formData?.observacoes && (
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Observações:</p>
                     <p className="text-sm">{formData.observacoes}</p>
@@ -481,16 +531,19 @@ export default function EmissaoRecibo() {
               <div className="text-center mt-12 pt-8 border-t border-gray-300">
                 <div className="inline-block">
                   <div className="w-64 border-b border-gray-400 mb-2"></div>
-                  <p className="text-sm text-gray-600">Assinatura</p>
-                </div>
+                  </div>
               </div>
 
               <div className="text-center mt-8">
                 <p className="text-sm text-gray-600">
-                  {configEmpresa?.cidade},{" "}
-                  {new Date(formData.data).toLocaleDateString("pt-BR", {
+                  {configEmpresa?.cidade || "Cidade"},{" "}
+                  {formData?.data ? new Date(formData.data).toLocaleDateString("pt-BR", {
                     day: "numeric",
                     month: "long",
+                    year: "numeric",
+                  }) : new Date().toLocaleDateString("pt-BR", {
+                    day: "numeric",
+                    month: "long", 
                     year: "numeric",
                   })}
                 </p>
@@ -501,7 +554,7 @@ export default function EmissaoRecibo() {
               <Button variant="outline" onClick={() => setShowPreview(false)}>
                 Fechar
               </Button>
-              <Button onClick={generateReciboPDF}>
+              <Button onClick={handleGenerateReciboPDF}>
                 <FileText className="h-4 w-4 mr-2" />
                 Gerar PDF
               </Button>
