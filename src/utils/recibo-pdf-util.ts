@@ -27,6 +27,12 @@ export interface ReciboData {
   desconto: number;           // ignorado visualmente
   total: number;
   referenteA?: string;        // usamos para o bloco "Referente a"
+  cliente_nome?: string;
+  cliente_documento?: string;
+  data?: string | Date;
+  descricao?: string;
+  valor?: number;
+  observacoes?: string;
 }
 
 /* ===== Helpers ===== */
@@ -104,73 +110,104 @@ export function generateReciboPDF(recibo: ReciboData, empresa: EmpresaInfo) {
   .hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px; }
   .title { font-weight:800; font-size:20px; margin:0; }
   .numwrap { text-align:right; }
-  .numbox { display:inline-block; border:1px solid #d1d5db; border-radius:6px; padding:8px 12px; font-weight:700; }
+  .numbox { display:inline-block; border:1px solid rgb(197, 217, 247); border-radius:6px; padding:8px 12px; font-weight:700; }
   .numlbl { font-size:11px; color:#6b7280; margin-top:4px; }
   .grid { display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-bottom: 20px; }
   .lbl { font-size:11px; color:#6b7280; text-transform:uppercase; margin-bottom:6px; }
   .val { font-size:14px; font-weight:700; color:#111827; }
   .muted { font-size:12px; color:#374151; }
-  .sec-h { background:#f3f4f6; border:1px solid #e5e7eb; padding:10px 14px; border-radius:6px 6px 0 0; font-size:11px; font-weight:700; text-transform:uppercase; }
+  .sec-h { background:#f3f4f6; border:1px solid rgb(154, 186, 252); padding:10px 14px; border-radius:6px 6px 0 0; font-size:11px; font-weight:700; text-transform:uppercase; }
   .sec-b { border:1px solid #e5e7eb; border-top:0; border-radius:0 0 6px 6px; padding:14px; font-size:13px; line-height:1.6; }
   .tot { width:320px; margin-left:auto; font-size:14px; margin-top: 6px; border-top:1px solid #e5e7eb; padding-top:8px; }
   .trow { display:flex; justify-content:space-between; padding:4px 0; }
   .obs { background:#fffbeb; border:1px solid #fde68a; padding:10px 14px; border-radius:6px; font-size:13px; margin-top:12px; color:#78350f; }
-  .decl { font-size:13px; margin-top:14px; }
+  .decl { font-size:13px; margin-top:14px; line-height:1.6; }
   .sign { text-align:center; margin-top: 36px; }
   .sign-line { width: 300px; border-bottom: 1px solid #111827; margin: 10px auto; }
-  .logo { height: 48px; object-fit: contain; margin: 0 auto 6px; display:block; }
+  .logo { height: 60px; object-fit: contain; margin: 0 auto 10px; display:block; }
+  .empresa-nome { font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+  .local-data { font-size: 12px; color: #6b7280; }
 </style>
 </head>
 <body>
 <div class="container">
 
+  <!-- Header: título + badge com NÚMERO -->
   <div class="hdr">
-    <h1 class="title">RECIBO DE PAGAMENTO</h1>
+    <h2 class="title">RECIBO DE PAGAMENTO</h2>
     <div class="numwrap">
-      <div class="numbox">${recibo.numero}</div>
+      <div class="numbox">${recibo.numero || "—"}</div>
       <div class="numlbl">Número do recibo</div>
     </div>
   </div>
 
+  <!-- Emissor / Pagador -->
   <div class="grid">
     <div>
       <div class="lbl">Emissor</div>
-      <div class="val">${empresa.razaoSocial}</div>
-      ${empresa.cnpj ? `<div class="muted">CNPJ: ${empresa.cnpj}</div>` : ``}
-      ${empresa.telefone ? `<div class="muted">/ ${empresa.telefone}</div>` : ``}
-      <div class="muted" style="margin-top:6px">
-        ${empresa.endereco}<br/>${empresa.cidade} - ${empresa.estado}, ${empresa.cep}
-      </div>
-      ${empresa.email ? `<div class="muted" style="margin-top:6px">${empresa.email}</div>` : ``}
+      <div class="val">${empresa.razaoSocial || "Empresa"}</div>
+      ${empresa.cnpj ? `<div class="muted">CNPJ: ${empresa.cnpj}</div>` : ""}
+      ${empresa.telefone ? `<div class="muted">Telefone: ${empresa.telefone}</div>` : ""}
+      ${empresa.endereco || empresa.cidade || empresa.estado || empresa.cep ? `
+        <div class="muted" style="margin-top:8px; line-height:1.4;">
+          ${empresa.endereco || ""}<br>
+          ${empresa.cidade || ""} - ${empresa.estado || ""}, ${empresa.cep || ""}
+        </div>
+      ` : ""}
+      ${empresa.email ? `<div class="muted" style="margin-top:8px;">${empresa.email}</div>` : ""}
     </div>
+
     <div>
       <div class="lbl">Pagador</div>
-      <div class="val">${recibo.pagador?.nome || ""}</div>
-      ${recibo.pagador?.documento ? `<div class="muted">CNPJ: ${recibo.pagador.documento}</div>` : ``}
-      <div class="muted" style="margin-top:6px">Data de emissão: ${formatDateBR(recibo.dataEmissao)}</div>
+      <div class="val">${recibo.cliente_nome || recibo.pagador?.nome || ""}</div>
+      ${recibo.cliente_documento || recibo.pagador?.documento ? `
+        <div class="muted">Documento: ${recibo.cliente_documento || recibo.pagador?.documento}</div>
+      ` : ""}
+      <div class="muted" style="margin-top:8px;">
+        Data de emissão: ${formatDateBR(recibo.data || recibo.dataEmissao)}
+      </div>
     </div>
   </div>
 
-  <div class="sec-h">Referente a</div>
-  <div class="sec-b">${recibo.referenteA || ""}</div>
+  <!-- Referente a (sem tabela) -->
+  <div style="margin-bottom:20px;">
+    <div class="sec-h">Referente a</div>
+    <div class="sec-b">
+      ${recibo.descricao || recibo.referenteA || "Serviços prestados"}
+    </div>
+  </div>
 
+  <!-- TOTAL -->
   <div class="tot">
-    <div class="trow"><div><b>Total:</b></div><div><b>${formatCurrency(recibo.total)}</b></div></div>
+    <div class="trow" style="font-weight:700; border-top:2px solid #374151;">
+      <span>Total:</span>
+      <span>${formatCurrency(recibo.valor || recibo.total || 0)}</span>
+    </div>
   </div>
 
-  ${recibo.observacao ? `<div class="obs"><b>Observação:</b> ${recibo.observacao}</div>` : ``}
+  <!-- Observação -->
+  ${recibo.observacoes || recibo.observacao ? `
+    <div class="obs">
+      <b>Observação:</b> ${recibo.observacoes || recibo.observacao}
+    </div>
+  ` : ""}
 
+  <!-- Declaração -->
   <div class="decl">
-    <b>Declaração:</b> Recebemos de <b>${recibo.pagador?.nome || ""}</b>, a importância de
-    <b>${valorPorExtenso(Number(recibo.total || 0))}</b>, referente ao descrito acima. Para maior clareza,
-    firmo o presente recibo para que produza seus efeitos, dando plena, geral e irrevogável quitação pelo valor recebido.
+    <b>Declaração:</b> Recebemos de <b>${recibo.cliente_nome || recibo.pagador?.nome || ""}</b>, a importância de
+    <b>${valorPorExtenso(Number(recibo.valor || recibo.total || 0))}</b>, referente ao descrito acima. Para maior
+    clareza, firmo o presente recibo para que produza seus efeitos, dando plena, geral e irrevogável
+    quitação pelo valor recebido.
   </div>
 
+  <!-- Assinatura com LOGO -->
   <div class="sign">
-    <img class="logo" src="${logo}" alt="Logo" />
+    <img src="${logo}" alt="Logo" class="logo" />
     <div class="sign-line"></div>
-    <div class="muted" style="font-weight:600">${empresa.razaoSocial}</div>
-    <div class="muted">${empresa.cidade}, ${formatDateLongBR(recibo.dataEmissao)}</div>
+    <p class="empresa-nome">${empresa.razaoSocial || "Empresa"}</p>
+    <p class="local-data">
+      ${empresa.cidade || "Cidade"}, ${formatDateLongBR(recibo.data || recibo.dataEmissao)}
+    </p>
   </div>
 
 </div>
