@@ -7,8 +7,8 @@ import {
 
 // ==== Firestore & Storage (com tudo que é usado) ====
 import {
-  collection, addDoc, getDocs, getDoc, doc, updateDoc,
-  query, where, orderBy, startAt, endAt, limit as fbLimit,
+  collection, addDoc, getDocs, doc, updateDoc,
+  query, orderBy, startAt, endAt, limit as fbLimit,
   runTransaction, serverTimestamp
 } from "firebase/firestore";
 import {
@@ -36,6 +36,7 @@ export interface DespesaViagem {
   pago_por: "Tripulante" | "Cotista" | "Share Brasil";
   comprovante_url?: string;
   comprovante_nome?: string;
+  // NUNCA salvar isso no Firestore:
   comprovante_file?: File;
 }
 
@@ -109,11 +110,11 @@ const PAGADORES_LIST: Array<"Tripulante" | "Cotista" | "Share Brasil"> = ["Tripu
 const WEBMAIL_URL_BASE = "https://webmail-seguro.com.br/sharebrasil.net.br/";
 
 // coleções (ajuste os nomes se no seu projeto forem outros)
-const relatoriosCollectionRef = collection(db, "relatorios");
-const cotistasCollectionRef  = collection(db, "clientes");
-const aeronavesCollectionRef = collection(db, "aeronaves");
-const tripulantesCollectionRef = collection(db, "tripulantes");
-const conciliacaoCollectionRef = collection(db, "conciliacao");
+const relatoriosCollectionRef   = collection(db, "relatorios");
+const cotistasCollectionRef     = collection(db, "clientes");
+const aeronavesCollectionRef    = collection(db, "aeronaves");
+const tripulantesCollectionRef  = collection(db, "tripulantes");
+const conciliacaoCollectionRef  = collection(db, "conciliacao");
 
 // ===== AUTOCOMPLETE =====
 interface AutocompleteProps {
@@ -216,6 +217,29 @@ const gerarPrefixoPadrao = (nome: string) =>
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+// Remove undefined recursivamente e remove campos não permitidos (ex.: File)
+const cleanForFirestore = (input: any): any => {
+  if (Array.isArray(input)) {
+    return input
+      .map(cleanForFirestore)
+      .filter((v) => v !== undefined);
+  }
+  if (input && typeof input === "object") {
+    if (input instanceof Date || input instanceof Blob || input instanceof File) {
+      // Blob/File não deve ir para Firestore — retorna undefined pra ser removido
+      return undefined as any;
+    }
+    const out: any = {};
+    for (const [k, v] of Object.entries(input)) {
+      if (v === undefined) continue;
+      const cleaned = cleanForFirestore(v);
+      if (cleaned !== undefined) out[k] = cleaned;
+    }
+    return out;
+  }
+  return input;
+};
 
 const generateReportNumberAtomic = async (prefixoCotista: string) => {
   if (!prefixoCotista) return "";
@@ -326,7 +350,6 @@ export default function RelatoriosViagem() {
     if (isNaN(d.getTime())) return "Data inválida";
     const userTimezoneOffset = d.getTimezoneOffset() * 60000;
     return new Date(d.getTime() + userTimezoneOffset).toLocaleDateString("pt-BR");
-    // dica: para PDF padrão, você pode usar d.toLocaleDateString('pt-BR', { timeZone: 'UTC' })
   };
 
   const calcularTotaisDetalhados = () => {
@@ -433,8 +456,8 @@ export default function RelatoriosViagem() {
         valor: Number(novaDespesa.valor),
         data: novaDespesa.data!,
         pago_por: novaDespesa.pago_por!,
-        comprovante_nome,
-        comprovante_url,
+        ...(comprovante_nome ? { comprovante_nome } : {}),
+        ...(comprovante_url ? { comprovante_url } : {}),
       };
       setFormData((prev) => ({ ...prev, despesas: [...prev.despesas, despesa] }));
       setNovaDespesa({
@@ -673,8 +696,17 @@ export default function RelatoriosViagem() {
       }
 
       const totals = calcularTotaisDetalhados();
-      const relatorioData = {
+
+      // Sanitiza despesas (não envia comprovante_file e não envia chaves vazias)
+      const despesasSanitizadas = (formData.despesas || []).map(({ comprovante_file, comprovante_nome, comprovante_url, ...rest }) => ({
+        ...rest,
+        ...(comprovante_nome ? { comprovante_nome } : {}),
+        ...(comprovante_url ? { comprovante_url } : {}),
+      }));
+
+      const relatorioDataRaw = {
         ...formData,
+        despesas: despesasSanitizadas,
         numero: numeroFinal,
         ...totals,
         status: "SALVO" as StatusRelatorio,
@@ -682,11 +714,14 @@ export default function RelatoriosViagem() {
         atualizado_em: serverTimestamp(),
       };
 
+      // Remove undefined/Blob/File recursivamente
+      const relatorioData = cleanForFirestore(relatorioDataRaw);
+
       const newDoc = await addDoc(relatoriosCollectionRef, relatorioData);
       docId = newDoc.id;
 
       const { blob, filename } = await generateRelatorioViagemPDF(
-        { ...relatorioData, id: docId },
+        { ...(relatorioData as any), id: docId },
         totals,
         companyConfig
       );
@@ -1031,7 +1066,7 @@ export default function RelatoriosViagem() {
             {/* MODAL VISUALIZAR */}
             {relatorioVisualizar && (
               <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-                <div className="bg-gray-900 rounded-lg shadow-lg p-6 max-w-4xl w/full max-h-[90vh] overflow-y-auto relative">
+                <div className="bg-gray-900 rounded-lg shadow-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
                   <button
                     onClick={() => setRelatorioVisualizar(null)}
                     className="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
