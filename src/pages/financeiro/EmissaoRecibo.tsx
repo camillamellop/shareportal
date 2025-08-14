@@ -507,7 +507,7 @@ export default function EmissaoRecibo() {
                               <button
                                 key={c.id}
                                 type="button"
-                                className="w-full text-left px-3 py-2 hover:bg-gray-50"
+                                className="w-full text-left px-3 py-2 hover:bg-gray-100"
                                 onClick={() => {
                                   setFormData((prev) => ({
                                     ...prev,
@@ -517,7 +517,7 @@ export default function EmissaoRecibo() {
                                   setShowClienteOptions(false);
                                 }}
                               >
-                                <div className="font-medium text-sm">{c.razao_social}</div>
+                                <div className="font-medium text-sm text-gray-900">{c.razao_social}</div>
                                 {c.CNPJ ? <div className="text-xs text-gray-500">CNPJ: {c.CNPJ}</div> : null}
                               </button>
                             ))}
