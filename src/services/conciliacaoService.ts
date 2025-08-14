@@ -277,24 +277,39 @@ export class ConciliacaoService {
   }
 
   // INTEGRAÇÃO COM RECIBOS E RELATÓRIOS
-  async criarDespesaDeRecibo(reciboId: string, dadosRecibo: {
-    numero: string;
-    cliente_nome: string;
-    valor: number;
-    descricao: string;
-    data: string;
-  }): Promise<string> {
-    return this.criarDespesaPendente({
-      tipo: 'recibo',
-      categoria: 'cliente',
+ 
+async criarDespesaDeRecibo(reciboId: string, dadosRecibo: {
+  numero: string;
+  cliente_nome: string;
+  valor: number;
+  descricao: string;
+  data: string;
+}): Promise<string> {
+  try {
+    console.log('Criando despesa para recibo:', dadosRecibo);
+    
+    const despesaData = {
+      tipo: 'recibo' as const,
+      categoria: 'cliente' as const,
       origem_id: reciboId,
       numero_documento: dadosRecibo.numero,
       cliente_nome: dadosRecibo.cliente_nome,
       descricao: `Recibo #${dadosRecibo.numero} - ${dadosRecibo.descricao}`,
       valor: dadosRecibo.valor,
       data_criacao: dadosRecibo.data,
-      status: 'pendente_envio'
-    });
+      status: 'pendente_envio' as const,
+      data_ocorrencia: dadosRecibo.data,
+      observacoes: `Despesa gerada automaticamente através do recibo #${dadosRecibo.numero}`
+    };
+
+    const despesaId = await this.criarDespesaPendente(despesaData);
+    
+    console.log('Despesa criada com sucesso:', despesaId);
+    return despesaId;
+  } catch (error) {
+    console.error('Erro ao criar despesa de recibo:', error);
+    throw error;
+  }
   }
 
   async criarDespesaDeRelatorioViagem(relatorioId: string, dadosRelatorio: {

@@ -12,8 +12,8 @@ import { Loader2 } from "lucide-react";
 // Lazy load das páginas para melhor performance
 const Index = React.lazy(() => import("./pages/Index"));
 const Login = React.lazy(() => import("./pages/Login"));
-const ValeAlimentacao = React.lazy(() => import("./pages/ValeAlimentacao"));
-const ValeCombustivel = React.lazy(() => import("./pages/ValeCombustivel"));
+const ValeAlimentacao = React.lazy(() => import("./pages/CartaoAlimentacao"));
+const ValeCombustivel = React.lazy(() => import("./pages/CartaoCombustivel"));
 const ConciliacaoBancaria = React.lazy(() => import("./pages/ConciliacaoBancaria"));
 const AgendaPage = React.lazy(() => import("./pages/AgendaPage"));
 const Contatos = React.lazy(() => import("./pages/Contatos"));
