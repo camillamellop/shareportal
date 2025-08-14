@@ -12,8 +12,6 @@ import { Loader2 } from "lucide-react";
 // Lazy load das páginas para melhor performance
 const Index = React.lazy(() => import("./pages/Index"));
 const Login = React.lazy(() => import("./pages/Login"));
-const ValeAlimentacao = React.lazy(() => import("./pages/CartaoAlimentacao"));
-const ValeCombustivel = React.lazy(() => import("./pages/CartaoCombustivel"));
 const ConciliacaoBancaria = React.lazy(() => import("./pages/ConciliacaoBancaria"));
 const AgendaPage = React.lazy(() => import("./pages/AgendaPage"));
 const Contatos = React.lazy(() => import("./pages/Contatos"));
@@ -37,7 +35,7 @@ const CoordenacaoVoos = React.lazy(() => import("./pages/CoordenacaoVoos"));
 const ControleAbastecimento = React.lazy(() => import("./pages/ControleAbastecimento"));
 const CartaoAlimentacao = React.lazy(() => import("./pages/CartaoAlimentacao"));
 const CartaoCombustivel = React.lazy(() => import("./pages/CartaoCombustivel"));
-const Documentos = React.lazy(() => import("./pages/Documentos"));
+
 
 
 // Configuração otimizada do QueryClient
@@ -96,17 +94,7 @@ function App() {
                     <ConciliacaoBancaria />
                   </ProtectedRoute>
                 } />
-                <Route path="/vale-alimentacao" element={
-                  <ProtectedRoute>
-                    <ValeAlimentacao />
-                  </ProtectedRoute>
-                } />
-                <Route path="/vale-combustivel" element={
-                  <ProtectedRoute>
-                    <ValeCombustivel />
-                  </ProtectedRoute>
-                } />
-                <Route path="/agenda" element={
+                  <Route path="/agenda" element={
                   <ProtectedRoute>
                     <AgendaPage />
                   </ProtectedRoute>
@@ -211,12 +199,7 @@ function App() {
                     <CartaoCombustivel />
                   </ProtectedRoute>
                 } />
-                <Route path="/documentos" element={
-                  <ProtectedRoute>
-                    <Documentos />
-                  </ProtectedRoute>
-                } />
-                <Route path="*" element={<NotFound />} />
+                         <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
             <Sonner />
