@@ -39,6 +39,7 @@ interface RelatorioViagemForm {
   criado_por: string;
   prefixo_cotista: string;
 }
+
 interface Props {
   dadosEmpresa: CompanyConfig;
   formData: RelatorioViagemForm | any;
@@ -63,33 +64,17 @@ export const RelatorioPreviewLayout: React.FC<Props> = ({
   status
 }) => {
   return (
-    <div className="w-full flex justify-center">
-      {/* Página A4 (≈ 794px a 96dpi) */}
-      <div
-        className="
-          w-[794px] max-w-full bg-white text-gray-900
-          rounded-xl shadow ring-1 ring-gray-200
-          p-8 space-y-8
-          print:w-[794px] print:rounded-none print:shadow-none print:ring-0 print:p-8
-        "
-      >
-        {/* ===== Cabeçalho ===== */}
-        <div
-          className="grid grid-cols-[1fr_auto] gap-6 items-start"
-          style={{ breakInside: "avoid", pageBreakInside: "avoid" }}
-        >
-          <div className="space-y-1">
-            <h1 className="text-2xl font-extrabold tracking-tight uppercase">
-              {dadosEmpresa?.razaoSocial || "Empresa"}
-            </h1>
-            <p className="text-sm">
-              CNPJ: {dadosEmpresa?.cnpj || "–"}
-              {dadosEmpresa?.inscricaoMunicipal ? ` • IM: ${dadosEmpresa.inscricaoMunicipal}` : ""}
+    <div className="space-y-6">
+      {/* Cabeçalho padrão */}
+      <div className="bg-white text-gray-900 rounded-lg p-6">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h2 className="text-xl font-bold">{dadosEmpresa?.razaoSocial || "Empresa"}</h2>
+            <p className="text-sm mt-1">
+              CNPJ: {dadosEmpresa?.cnpj || "-"}{dadosEmpresa?.inscricaoMunicipal ? ` • IM: ${dadosEmpresa.inscricaoMunicipal}` : ""}
             </p>
             <p className="text-sm">
-              Endereço: {dadosEmpresa?.endereco || "–"},{" "}
-              {dadosEmpresa?.cidade || "–"} – {dadosEmpresa?.estado || "–"}
-              {dadosEmpresa?.cep ? `, ${dadosEmpresa.cep}` : ""}
+              Endereço: {dadosEmpresa?.endereco || "-"}, {dadosEmpresa?.cidade || "-"} - {dadosEmpresa?.estado || "-"}{dadosEmpresa?.cep ? `, ${dadosEmpresa.cep}` : ""}
             </p>
             {(dadosEmpresa?.telefone || dadosEmpresa?.email || dadosEmpresa?.website) && (
               <p className="text-sm">
@@ -101,164 +86,104 @@ export const RelatorioPreviewLayout: React.FC<Props> = ({
               </p>
             )}
           </div>
-
           {dadosEmpresa?.logo && (
-            <img
-              src={dadosEmpresa.logo}
-              alt="Logo"
-              className="h-16 w-auto object-contain justify-self-end"
-            />
+            <img src={dadosEmpresa.logo} alt="Logo" className="h-16 w-auto object-contain" />
           )}
         </div>
+      </div>
 
-        {/* Linha divisória leve */}
-        <hr className="border-gray-200" />
+      {/* Título + status */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">
+            Pré-visualização — Relatório #{formData?.numero || "—"}
+          </h1>
+          <p className="text-gray-400 text-sm">
+            Confira os dados abaixo. Você pode voltar e editar, ou salvar e baixar o PDF.
+          </p>
+        </div>
+        {status && (
+          <Badge variant="outline" className="border-gray-600 text-gray-200">
+            {status}
+          </Badge>
+        )}
+      </div>
 
-        {/* Título + Status */}
-        <div className="flex items-center justify-between" style={{ breakInside: "avoid" }}>
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold">
-              Relatório #{formData?.numero || "—"}
-            </h2>
-            <p className="text-sm text-gray-500">
-              Pré-visualização do documento antes da geração do PDF.
-            </p>
-          </div>
-          {status && (
-            <Badge variant="outline" className="border-gray-300 text-gray-700">
-              {status}
-            </Badge>
-          )}
+      {/* Bloco de informações */}
+      <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+          <div><span className="text-gray-400">Cotista:</span> <span className="text-white font-medium">{formData.cotista || "—"}</span></div>
+          <div><span className="text-gray-400">Aeronave:</span> <span className="text-white font-medium">{formData.aeronave || "—"}</span></div>
+          <div><span className="text-gray-400">Tripulante:</span> <span className="text-white font-medium">{formData.tripulante || "—"}</span></div>
+          <div><span className="text-gray-400">Destino:</span> <span className="text-white font-medium">{formData.destino || "—"}</span></div>
+          <div><span className="text-gray-400">Período:</span> <span className="text-white font-medium">{formatDate(formData.data_inicio)} a {formatDate(formData.data_fim)}</span></div>
+          <div><span className="text-gray-400">Número:</span> <span className="text-white font-medium">{formData.numero || "—"}</span></div>
         </div>
 
-        {/* ===== Cards de Metadados ===== */}
-        <section
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          style={{ breakInside: "avoid" }}
-        >
-          {[
-            { label: "Cotista", value: formData.cotista || "—" },
-            { label: "Aeronave", value: formData.aeronave || "—" },
-            { label: "Tripulante", value: formData.tripulante || "—" },
-            { label: "Destino", value: formData.destino || "—" },
-            { label: "Período", value: `${formatDate(formData.data_inicio)} a ${formatDate(formData.data_fim)}` },
-            { label: "Número", value: formData.numero || "—" },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="rounded-lg border border-gray-200 bg-white p-4"
-            >
-              <div className="text-[10px] uppercase tracking-wider text-gray-500">
-                {item.label}
-              </div>
-              <div className="mt-1 font-semibold">{item.value}</div>
-            </div>
-          ))}
-        </section>
-
-        {/* ===== Despesas ===== */}
-        <section className="space-y-4" style={{ breakInside: "avoid" }}>
-          <h3 className="text-lg font-semibold">
-            Despesas ({formData?.despesas?.length || 0})
-          </h3>
-
-          <div className="rounded-lg border border-gray-200 overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr className="text-gray-600">
-                  <th className="p-3 text-left">Data</th>
-                  <th className="p-3 text-left">Categoria</th>
-                  <th className="p-3 text-left">Descrição</th>
-                  <th className="p-3 text-left">Pago por</th>
+        {/* Despesas */}
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold text-white mb-3">Despesas ({formData?.despesas?.length || 0})</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-gray-600">
+                <tr className="text-gray-400">
+                  <th className="p-3">Data</th>
+                  <th className="p-3">Categoria</th>
+                  <th className="p-3">Descrição</th>
+                  <th className="p-3">Pago por</th>
                   <th className="p-3 text-right">Valor</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody>
                 {(formData?.despesas || []).map((d: DespesaViagem) => (
-                  <tr key={d.id} className="bg-white">
-                    <td className="p-3 text-gray-700 whitespace-nowrap">{formatDate(d.data)}</td>
-                    <td className="p-3 text-gray-700">{d.categoria}</td>
-                    <td className="p-3 text-gray-900">{d.descricao}</td>
-                    <td className="p-3 text-gray-700">{d.pago_por}</td>
-                    <td className="p-3 text-right font-medium">
-                      {formatCurrency(d.valor)}
-                    </td>
+                  <tr key={d.id} className="border-b border-gray-700">
+                    <td className="p-3 text-gray-300">{formatDate(d.data)}</td>
+                    <td className="p-3 text-gray-300">{d.categoria}</td>
+                    <td className="p-3 text-white">{d.descricao}</td>
+                    <td className="p-3 text-gray-300">{d.pago_por}</td>
+                    <td className="p-3 text-right text-green-400 font-medium">{formatCurrency(d.valor)}</td>
                   </tr>
                 ))}
-                {(!formData?.despesas || formData?.despesas.length === 0) && (
-                  <tr>
-                    <td colSpan={5} className="p-6 text-center text-gray-500">
-                      Nenhuma despesa adicionada
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
 
           {/* Totais */}
-          <div
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            style={{ breakInside: "avoid" }}
-          >
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <ul className="text-sm space-y-1">
-                <li className="text-gray-700">
-                  Tripulante:{" "}
-                  <span className="font-semibold">
-                    {formatCurrency(totals.total_tripulante)}
-                  </span>
-                </li>
-                <li className="text-gray-700">
-                  Cotista:{" "}
-                  <span className="font-semibold">
-                    {formatCurrency(totals.total_cotista)}
-                  </span>
-                </li>
-                <li className="text-gray-700">
-                  Share Brasil:{" "}
-                  <span className="font-semibold">
-                    {formatCurrency(totals.total_share_brasil)}
-                  </span>
-                </li>
-              </ul>
+          <div className="mt-4 p-4 bg-gray-700 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1 text-sm">
+              <div className="text-gray-300">Tripulante: <span className="text-white font-medium">{formatCurrency(totals.total_tripulante)}</span></div>
+              <div className="text-gray-300">Cotista: <span className="text-white font-medium">{formatCurrency(totals.total_cotista)}</span></div>
+              <div className="text-gray-300">Share Brasil: <span className="text-white font-medium">{formatCurrency(totals.total_share_brasil)}</span></div>
             </div>
-
-            <div className="rounded-lg border border-gray-200 bg-white p-4 flex items-center justify-between md:justify-end">
-              <div className="text-lg font-bold">
-                Total: {formatCurrency(totals.valor_total)}
-              </div>
+            <div className="text-right text-lg text-cyan-400 font-bold">
+              Total: {formatCurrency(totals.valor_total)}
             </div>
           </div>
 
           {/* Observações */}
           {formData?.observacoes && (
-            <div
-              className="rounded-lg border border-gray-200 bg-gray-50 p-4"
-              style={{ breakInside: "avoid" }}
-            >
-              <h4 className="font-semibold mb-2">Observações</h4>
-              <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                {formData.observacoes}
-              </p>
+            <div className="mt-4 p-4 bg-gray-700/60 rounded-lg">
+              <h4 className="text-white font-semibold mb-2">Observações</h4>
+              <p className="text-gray-200 text-sm whitespace-pre-wrap">{formData.observacoes}</p>
             </div>
           )}
-        </section>
-
-        {/* ===== Ações (somente na tela; ocultas no print/PDF via navegador) ===== */}
-        <div className="flex flex-col md:flex-row gap-3 justify-end print:hidden">
-          <Button variant="outline" onClick={onBack} className="gap-2">
-            <ArrowLeft className="w-4 h-4" /> Voltar e editar
-          </Button>
-          <Button onClick={onSaveAndPdf} disabled={isSubmitting} className="gap-2">
-            <Download className="w-4 h-4" /> Salvar & Baixar PDF
-          </Button>
         </div>
-
-        <p className="text-xs text-gray-500 print:hidden">
-          Obs.: No PDF final, o cabeçalho aparece nesta primeira página; anexos/comprovantes podem ir em páginas seguintes.
-        </p>
       </div>
+
+      {/* Ações */}
+      <div className="flex flex-col md:flex-row gap-3 justify-end">
+        <Button variant="outline" onClick={onBack} className="gap-2">
+          <ArrowLeft className="w-4 h-4" /> Voltar e editar
+        </Button>
+        <Button onClick={onSaveAndPdf} disabled={isSubmitting} className="gap-2">
+          <Download className="w-4 h-4" /> Salvar & Baixar PDF
+        </Button>
+      </div>
+
+      <p className="text-xs text-gray-400">
+        Obs.: O PDF terá o cabeçalho da empresa na primeira página e, na segunda, os comprovantes anexados (imagens).
+        Comprovantes PDF aparecem listados como link.
+      </p>
     </div>
   );
 };
