@@ -4,16 +4,33 @@ import {
   Plane, Plus, Search, Eye,
   Send, Edit, FileText, Receipt, Trash2, ChevronDown, X
 } from "lucide-react";
-import {
-  collection, addDoc, getDocs, doc,
-  updateDoc, query, where, orderBy, limit
-} from "firebase/firestore";
+
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/integrations/firebase/config";
 import { RelatorioPreviewLayout } from '@/components/financeiro/RelatorioPreviewLayout';
 import { generateRelatorioViagemPDF } from '@/utils/generateRelatorioViagemPDF';
 import { toast } from "sonner";
 
+import { getApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  doc,
+  deleteDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  Timestamp,
+  runTransaction,
+  getDoc,
+  startAt,
+  endAt,
+  limit as fbLimit,
+  where, // <- para auto-pre
+} from "firebase/firestore";
 // TYPES
 export type StatusRelatorio = 'RASCUNHO' | 'SALVO' | 'ENVIADO' | 'EXCLUIDO';
 type ViewMode = 'list' | 'form' | 'preview';
@@ -171,9 +188,9 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
 
 // FIREBASE REFS
 const relatoriosCollectionRef = collection(db, "relatorios");
-const cotistasCollectionRef = collection(db, "cotistas");
+const cotistasCollectionRef = collection(db, "clientes");
 const aeronavesCollectionRef = collection(db, "aeronaves");
-const tripulantesCollectionRef = collection(db, "tripulantes");
+const tripulantesCollectionRef = collection(db, "tripulacao");
 
 const formatCurrency = (value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
 
