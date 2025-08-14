@@ -2,6 +2,7 @@ import {
   collection, 
   addDoc, 
   getDocs, 
+  getDoc,
   updateDoc, 
   deleteDoc, 
   doc, 
@@ -73,14 +74,11 @@ class TripulacaoService {
     }
   }
 
-<<<<<<< HEAD
   // Criar novo tripulante (alias para adicionarTripulante)
   async criarTripulante(tripulante: Omit<Tripulante, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     return this.adicionarTripulante(tripulante);
   }
 
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   // Buscar todos os tripulantes
   async buscarTripulantes(): Promise<Tripulante[]> {
     try {
@@ -104,7 +102,7 @@ class TripulacaoService {
   async buscarTripulantePorId(id: string): Promise<Tripulante | null> {
     try {
       const docRef = doc(db, this.collectionName, id);
-      const docSnap = await getDocs(docRef);
+      const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as Tripulante;
@@ -204,4 +202,4 @@ class TripulacaoService {
 }
 
 export const tripulacaoService = new TripulacaoService();
-export default tripulacaoService; 
+export default tripulacaoService;

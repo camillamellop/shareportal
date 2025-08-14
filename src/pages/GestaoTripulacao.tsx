@@ -1,10 +1,9 @@
 import { Layout } from "@/components/layout/Layout";
-<<<<<<< HEAD
 import { TripulacaoCard } from "@/components/tripulacao/TripulacaoCard";
 import { ValoresHorasVoo } from "@/components/tripulacao/ValoresHorasVoo";
 import { HorasVooTripulante } from "@/components/tripulacao/HorasVooTripulante";
-import { Plus, Search, Users, Clock, DollarSign, ArrowLeft, Edit, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Plus, Search, Users, Clock, DollarSign, ArrowLeft, AlertTriangle } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import { tripulacaoService } from "@/services/tripulacaoService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -24,16 +23,41 @@ interface Tripulante {
   email: string;
   cht: {
     numero: string;
-    vencimento: string;
-    status: 'valido' | 'vencido' | 'proximo_vencimento';
+    vencimento: string; // ISO yyyy-MM-dd
+    status: "valido" | "vencido" | "proximo_vencimento";
   };
   cma: {
     numero: string;
-    vencimento: string;
-    status: 'valido' | 'vencido' | 'proximo_vencimento';
+    vencimento: string; // ISO yyyy-MM-dd
+    status: "valido" | "vencido" | "proximo_vencimento";
   };
   foto?: string;
-  status: 'ativo' | 'inativo' | 'afastado';
+  status: "ativo" | "inativo" | "afastado";
+}
+
+const ALERTA_DIAS = 30;
+
+function parseISODate(d: string | undefined) {
+  if (!d) return null;
+  const dt = new Date(d);
+  return isNaN(dt.getTime()) ? null : dt;
+}
+
+function diffDays(from: Date, to: Date) {
+  const MS = 24 * 60 * 60 * 1000;
+  const f = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const t = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.round((t.getTime() - f.getTime()) / MS);
+}
+
+function computeStatus(vencimentoISO?: string): "valido" | "vencido" | "proximo_vencimento" {
+  const hoje = new Date();
+  const venc = parseISODate(vencimentoISO);
+  if (!venc) return "valido";
+  const dias = diffDays(hoje, venc);
+  if (dias < 0) return "vencido";
+  if (dias <= ALERTA_DIAS) return "proximo_vencimento";
+  return "valido";
 }
 
 export default function GestaoTripulacao() {
@@ -42,13 +66,12 @@ export default function GestaoTripulacao() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("tripulantes");
   const [selectedTripulante, setSelectedTripulante] = useState<string | null>(null);
-  
-  // Estados para modais
+
+  // Modais e formulário
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingTripulante, setEditingTripulante] = useState<Tripulante | null>(null);
-  
-  // Formulário
+
   const [form, setForm] = useState({
     nome: "",
     cargo: "",
@@ -59,7 +82,7 @@ export default function GestaoTripulacao() {
     cht_vencimento: "",
     cma_numero: "",
     cma_vencimento: "",
-    status: "ativo" as const
+    status: "ativo" as const,
   });
 
   useEffect(() => {
@@ -67,49 +90,30 @@ export default function GestaoTripulacao() {
   }, []);
 
   const loadTripulantes = async () => {
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
       const data = await tripulacaoService.buscarTripulantes();
-      setTripulantes(data);
-      } catch (error) {
-      console.error("Erro ao carregar tripulantes:", error);
+      // garante status calculado somente por vencimento
+      const normalizados = data.map((t: Tripulante) => ({
+        ...t,
+        cht: {
+          ...t.cht,
+          status: computeStatus(t.cht?.vencimento),
+        },
+        cma: {
+          ...t.cma,
+          status: computeStatus(t.cma?.vencimento),
+        },
+      }));
+      setTripulantes(normalizados);
+    } catch (error) {
+      // Erro técnico: mantemos toast de erro (não é alerta genérico de UI)
       toast.error("Erro ao carregar tripulantes");
-=======
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { TripulacaoCard } from "@/components/tripulacao/TripulacaoCard";
-import { Plus, Search, Users } from "lucide-react";
-import { useState, useEffect } from "react";
-import { tripulacaoService } from "@/services/tripulacaoService";
+    } finally {
+      setLoading(false);
+    }
+  };
 
-import { Tripulante } from "@/services/tripulacaoService";
-
-const mockTripulantes: Tripulante[] = [];
-
-export default function GestaoTripulacao() {
-  const [tripulantes, setTripulantes] = useState<Tripulante[]>(mockTripulantes);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  // Carregar tripulantes do Firebase ao montar o componente
-  useEffect(() => {
-    const carregarTripulantes = async () => {
-      try {
-        setLoading(true);
-        const tripulantesFirebase = await tripulacaoService.buscarTripulantes();
-        setTripulantes(tripulantesFirebase);
-        console.log("Tripulantes carregados do Firebase:", tripulantesFirebase);
-      } catch (error) {
-        console.error("Erro ao carregar tripulantes do Firebase:", error);
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-      } finally {
-        setLoading(false);
-      }
-    };
-
-<<<<<<< HEAD
   const handleViewHoras = (tripulanteNome: string) => {
     setSelectedTripulante(tripulanteNome);
     setActiveTab("horas-tripulante");
@@ -132,7 +136,7 @@ export default function GestaoTripulacao() {
       cht_vencimento: tripulante.cht.vencimento,
       cma_numero: tripulante.cma.numero,
       cma_vencimento: tripulante.cma.vencimento,
-      status: tripulante.status
+      status: tripulante.status,
     });
     setShowEditModal(true);
   };
@@ -148,15 +152,16 @@ export default function GestaoTripulacao() {
       cht_vencimento: "",
       cma_numero: "",
       cma_vencimento: "",
-      status: "ativo"
+      status: "ativo",
     });
     setShowAddModal(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!form.nome || !form.cargo || !form.cpf || !form.telefone || !form.email) {
+      // validação de formulário — mantemos somente este aviso objetivo
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -171,22 +176,20 @@ export default function GestaoTripulacao() {
         cht: {
           numero: form.cht_numero,
           vencimento: form.cht_vencimento,
-          status: 'valido' as const
+          status: computeStatus(form.cht_vencimento),
         },
         cma: {
           numero: form.cma_numero,
           vencimento: form.cma_vencimento,
-          status: 'valido' as const
+          status: computeStatus(form.cma_vencimento),
         },
-        status: form.status
+        status: form.status,
       };
 
       if (editingTripulante) {
-        // Atualizar tripulante existente
         await tripulacaoService.atualizarTripulante(editingTripulante.id, tripulanteData);
         toast.success("Tripulante atualizado com sucesso!");
       } else {
-        // Criar novo tripulante
         await tripulacaoService.criarTripulante(tripulanteData);
         toast.success("Tripulante criado com sucesso!");
       }
@@ -196,7 +199,6 @@ export default function GestaoTripulacao() {
       setEditingTripulante(null);
       loadTripulantes();
     } catch (error) {
-      console.error("Erro ao salvar tripulante:", error);
       toast.error("Erro ao salvar tripulante");
     }
   };
@@ -212,54 +214,45 @@ export default function GestaoTripulacao() {
       cht_vencimento: "",
       cma_numero: "",
       cma_vencimento: "",
-      status: "ativo"
+      status: "ativo",
     });
     setEditingTripulante(null);
   };
 
-  const filteredTripulantes = tripulantes.filter(tripulante =>
-    tripulante.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tripulante.cargo.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTripulantes = useMemo(
+    () =>
+      tripulantes.filter(
+        (t) =>
+          t.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          t.cargo.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [tripulantes, searchTerm]
   );
+
+  // Somente dados de alerta (vencimento/próximo)
+  const alertas = useMemo(() => {
+    return tripulantes
+      .map((t) => {
+        const itens: { tipo: "CHT" | "CMA"; status: "vencido" | "proximo_vencimento"; nome: string; venc: string }[] =
+          [];
+        if (t.cht?.status === "vencido" || t.cht?.status === "proximo_vencimento") {
+          itens.push({ tipo: "CHT", status: t.cht.status, nome: t.nome, venc: t.cht.vencimento });
+        }
+        if (t.cma?.status === "vencido" || t.cma?.status === "proximo_vencimento") {
+          itens.push({ tipo: "CMA", status: t.cma.status, nome: t.nome, venc: t.cma.vencimento });
+        }
+        return itens;
+      })
+      .flat();
+  }, [tripulantes]);
 
   if (loading) {
     return (
       <Layout>
-=======
-    carregarTripulantes();
-  }, []);
-
-  const filteredTripulantes = tripulantes.filter(tripulante =>
-    tripulante.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tripulante.cargo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tripulante.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  function getStatusCounts() {
-    const chtVencidos = tripulantes.filter(t => t.cht?.status === 'vencido').length;
-    const cmaVencidos = tripulantes.filter(t => t.cma?.status === 'vencido').length;
-    const chtProximoVenc = tripulantes.filter(t => t.cht?.status === 'proximo_vencimento').length;
-    const cmaProximoVenc = tripulantes.filter(t => t.cma?.status === 'proximo_vencimento').length;
-
-    return { chtVencidos, cmaVencidos, chtProximoVenc, cmaProximoVenc };
-  }
-
-  const { chtVencidos, cmaVencidos, chtProximoVenc, cmaProximoVenc } = getStatusCounts();
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className="max-w-7xl mx-auto p-6">
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-6"></div>
-              <p className="text-lg text-muted-foreground font-medium">Carregando tripulantes...</p>
-<<<<<<< HEAD
-=======
-              <p className="text-sm text-muted-foreground mt-2">Aguarde enquanto buscamos os dados</p>
-            </div>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-6"></div>
+            <p className="text-lg text-muted-foreground font-medium">Carregando tripulantes...</p>
           </div>
         </div>
       </Layout>
@@ -268,27 +261,41 @@ export default function GestaoTripulacao() {
 
   return (
     <Layout>
-<<<<<<< HEAD
       <div className="space-y-6">
-=======
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Gestão de Tripulação</h1>
-<<<<<<< HEAD
-            <p className="text-muted-foreground mt-1">
-              Gerencie tripulantes, horas de voo e valores por aeronave
-=======
-            <p className="text-muted-foreground mt-2">
-              Gerencie os dados e vencimentos da sua equipe
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-            </p>
+            <p className="text-muted-foreground mt-1">Gerencie tripulantes, horas de voo e valores por aeronave</p>
           </div>
         </div>
 
-<<<<<<< HEAD
+        {/* Alerta ÚNICO de vencimento (sem mensagens genéricas) */}
+        {alertas.length > 0 && (
+          <Card className="border-amber-300/50 bg-amber-50/40 dark:bg-amber-950/20">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <div className="space-y-1 text-sm">
+                  <p className="font-medium text-amber-800 dark:text-amber-200">
+                    Atenção: {alertas.length} {alertas.length === 1 ? "item" : "itens"} com vencimento.
+                  </p>
+                  <ul className="list-disc ml-5 space-y-1 text-amber-700 dark:text-amber-200/90">
+                    {alertas.slice(0, 6).map((a, idx) => (
+                      <li key={idx}>
+                        <span className="font-medium">{a.nome}</span> — {a.tipo}{" "}
+                        {a.status === "vencido" ? "vencido" : "próx. vencimento"}{" "}
+                        {a.venc ? `(${new Date(a.venc).toLocaleDateString("pt-BR")})` : ""}
+                      </li>
+                    ))}
+                    {alertas.length > 6 && <li>+ {alertas.length - 6} outros…</li>}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
@@ -311,9 +318,7 @@ export default function GestaoTripulacao() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Tripulantes</h2>
-                <p className="text-muted-foreground mt-1">
-                  Gerencie informações dos tripulantes
-                </p>
+                <p className="text-muted-foreground mt-1">Gerencie informações dos tripulantes</p>
               </div>
               <Button onClick={handleAddTripulante}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -322,7 +327,7 @@ export default function GestaoTripulacao() {
             </div>
 
             {/* Busca */}
-          <Card>
+            <Card>
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <CardTitle>Buscar Tripulantes</CardTitle>
@@ -342,8 +347,8 @@ export default function GestaoTripulacao() {
             {/* Grid de Tripulantes */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {filteredTripulantes.map((tripulante) => (
-                <TripulacaoCard 
-                  key={tripulante.id} 
+                <TripulacaoCard
+                  key={tripulante.id}
                   tripulante={tripulante}
                   onViewHoras={handleViewHoras}
                   onEdit={() => handleEditTripulante(tripulante)}
@@ -369,25 +374,16 @@ export default function GestaoTripulacao() {
               <div className="space-y-6">
                 {/* Header com botão voltar */}
                 <div className="flex items-center gap-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleBackToTripulantes}
-                    className="flex items-center gap-2"
-                  >
+                  <Button variant="outline" onClick={handleBackToTripulantes} className="flex items-center gap-2">
                     <ArrowLeft className="h-4 w-4" />
                     Voltar aos Tripulantes
                   </Button>
-                <div>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      Horas de Voo - {selectedTripulante}
-                    </h2>
-                    <p className="text-muted-foreground mt-1">
-                      Controle as horas voadas por mês
-                    </p>
+                  <div>
+                    <h2 className="text-2xl font-bold text-foreground">Horas de Voo - {selectedTripulante}</h2>
+                    <p className="text-muted-foreground mt-1">Controle as horas voadas por mês</p>
                   </div>
                 </div>
 
-                {/* Componente de Horas de Voo */}
                 <HorasVooTripulante tripulanteFiltrado={selectedTripulante} />
               </div>
             ) : (
@@ -413,7 +409,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="nome"
                     value={form.nome}
-                    onChange={(e) => setForm(prev => ({ ...prev, nome: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, nome: e.target.value }))}
                     placeholder="Nome completo"
                     required
                   />
@@ -423,7 +419,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="cargo"
                     value={form.cargo}
-                    onChange={(e) => setForm(prev => ({ ...prev, cargo: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cargo: e.target.value }))}
                     placeholder="Ex: Comandante"
                     required
                   />
@@ -436,7 +432,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="cpf"
                     value={form.cpf}
-                    onChange={(e) => setForm(prev => ({ ...prev, cpf: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cpf: e.target.value }))}
                     placeholder="000.000.000-00"
                     required
                   />
@@ -446,7 +442,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="telefone"
                     value={form.telefone}
-                    onChange={(e) => setForm(prev => ({ ...prev, telefone: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, telefone: e.target.value }))}
                     placeholder="(00) 00000-0000"
                     required
                   />
@@ -459,7 +455,7 @@ export default function GestaoTripulacao() {
                   id="email"
                   type="email"
                   value={form.email}
-                  onChange={(e) => setForm(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
                   placeholder="email@exemplo.com"
                   required
                 />
@@ -471,7 +467,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="cht_numero"
                     value={form.cht_numero}
-                    onChange={(e) => setForm(prev => ({ ...prev, cht_numero: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cht_numero: e.target.value }))}
                     placeholder="Número do CHT"
                   />
                 </div>
@@ -481,7 +477,7 @@ export default function GestaoTripulacao() {
                     id="cht_vencimento"
                     type="date"
                     value={form.cht_vencimento}
-                    onChange={(e) => setForm(prev => ({ ...prev, cht_vencimento: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cht_vencimento: e.target.value }))}
                   />
                 </div>
               </div>
@@ -492,7 +488,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="cma_numero"
                     value={form.cma_numero}
-                    onChange={(e) => setForm(prev => ({ ...prev, cma_numero: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cma_numero: e.target.value }))}
                     placeholder="Número do CMA"
                   />
                 </div>
@@ -502,19 +498,16 @@ export default function GestaoTripulacao() {
                     id="cma_vencimento"
                     type="date"
                     value={form.cma_vencimento}
-                    onChange={(e) => setForm(prev => ({ ...prev, cma_vencimento: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cma_vencimento: e.target.value }))}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select 
-                  value={form.status} 
-                  onValueChange={(value: any) => setForm(prev => ({ ...prev, status: value }))}
-                >
+                <Select value={form.status} onValueChange={(value: any) => setForm((prev) => ({ ...prev, status: value }))}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Selecione o status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ativo">Ativo</SelectItem>
@@ -525,9 +518,9 @@ export default function GestaoTripulacao() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => {
                     setShowAddModal(false);
                     resetForm();
@@ -535,9 +528,7 @@ export default function GestaoTripulacao() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">
-                  Criar Tripulante
-                </Button>
+                <Button type="submit">Criar Tripulante</Button>
               </div>
             </form>
           </DialogContent>
@@ -556,7 +547,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="edit_nome"
                     value={form.nome}
-                    onChange={(e) => setForm(prev => ({ ...prev, nome: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, nome: e.target.value }))}
                     placeholder="Nome completo"
                     required
                   />
@@ -566,7 +557,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="edit_cargo"
                     value={form.cargo}
-                    onChange={(e) => setForm(prev => ({ ...prev, cargo: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cargo: e.target.value }))}
                     placeholder="Ex: Comandante"
                     required
                   />
@@ -579,7 +570,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="edit_cpf"
                     value={form.cpf}
-                    onChange={(e) => setForm(prev => ({ ...prev, cpf: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cpf: e.target.value }))}
                     placeholder="000.000.000-00"
                     required
                   />
@@ -589,7 +580,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="edit_telefone"
                     value={form.telefone}
-                    onChange={(e) => setForm(prev => ({ ...prev, telefone: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, telefone: e.target.value }))}
                     placeholder="(00) 00000-0000"
                     required
                   />
@@ -602,11 +593,11 @@ export default function GestaoTripulacao() {
                   id="edit_email"
                   type="email"
                   value={form.email}
-                  onChange={(e) => setForm(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
                   placeholder="email@exemplo.com"
                   required
                 />
-        </div>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -614,7 +605,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="edit_cht_numero"
                     value={form.cht_numero}
-                    onChange={(e) => setForm(prev => ({ ...prev, cht_numero: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cht_numero: e.target.value }))}
                     placeholder="Número do CHT"
                   />
                 </div>
@@ -624,7 +615,7 @@ export default function GestaoTripulacao() {
                     id="edit_cht_vencimento"
                     type="date"
                     value={form.cht_vencimento}
-                    onChange={(e) => setForm(prev => ({ ...prev, cht_vencimento: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cht_vencimento: e.target.value }))}
                   />
                 </div>
               </div>
@@ -635,7 +626,7 @@ export default function GestaoTripulacao() {
                   <Input
                     id="edit_cma_numero"
                     value={form.cma_numero}
-                    onChange={(e) => setForm(prev => ({ ...prev, cma_numero: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cma_numero: e.target.value }))}
                     placeholder="Número do CMA"
                   />
                 </div>
@@ -645,19 +636,16 @@ export default function GestaoTripulacao() {
                     id="edit_cma_vencimento"
                     type="date"
                     value={form.cma_vencimento}
-                    onChange={(e) => setForm(prev => ({ ...prev, cma_vencimento: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, cma_vencimento: e.target.value }))}
                   />
+                </div>
               </div>
-            </div>
 
               <div className="space-y-2">
                 <Label htmlFor="edit_status">Status</Label>
-                <Select 
-                  value={form.status} 
-                  onValueChange={(value: any) => setForm(prev => ({ ...prev, status: value }))}
-                >
+                <Select value={form.status} onValueChange={(value: any) => setForm((prev) => ({ ...prev, status: value }))}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Selecione o status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ativo">Ativo</SelectItem>
@@ -665,12 +653,12 @@ export default function GestaoTripulacao() {
                     <SelectItem value="afastado">Afastado</SelectItem>
                   </SelectContent>
                 </Select>
-                  </div>
+              </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => {
                     setShowEditModal(false);
                     resetForm();
@@ -678,106 +666,11 @@ export default function GestaoTripulacao() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">
-                  Atualizar Tripulante
-                </Button>
-            </div>
+                <Button type="submit">Atualizar Tripulante</Button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
-=======
-        {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Users className="h-8 w-8 text-primary" />
-                <div>
-                  <p className="text-2xl font-bold">{tripulantes.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Tripulantes</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded bg-red-100 flex items-center justify-center">
-                  <span className="text-red-600 font-bold text-sm">CHT</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-red-600">{chtVencidos}</p>
-                  <p className="text-sm text-muted-foreground">CHT Vencidos</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded bg-red-100 flex items-center justify-center">
-                  <span className="text-red-600 font-bold text-sm">CMA</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-red-600">{cmaVencidos}</p>
-                  <p className="text-sm text-muted-foreground">CMA Vencidos</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded bg-yellow-100 flex items-center justify-center">
-                  <span className="text-yellow-600 font-bold text-sm">!</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-yellow-600">{chtProximoVenc + cmaProximoVenc}</p>
-                  <p className="text-sm text-muted-foreground">Próx. Vencimento</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filtros e Busca */}
-        <Card className="shadow-sm">
-          <CardHeader className="pb-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <CardTitle className="text-xl">Tripulantes</CardTitle>
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar tripulante..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-full sm:w-64"
-                  />
-                </div>
-              </div>
-            </div>
-          </CardHeader>
-                     <CardContent className="pt-0">
-             <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8">
-                             {filteredTripulantes.length === 0 ? (
-                                   <div className="col-span-full text-center py-16 text-muted-foreground">
-                    <Users className="h-16 w-16 mx-auto mb-6 opacity-50" />
-                    <p className="text-xl font-medium mb-3">Nenhum tripulante encontrado</p>
-                    <p className="text-sm max-w-md mx-auto">Não há tripulantes cadastrados no sistema</p>
-                  </div>
-               ) : (
-                 filteredTripulantes.map((tripulante) => (
-                   <TripulacaoCard key={tripulante.id} tripulante={tripulante} />
-                 ))
-               )}
-            </div>
-          </CardContent>
-        </Card>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       </div>
     </Layout>
   );

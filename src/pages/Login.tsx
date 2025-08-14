@@ -124,7 +124,6 @@ const Login = () => {
             </div>
           </div>
 
-<<<<<<< HEAD
           {/* Formulário de Login */}
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div className="space-y-2">
@@ -185,19 +184,6 @@ const Login = () => {
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
-
-
-=======
-          {/* Botão de login */}
-          <Button 
-            onClick={handleLogin} 
-            size="lg" 
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            disabled={loading}
-          >
-            {loading ? "Entrando..." : "Entrar"}
-          </Button>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
           {/* Texto decorativo */}
           <p className="text-sm text-muted-foreground">

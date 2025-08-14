@@ -161,7 +161,6 @@ export class ConciliacaoService {
 
       // Se deve gerar despesa, criar automaticamente
       if (lancamento.gerar_despesa) {
-<<<<<<< HEAD
         const dadosDespesa: any = {
           tipo: 'lancamento_manual',
           categoria: lancamento.categoria,
@@ -203,20 +202,6 @@ export class ConciliacaoService {
         }
 
         await this.criarDespesaPendente(dadosDespesa);
-=======
-        await this.criarDespesaPendente({
-          tipo: 'lancamento_manual',
-          categoria: lancamento.categoria,
-          origem_id: docRef.id,
-          cliente_nome: lancamento.categoria === 'cliente' ? lancamento.pessoa_nome : undefined,
-          colaborador_nome: lancamento.categoria === 'colaborador' ? lancamento.pessoa_nome : undefined,
-          descricao: lancamento.descricao,
-          valor: lancamento.valor,
-          data_criacao: new Date().toISOString().split('T')[0],
-          status: 'pendente_envio',
-          observacoes: lancamento.observacoes
-        });
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       }
 
       return docRef.id;

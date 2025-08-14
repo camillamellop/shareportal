@@ -47,17 +47,11 @@ export class VooService {
 
   async obterSolicitacoes(filtros?: { status?: string; cotista?: string }): Promise<SolicitacaoVoo[]> {
     try {
-<<<<<<< HEAD
-      let q = query(collection(db, this.solicitacoesCollection));
-
-      // Aplicar filtros se fornecidos
-=======
       let q = query(
         collection(db, this.solicitacoesCollection),
         orderBy('createdAt', 'desc')
       );
 
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       if (filtros?.status) {
         q = query(q, where('status', '==', filtros.status));
       }
@@ -67,24 +61,10 @@ export class VooService {
       }
 
       const querySnapshot = await getDocs(q);
-<<<<<<< HEAD
-      const solicitacoes = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as SolicitacaoVoo));
-
-      // Ordenar no cliente para evitar problemas de índice
-      return solicitacoes.sort((a, b) => {
-        const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt);
-        const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
-=======
       return querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       } as SolicitacaoVoo));
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     } catch (error) {
       console.error('Erro ao obter solicitações:', error);
       throw error;
@@ -127,14 +107,10 @@ export class VooService {
 
   async obterPlanosVoo(filtros?: { status?: string; data?: string }): Promise<PlanoVoo[]> {
     try {
-<<<<<<< HEAD
-      let q = query(collection(db, this.planosCollection));
-=======
       let q = query(
         collection(db, this.planosCollection),
         orderBy('data_voo', 'asc')
       );
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
       if (filtros?.status) {
         q = query(q, where('status', '==', filtros.status));
@@ -145,24 +121,10 @@ export class VooService {
       }
 
       const querySnapshot = await getDocs(q);
-<<<<<<< HEAD
-      const results = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as PlanoVoo));
-      
-      // Ordenação client-side
-      return results.sort((a, b) => {
-        const dateA = new Date(a.data_voo);
-        const dateB = new Date(b.data_voo);
-        return dateA.getTime() - dateB.getTime();
-      });
-=======
       return querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       } as PlanoVoo));
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     } catch (error) {
       console.error('Erro ao obter planos de voo:', error);
       throw error;
@@ -212,23 +174,6 @@ export class VooService {
       const q = query(
         collection(db, this.notificacoesCollection),
         where('destinatario_id', '==', destinatarioId),
-<<<<<<< HEAD
-        where('destinatario_tipo', '==', destinatarioTipo)
-      );
-
-      const querySnapshot = await getDocs(q);
-      const results = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as NotificacaoVoo));
-      
-      // Ordenação client-side
-      return results.sort((a, b) => {
-        const dateA = new Date(a.createdAt as string);
-        const dateB = new Date(b.createdAt as string);
-        return dateB.getTime() - dateA.getTime(); // Descendente
-      });
-=======
         where('destinatario_tipo', '==', destinatarioTipo),
         orderBy('createdAt', 'desc')
       );
@@ -238,7 +183,6 @@ export class VooService {
         id: doc.id,
         ...doc.data()
       } as NotificacaoVoo));
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     } catch (error) {
       console.error('Erro ao obter notificações:', error);
       throw error;

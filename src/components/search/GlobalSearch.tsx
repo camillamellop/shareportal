@@ -9,37 +9,33 @@ interface SearchResult {
   id: string;
   title: string;
   description: string;
-  type: 'page' | 'document' | 'contact' | 'task';
+  type: "page" | "document" | "contact" | "task";
   path: string;
   icon: any;
 }
 
 const searchData: SearchResult[] = [
   // Páginas principais
-  { id: '1', title: 'Conciliação Bancária', description: 'Gestão de movimentações bancárias', type: 'page', path: '/financeiro/conciliacao', icon: DollarSign },
-  { id: '2', title: 'Minhas Tarefas', description: 'Gerenciar atividades e pendências', type: 'page', path: '/tarefas', icon: Calendar },
-  { id: '3', title: 'Meu Perfil', description: 'Informações pessoais e documentos', type: 'page', path: '/perfil', icon: Users },
-  { id: '4', title: 'Agenda', description: 'Contatos e aniversários', type: 'page', path: '/agenda', icon: Calendar },
-  { id: '5', title: 'Recados', description: 'Comunicações internas', type: 'page', path: '/recados', icon: File },
-  
+  { id: "1", title: "Conciliação Bancária", description: "Gestão de movimentações bancárias", type: "page", path: "/financeiro/conciliacao-bancaria", icon: DollarSign },
+  { id: "2", title: "Minhas Tarefas", description: "Gerenciar atividades e pendências", type: "page", path: "/tarefas", icon: Calendar },
+  { id: "3", title: "Meu Perfil", description: "Informações pessoais e documentos", type: "page", path: "/perfil", icon: Users },
+  { id: "4", title: "Agenda", description: "Contatos e aniversários", type: "page", path: "/agenda", icon: Calendar },
+  { id: "5", title: "Recados", description: "Comunicações internas", type: "page", path: "/recados", icon: File },
+
   // Financeiro
-  { id: '6', title: 'Configuração da Empresa', description: 'Dados da empresa', type: 'page', path: '/financeiro/config', icon: DollarSign },
-  { id: '7', title: 'Emissão de Recibo', description: 'Gerar recibos', type: 'page', path: '/financeiro/recibo', icon: Receipt },
-<<<<<<< HEAD
-  { id: '8', title: 'Relatório de Viagem', description: 'Relatórios de despesas', type: 'page', path: '/financeiro/relatorios-viagem', icon: Plane },
-=======
-  { id: '8', title: 'Relatório de Viagem', description: 'Relatórios de despesas', type: 'page', path: '/financeiro/viagem', icon: Plane },
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-  { id: '9', title: 'Cobrança', description: 'Gestão de cobranças', type: 'page', path: '/financeiro/cobranca', icon: DollarSign },
-  { id: '10', title: 'Solicitação de Compras', description: 'Requisições de materiais', type: 'page', path: '/financeiro/compras', icon: File },
-  
+  { id: "6", title: "Configuração da Empresa", description: "Dados da empresa", type: "page", path: "/financeiro/config-empresa", icon: DollarSign },
+  { id: "7", title: "Emissão de Recibo", description: "Gerar recibos", type: "page", path: "/financeiro/recibo", icon: Receipt },
+  { id: "8", title: "Relatório de Viagem", description: "Relatórios de despesas", type: "page", path: "/financeiro/relatorio-viagem", icon: Plane },
+  { id: "9", title: "Cobrança", description: "Gestão de cobranças", type: "page", path: "/financeiro/cobranca", icon: DollarSign },
+  { id: "10", title: "Solicitação de Compras", description: "Requisições de materiais", type: "page", path: "/financeiro/solicitacao-compras", icon: File },
+
   // Cartões
-  { id: '11', title: 'Cartão Alimentação', description: 'Saldo e gastos do vale alimentação', type: 'page', path: '/cartao/alimentacao', icon: Receipt },
-  { id: '13', title: 'Cartão Combustível', description: 'Saldo e gastos do cartão combustível', type: 'page', path: '/cartao/combustivel', icon: Receipt },
-  
+  { id: "11", title: "Cartão Alimentação", description: "Saldo e gastos do vale alimentação", type: "page", path: "/cartao/alimentacao", icon: Receipt },
+  { id: "13", title: "Cartão Combustível", description: "Saldo e gastos do cartão combustível", type: "page", path: "/cartao/combustivel", icon: Receipt },
+
   // Agenda
-  { id: '14', title: 'Contatos', description: 'Lista de contatos', type: 'contact', path: '/agenda/contatos', icon: Users },
-  { id: '15', title: 'Aniversários', description: 'Aniversários do mês', type: 'contact', path: '/agenda/aniversarios', icon: Calendar },
+  { id: "14", title: "Contatos", description: "Lista de contatos", type: "contact", path: "/contatos", icon: Users },
+  { id: "15", title: "Aniversários", description: "Aniversários do mês", type: "contact", path: "/aniversarios", icon: Calendar },
 ];
 
 export function GlobalSearch() {
@@ -51,9 +47,10 @@ export function GlobalSearch() {
 
   useEffect(() => {
     if (query.length >= 2) {
-      const filtered = searchData.filter(item =>
-        item.title.toLowerCase().includes(query.toLowerCase()) ||
-        item.description.toLowerCase().includes(query.toLowerCase())
+      const filtered = searchData.filter(
+        (item) =>
+          item.title.toLowerCase().includes(query.toLowerCase()) ||
+          item.description.toLowerCase().includes(query.toLowerCase())
       );
       setResults(filtered.slice(0, 8));
       setIsOpen(true);
@@ -70,8 +67,8 @@ export function GlobalSearch() {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleResultClick = (result: SearchResult) => {
@@ -82,11 +79,16 @@ export function GlobalSearch() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'page': return 'text-primary';
-      case 'document': return 'text-blue-600';
-      case 'contact': return 'text-green-600';
-      case 'task': return 'text-orange-600';
-      default: return 'text-muted-foreground';
+      case "page":
+        return "text-primary";
+      case "document":
+        return "text-blue-600";
+      case "contact":
+        return "text-green-600";
+      case "task":
+        return "text-orange-600";
+      default:
+        return "text-muted-foreground";
     }
   };
 
@@ -94,9 +96,9 @@ export function GlobalSearch() {
     <div className="relative flex-1 max-w-md mx-2 lg:mx-8" ref={searchRef}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input 
-          placeholder="Pesquisar no portal..." 
-          className="pl-10 bg-secondary border-border focus:ring-primary" 
+        <Input
+          placeholder="Pesquisar no portal..."
+          className="pl-10 bg-secondary border-border focus:ring-primary"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.length >= 2 && setIsOpen(true)}

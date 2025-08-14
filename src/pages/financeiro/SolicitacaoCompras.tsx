@@ -10,39 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ShoppingCart, Plus, FileText, Clock, CheckCircle, XCircle } from "lucide-react";
 
 export default function SolicitacaoCompras() {
-<<<<<<< HEAD
-  const solicitacoes = [];
-=======
   const solicitacoes = [
-    {
-      id: 1,
-      produto: "Combustível Aviação",
-      quantidade: "1000L",
-      valor: 8500.00,
-      data: "15/01/2024",
-      status: "Aprovada",
-      solicitante: "João Silva",
-    },
-    {
-      id: 2,
-      produto: "Peças de Reposição",
-      quantidade: "5 unidades",
-      valor: 2300.00,
-      data: "12/01/2024",
-      status: "Pendente",
-      solicitante: "Maria Santos",
-    },
-    {
-      id: 3,
-      produto: "Serviço de Manutenção",
-      quantidade: "1 serviço",
-      valor: 4500.00,
-      data: "10/01/2024",
-      status: "Rejeitada",
-      solicitante: "Carlos Oliveira",
-    },
+    
   ];
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -126,7 +96,7 @@ export default function SolicitacaoCompras() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="quantidade">Quantidade</Label>
-                  <Input id="quantidade" placeholder="Ex: 10 unidades, 500L" />
+                  <Input id="quantidade" placeholder="" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="valor-estimado">Valor Estimado (R$)</Label>
@@ -174,45 +144,25 @@ export default function SolicitacaoCompras() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Total Solicitações</span>
-<<<<<<< HEAD
-                  <span className="font-semibold">0</span>
+                  <span className="font-semibold"></span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Pendentes</span>
-                  <Badge className="bg-yellow-100 text-yellow-800">0</Badge>
+                  <Badge className="bg-yellow-100 text-yellow-800"></Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Aprovadas</span>
-                  <Badge className="bg-green-100 text-green-800">0</Badge>
+                  <Badge className="bg-green-100 text-green-800"></Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Rejeitadas</span>
-                  <Badge className="bg-red-100 text-red-800">0</Badge>
-=======
-                  <span className="font-semibold">15</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Pendentes</span>
-                  <Badge className="bg-yellow-100 text-yellow-800">5</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Aprovadas</span>
-                  <Badge className="bg-green-100 text-green-800">8</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Rejeitadas</span>
-                  <Badge className="bg-red-100 text-red-800">2</Badge>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+                  <Badge className="bg-red-100 text-red-800"></Badge>
                 </div>
               </div>
               <div className="pt-4 border-t">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Valor Total Mês</span>
-<<<<<<< HEAD
-                  <span className="font-bold text-primary">R$ 0,00</span>
-=======
-                  <span className="font-bold text-primary">R$ 45.200,00</span>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+                  <span className="font-bold text-primary">R$ </span>
                 </div>
               </div>
             </CardContent>

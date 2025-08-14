@@ -1,23 +1,10 @@
-<<<<<<< HEAD
-import { Clock, Calendar, Plane, MapPin, Users, Settings, Wrench, CheckCircle, FileText, Fuel, AlertTriangle, WrenchIcon, Folder, Plus, Edit2, Upload, X, Trash2 } from "lucide-react";
-=======
 import { Clock, Calendar, Plane, MapPin, Users, Settings, Wrench, CheckCircle, FileText, Fuel, AlertTriangle, WrenchIcon, Folder, Plus, Edit2, Upload, X } from "lucide-react";
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-import { useToast } from "@/components/ui/use-toast";
-
-
-
-export function RightSidebar() {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-=======
 
 interface DocumentFolder {
   id: string;
@@ -36,7 +23,6 @@ interface DocumentFile {
 
 export function RightSidebar() {
   const navigate = useNavigate();
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString('pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
@@ -50,9 +36,6 @@ export function RightSidebar() {
     day: 'numeric'
   }));
 
-<<<<<<< HEAD
-
-=======
   const [documentFolders, setDocumentFolders] = useState<DocumentFolder[]>([
     {
       id: '1',
@@ -89,7 +72,6 @@ export function RightSidebar() {
       isEditing: false
     }
   ]);
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -115,39 +97,6 @@ export function RightSidebar() {
       id: `folder_${Date.now()}`,
       name: 'Nova Pasta',
       documents: [],
-<<<<<<< HEAD
-      isEditing: true,
-      createdAt: new Date()
-    };
-    setDocumentFolders(prev => [...prev, newFolder]);
-    toast({
-      title: "Nova pasta criada!",
-      description: "Edite o nome para personalizar.",
-    });
-  };
-
-  const updateFolderName = (folderId: string, newName: string) => {
-    if (newName.trim() === '') {
-      toast({
-        title: "Erro",
-        description: "O nome da pasta não pode estar vazio",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setDocumentFolders(prev => 
-      prev.map(folder => 
-        folder.id === folderId 
-          ? { ...folder, name: newName.trim(), isEditing: false }
-          : folder
-      )
-    );
-    toast({
-      title: "Sucesso",
-      description: "Nome da pasta atualizado!",
-    });
-=======
       isEditing: true
     };
     setDocumentFolders(prev => [...prev, newFolder]);
@@ -161,7 +110,6 @@ export function RightSidebar() {
           : folder
       )
     );
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   };
 
   const toggleFolderEdit = (folderId: string) => {
@@ -175,62 +123,16 @@ export function RightSidebar() {
   };
 
   const deleteFolder = (folderId: string) => {
-<<<<<<< HEAD
-    const folder = documentFolders.find(f => f.id === folderId);
-    if (folder && folder.documents.length > 0) {
-      if (!confirm(`Tem certeza que deseja excluir a pasta "${folder.name}" com ${folder.documents.length} documento(s)?`)) {
-        return;
-      }
-    }
-    
-    setDocumentFolders(prev => prev.filter(folder => folder.id !== folderId));
-    toast({
-      title: "Sucesso",
-      description: "Pasta excluída!",
-    });
-  };
-
-  const handleFileUpload = (folderId: string, file: File) => {
-    // Validar tipo de arquivo
-    const allowedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt'];
-    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
-    
-    if (!allowedTypes.includes(fileExtension)) {
-      toast({
-        title: "Erro",
-        description: "Tipo de arquivo não suportado. Use: PDF, DOC, DOCX, JPG, PNG, TXT",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validar tamanho (máximo 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: "Erro",
-        description: "Arquivo muito grande. Máximo 10MB permitido.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-=======
     setDocumentFolders(prev => prev.filter(folder => folder.id !== folderId));
   };
 
   const handleFileUpload = (folderId: string, file: File) => {
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     const newDocument: DocumentFile = {
       id: `doc_${Date.now()}`,
       name: file.name,
       size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
       uploadedAt: new Date(),
-<<<<<<< HEAD
-      url: URL.createObjectURL(file),
-      type: fileExtension
-=======
       url: URL.createObjectURL(file)
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     };
 
     setDocumentFolders(prev => 
@@ -240,47 +142,6 @@ export function RightSidebar() {
           : folder
       )
     );
-<<<<<<< HEAD
-    toast({
-      title: "Sucesso",
-      description: `Arquivo "${file.name}" enviado com sucesso!`,
-    });
-  };
-
-  const deleteDocument = (folderId: string, documentId: string) => {
-    setDocumentFolders(prev => 
-      prev.map(folder => 
-        folder.id === folderId 
-          ? { ...folder, documents: folder.documents.filter(doc => doc.id !== documentId) }
-          : folder
-      )
-    );
-    toast({
-      title: "Sucesso",
-      description: "Documento excluído!",
-    });
-  };
-
-  const formatFileSize = (size: string) => {
-    return size;
-  };
-
-  const getFileIcon = (type: string) => {
-    switch (type) {
-      case '.pdf':
-        return <FileText className="h-3 w-3 text-red-500" />;
-      case '.doc':
-      case '.docx':
-        return <FileText className="h-3 w-3 text-blue-500" />;
-      case '.jpg':
-      case '.jpeg':
-      case '.png':
-        return <FileText className="h-3 w-3 text-green-500" />;
-      default:
-        return <FileText className="h-3 w-3 text-muted-foreground" />;
-    }
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   };
 
   const flightOperations = [{
@@ -315,9 +176,6 @@ export function RightSidebar() {
     onClick: () => navigate("/documentos")
   }];
 
-<<<<<<< HEAD
-  const aircraftMaintenance = [];
-=======
   const aircraftMaintenance = [
     {
       registration: "PR-MDL",
@@ -347,7 +205,6 @@ export function RightSidebar() {
       priority: "normal"
     },
   ];
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -436,40 +293,6 @@ export function RightSidebar() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-<<<<<<< HEAD
-            {aircraftMaintenance.length > 0 ? (
-              aircraftMaintenance.map((aircraft, index) => (
-                <div key={index} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-foreground">{aircraft.registration}</h4>
-                    <Badge className={getStatusColor(aircraft.status)}>
-                      {aircraft.status === 'active' ? 'Ativo' : 'Manutenção'}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-2">{aircraft.model}</p>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{aircraft.hours}h</span>
-                    <div className="flex items-center gap-1">
-                      {getPriorityIcon(aircraft.priority)}
-                      <span className={getPriorityColor(aircraft.priority).split(' ')[1]}>
-                        {aircraft.priority === 'normal' ? 'Normal' : 'Urgente'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-4 text-muted-foreground">
-                <WrenchIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Nenhuma aeronave</p>
-                <p className="text-xs">Dados de manutenção aparecerão aqui</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-
-=======
             {aircraftMaintenance.map((aircraft, index) => (
               <div key={index} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
                 <div className="flex items-center justify-between mb-2">
@@ -599,7 +422,6 @@ export function RightSidebar() {
             ))}
           </CardContent>
         </Card>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       </div>
     </aside>
   );

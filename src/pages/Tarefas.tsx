@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckSquare, Plus, Clock, AlertCircle, CheckCircle, Filter } from "lucide-react";
+import { CheckSquare, Plus, Clock, AlertCircle, CheckCircle, Filter, Trash2 } from "lucide-react";
 import { taskServiceSpecific, Task } from "@/services/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -14,12 +14,13 @@ import { toast } from "sonner";
 export default function Tarefas() {
   const [tarefas, setTarefas] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const todayISO = new Date().toISOString().split('T')[0];
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
     status: "pending" as const,
     assignedTo: "",
-    dueDate: ""
+    dueDate: todayISO
   });
   const { user } = useAuth();
 
@@ -52,7 +53,7 @@ export default function Tarefas() {
         description: newTask.description,
         status: newTask.status,
         assignedTo: newTask.assignedTo || user?.uid || "",
-        dueDate: new Date(newTask.dueDate).getTime() as any,
+        dueDate: new Date(newTask.dueDate || todayISO).getTime() as any,
       });
 
       toast.success("Tarefa criada com sucesso!");
@@ -61,12 +62,23 @@ export default function Tarefas() {
         description: "",
         status: "pending",
         assignedTo: "",
-        dueDate: ""
+        dueDate: todayISO
       });
       loadTarefas();
     } catch (error) {
       toast.error("Erro ao criar tarefa");
       console.error("Erro ao criar tarefa:", error);
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await taskServiceSpecific.delete(taskId);
+      setTarefas(prev => prev.filter(t => t.id !== taskId));
+      toast.success("Tarefa excluída com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao excluir tarefa");
+      console.error("Erro ao excluir tarefa:", error);
     }
   };
 
@@ -129,15 +141,9 @@ export default function Tarefas() {
   return (
     <Layout>
       <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Tarefas</h1>
-            <p className="text-muted-foreground">Gerencie suas tarefas e responsabilidades</p>
-          </div>
-          <Button className="bg-primary hover:bg-primary/90">
-            <Plus className="h-4 w-4 mr-2" />
-            Nova Tarefa
-          </Button>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Tarefas</h1>
+          <p className="text-muted-foreground">Gerencie suas tarefas e responsabilidades</p>
         </div>
 
         {/* Formulário para nova tarefa */}
@@ -237,6 +243,9 @@ export default function Tarefas() {
                         <SelectItem value="completed">Concluída</SelectItem>
                       </SelectContent>
                     </Select>
+                    <Button variant="ghost" size="icon" onClick={() => handleDeleteTask(tarefa.id)} title="Excluir tarefa">
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </Button>
                   </div>
                 </div>
               </CardContent>

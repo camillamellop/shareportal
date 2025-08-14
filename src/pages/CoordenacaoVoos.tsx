@@ -26,6 +26,7 @@ import {
 import { toast } from "sonner";
 import { vooService } from "@/services/vooService";
 import { SolicitacaoVoo, PlanoVoo, NotificacaoVoo, STATUS_VOO_CONFIG } from "@/types/voo";
+import { useNavigate } from "react-router-dom";
 
 const PILOTOS = [
   "RODRIGO DE MORAES TOSCANO",
@@ -54,8 +55,8 @@ interface PlanoVooForm {
   combustivel_estimado: number;
   observacoes_coordenador: string;
 }
-
 export default function CoordenacaoVoos() {
+  const navigate = useNavigate();
   const [dashboard, setDashboard] = useState<DashboardData>({
     solicitacoesPendentes: 0,
     voosProgramados: 0,
@@ -534,16 +535,12 @@ export default function CoordenacaoVoos() {
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o copiloto" />
                     </SelectTrigger>
-                    <SelectContent>
-<<<<<<< HEAD
-                                              <SelectItem value="nenhum">Nenhum</SelectItem>
-=======
-                      <SelectItem value="">Nenhum</SelectItem>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-                      {PILOTOS.map(piloto => (
-                        <SelectItem key={piloto} value={piloto}>{piloto}</SelectItem>
-                      ))}
-                    </SelectContent>
+<SelectContent>
+  <SelectItem value="">Nenhum</SelectItem>
+  {PILOTOS.map(piloto => (
+    <SelectItem key={piloto} value={piloto}>{piloto}</SelectItem>
+  ))}
+</SelectContent>
                   </Select>
                 </div>
               </div>

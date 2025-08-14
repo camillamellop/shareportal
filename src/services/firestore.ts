@@ -14,10 +14,6 @@ import {
 } from "firebase/firestore";
 import { db } from "@/integrations/firebase/config";
 import { auth } from "@/integrations/firebase/config";
-<<<<<<< HEAD
-import { RelatorioViagem, Ressarcimento, Despesa } from '@/types/viagem';
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
 // Tipos básicos
 export interface User {
@@ -188,6 +184,7 @@ export interface SolicitacaoCompra {
 }
 
 export interface Despesa {
+  data: any;
   categoria: string;
   descricao: string;
   valor: number;
@@ -196,6 +193,7 @@ export interface Despesa {
 }
 
 export interface RelatorioViagem {
+  numero: string;
   id: string;
   cotista: string;
   aeronave: string;
@@ -215,9 +213,6 @@ export interface RelatorioViagem {
   valor_total: number;
   observacoes?: string;
   status: 'pendente' | 'aprovado' | 'rejeitado';
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -255,6 +250,7 @@ export interface Ressarcimento {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+
 // Serviço genérico para CRUD
 export class FirestoreService<T> {
   constructor(private collectionName: string) {}
@@ -337,6 +333,7 @@ export const birthdayService = new FirestoreService<Birthday>('birthdays');
 export const abastecimentoService = new FirestoreService<Abastecimento>('abastecimento');
 export const relatorioViagemService = new FirestoreService<RelatorioViagem>('relatorios_viagem');
 export const ressarcimentoService = new FirestoreService<Ressarcimento>('ressarcimentos');
+export const solicitacaoCompraService = new FirestoreService<SolicitacaoCompra>('solicitacoes_compras');
 
 // Funções específicas para cada entidade
 export const userServiceSpecific = {
@@ -365,10 +362,7 @@ export const userServiceSpecific = {
         name: userData.name || user.displayName || "Usuário",
         email: userData.email || user.email || "",
         role: userData.role || "user",
-<<<<<<< HEAD
         dataNascimento: userData.dataNascimento,
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
         photoURL: userData.photoURL,
         photoPath: userData.photoPath,
         createdAt: Timestamp.now(),
@@ -386,7 +380,6 @@ export const userServiceSpecific = {
       photoURL,
       photoPath
     } as Partial<User>);
-<<<<<<< HEAD
   },
 
   // Atualizar perfil do usuário atual
@@ -398,8 +391,6 @@ export const userServiceSpecific = {
       ...userData,
       updatedAt: Timestamp.now()
     } as Partial<User>);
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   }
 };
 
@@ -708,12 +699,9 @@ export const ressarcimentoServiceSpecific = {
       await ressarcimentoService.create(ressarcimento);
     }
   }
-<<<<<<< HEAD
 }; 
 
 // Serviços para Solicitações de Compras
-export const solicitacaoCompraService = new FirestoreService<SolicitacaoCompra>('solicitacoes_compras');
-
 export const solicitacaoCompraServiceSpecific = {
   ...solicitacaoCompraService,
   
@@ -759,6 +747,4 @@ export const solicitacaoCompraServiceSpecific = {
       await solicitacaoCompraService.delete(solicitacao.id);
     }
   }
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-}; 
+};

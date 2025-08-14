@@ -1,3 +1,4 @@
+// Lazy load das páginas para melhor performance
 import React, { Suspense } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +9,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAppStore } from "@/stores/appStore";
 import { queryConfig } from "@/hooks/useEnhancedFirestore";
 import { Loader2 } from "lucide-react";
-
 // Lazy load das páginas para melhor performance
 const Index = React.lazy(() => import("./pages/Index"));
 const Login = React.lazy(() => import("./pages/Login"));
@@ -16,11 +16,11 @@ const ValeAlimentacao = React.lazy(() => import("./pages/ValeAlimentacao"));
 const ValeCombustivel = React.lazy(() => import("./pages/ValeCombustivel"));
 const ConciliacaoBancaria = React.lazy(() => import("./pages/ConciliacaoBancaria"));
 const AgendaPage = React.lazy(() => import("./pages/AgendaPage"));
-const Contatos = React.lazy(() => import("./pages/agenda/Contatos"));
+const Contatos = React.lazy(() => import("./pages/Contatos"));
 const Aniversarios = React.lazy(() => import("./pages/Aniversarios"));
 const ConfigEmpresa = React.lazy(() => import("./pages/financeiro/ConfigEmpresa"));
 const EmissaoRecibo = React.lazy(() => import("./pages/financeiro/EmissaoRecibo"));
-const RelatoriosViagem = React.lazy(() => import("./pages/RelatoriosViagem"));
+const RelatorioViagem = React.lazy(() => import("./pages/financeiro/RelatorioViagem"));
 const Cobranca = React.lazy(() => import("./pages/financeiro/Cobranca"));
 const SolicitacaoCompras = React.lazy(() => import("./pages/financeiro/SolicitacaoCompras"));
 const Recados = React.lazy(() => import("./pages/Recados"));
@@ -32,36 +32,16 @@ const DiarioAeronaves = React.lazy(() => import("./pages/DiarioAeronaves"));
 const NovaAeronave = React.lazy(() => import("./pages/NovaAeronave"));
 const DiarioDetalhes = React.lazy(() => import("./pages/DiarioDetalhes"));
 const AdicionarVoo = React.lazy(() => import("./pages/AdicionarVoo"));
-const AgendamentoVoo = React.lazy(() => import("./pages/AgendamentoVoo"));
+const AgendamentoVoo = React.lazy(() => import("./pages/AgendamentoVoo"));    
 const CoordenacaoVoos = React.lazy(() => import("./pages/CoordenacaoVoos"));
 const ControleAbastecimento = React.lazy(() => import("./pages/ControleAbastecimento"));
+const CartaoAlimentacao = React.lazy(() => import("./pages/CartaoAlimentacao"));
+const CartaoCombustivel = React.lazy(() => import("./pages/CartaoCombustivel"));
 const Documentos = React.lazy(() => import("./pages/Documentos"));
 
-// Conditional import of ReactQueryDevtools
-const ReactQueryDevtools = process.env.NODE_ENV === 'development' 
-  ? React.lazy(() => import('@tanstack/react-query-devtools').then(module => ({ default: module.ReactQueryDevtools })))
-  : () => null;
 
 // Configuração otimizada do QueryClient
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      ...queryConfig,
-      retry: (failureCount, error) => {
-        // Não tentar novamente em caso de erro 404 ou de autenticação
-        if (error instanceof Error && 
-           (error.message.includes('404') || error.message.includes('auth'))) {
-          return false;
-        }
-        return failureCount < 3;
-      },
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient(queryConfig);
 
 // Componente de loading global
 const PageLoader = () => (
@@ -111,6 +91,11 @@ function App() {
                     <Index />
                   </ProtectedRoute>
                 } />
+                <Route path="/financeiro/conciliacao-bancaria" element={
+                  <ProtectedRoute>
+                    <ConciliacaoBancaria />
+                  </ProtectedRoute>
+                } />
                 <Route path="/vale-alimentacao" element={
                   <ProtectedRoute>
                     <ValeAlimentacao />
@@ -119,11 +104,6 @@ function App() {
                 <Route path="/vale-combustivel" element={
                   <ProtectedRoute>
                     <ValeCombustivel />
-                  </ProtectedRoute>
-                } />
-                <Route path="/conciliacao-bancaria" element={
-                  <ProtectedRoute>
-                    <ConciliacaoBancaria />
                   </ProtectedRoute>
                 } />
                 <Route path="/agenda" element={
@@ -151,11 +131,6 @@ function App() {
                     <EmissaoRecibo />
                   </ProtectedRoute>
                 } />
-                <Route path="/relatorios-viagem" element={
-                  <ProtectedRoute>
-                    <RelatoriosViagem />
-                  </ProtectedRoute>
-                } />
                 <Route path="/financeiro/cobranca" element={
                   <ProtectedRoute>
                     <Cobranca />
@@ -164,6 +139,11 @@ function App() {
                 <Route path="/financeiro/solicitacao-compras" element={
                   <ProtectedRoute>
                     <SolicitacaoCompras />
+                  </ProtectedRoute>
+                } />
+                <Route path="/financeiro/relatorio-viagem" element={
+                  <ProtectedRoute>
+                    <RelatorioViagem />
                   </ProtectedRoute>
                 } />
                 <Route path="/recados" element={
@@ -221,6 +201,16 @@ function App() {
                     <ControleAbastecimento />
                   </ProtectedRoute>
                 } />
+                <Route path="/cartao/alimentacao" element={
+                  <ProtectedRoute>
+                    <CartaoAlimentacao />
+                  </ProtectedRoute>
+                } />
+                <Route path="/cartao/combustivel" element={
+                  <ProtectedRoute>
+                    <CartaoCombustivel />
+                  </ProtectedRoute>
+                } />
                 <Route path="/documentos" element={
                   <ProtectedRoute>
                     <Documentos />
@@ -230,11 +220,6 @@ function App() {
               </Routes>
             </Suspense>
             <Sonner />
-            {process.env.NODE_ENV === 'development' && (
-              <Suspense fallback={null}>
-                <ReactQueryDevtools />
-              </Suspense>
-            )}
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

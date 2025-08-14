@@ -208,7 +208,7 @@ export default function ConfigEmpresa() {
                   <Label htmlFor="razaoSocial">Razão Social *</Label>
                   <Input
                     id="razaoSocial"
-                    value={companyData.razaoSocial}
+                    value={companyData.razaoSocial ?? ""}
                     onChange={(e) => handleInputChange('razaoSocial', e.target.value)}
                     placeholder="Razão social da empresa"
                     className="font-semibold"
@@ -220,7 +220,7 @@ export default function ConfigEmpresa() {
                     <Label htmlFor="cnpj">CNPJ *</Label>
                     <Input
                       id="cnpj"
-                      value={companyData.cnpj}
+                      value={companyData.cnpj ?? ""}
                       onChange={(e) => handleInputChange('cnpj', e.target.value)}
                       placeholder="00.000.000/0000-00"
                     />
@@ -229,7 +229,7 @@ export default function ConfigEmpresa() {
                     <Label htmlFor="inscricaoMunicipal">Inscrição Municipal</Label>
                     <Input
                       id="inscricaoMunicipal"
-                      value={companyData.inscricaoMunicipal}
+                      value={companyData.inscricaoMunicipal ?? ""}
                       onChange={(e) => handleInputChange('inscricaoMunicipal', e.target.value)}
                       placeholder="Número da inscrição municipal"
                     />
@@ -240,7 +240,7 @@ export default function ConfigEmpresa() {
                   <Label htmlFor="endereco">Endereço Completo *</Label>
                   <Input
                     id="endereco"
-                    value={companyData.endereco}
+                    value={companyData.endereco ?? ""}
                     onChange={(e) => handleInputChange('endereco', e.target.value)}
                     placeholder="Rua, número, bairro"
                   />
@@ -251,7 +251,7 @@ export default function ConfigEmpresa() {
                     <Label htmlFor="cidade">Cidade *</Label>
                     <Input
                       id="cidade"
-                      value={companyData.cidade}
+                      value={companyData.cidade ?? ""}
                       onChange={(e) => handleInputChange('cidade', e.target.value)}
                       placeholder="Cidade"
                     />
@@ -260,7 +260,7 @@ export default function ConfigEmpresa() {
                     <Label htmlFor="estado">Estado *</Label>
                     <Input
                       id="estado"
-                      value={companyData.estado}
+                      value={companyData.estado ?? ""}
                       onChange={(e) => handleInputChange('estado', e.target.value)}
                       placeholder="UF"
                       maxLength={2}
@@ -270,7 +270,7 @@ export default function ConfigEmpresa() {
                     <Label htmlFor="cep">CEP</Label>
                     <Input
                       id="cep"
-                      value={companyData.cep}
+                      value={companyData.cep ?? ""}
                       onChange={(e) => handleInputChange('cep', e.target.value)}
                       placeholder="00000-000"
                     />
@@ -292,7 +292,7 @@ export default function ConfigEmpresa() {
                     <Label htmlFor="telefone">Telefone</Label>
                     <Input
                       id="telefone"
-                      value={companyData.telefone}
+                      value={companyData.telefone ?? ""}
                       onChange={(e) => handleInputChange('telefone', e.target.value)}
                       placeholder="(00) 0000-0000"
                     />
@@ -302,7 +302,7 @@ export default function ConfigEmpresa() {
                     <Input
                       id="email"
                       type="email"
-                      value={companyData.email}
+                      value={companyData.email ?? ""}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       placeholder="contato@empresa.com.br"
                     />
@@ -313,7 +313,7 @@ export default function ConfigEmpresa() {
                   <Label htmlFor="website">Website</Label>
                   <Input
                     id="website"
-                    value={companyData.website}
+                    value={companyData.website ?? ""}
                     onChange={(e) => handleInputChange('website', e.target.value)}
                     placeholder="https://www.empresa.com.br"
                   />
@@ -323,7 +323,7 @@ export default function ConfigEmpresa() {
                   <Label htmlFor="observacoes">Observações</Label>
                   <Textarea
                     id="observacoes"
-                    value={companyData.observacoes}
+                    value={companyData.observacoes ?? ""}
                     onChange={(e) => handleInputChange('observacoes', e.target.value)}
                     placeholder="Informações adicionais sobre a empresa..."
                     rows={3}

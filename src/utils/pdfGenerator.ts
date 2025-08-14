@@ -196,53 +196,5 @@ export class PDFGenerator {
     pdf.setDrawColor(200, 200, 200);
     pdf.line(20, 50, 190, 50);
     
-    // Título do documento
-    pdf.setFontSize(18);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('RELATÓRIO DE VIAGEM', 105, 65, { align: 'center' });
-    
-    // Dados do relatório
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Dados do Relatório:', 20, 80);
-    
-    pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Número: ${data.numero}`, 20, 95);
-    pdf.text(`Colaborador: ${data.colaborador_nome}`, 20, 105);
-    pdf.text(`Destino: ${data.destino}`, 20, 115);
-    pdf.text(`Valor Total: R$ ${data.valor_total.toFixed(2)}`, 20, 125);
-    pdf.text(`Data: ${new Date(data.data).toLocaleDateString('pt-BR')}`, 20, 135);
-    
-    if (data.descricao) {
-      pdf.text('Descrição:', 20, 150);
-      pdf.setFontSize(8);
-      const descricao = pdf.splitTextToSize(data.descricao, 170);
-      pdf.text(descricao, 20, 160);
-    }
-    
-    // Lista de despesas (se houver)
-    if (data.despesas && data.despesas.length > 0) {
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Despesas:', 20, 180);
-      
-      let yPosition = 190;
-      data.despesas.forEach((despesa, index) => {
-        if (yPosition > 250) {
-          pdf.addPage();
-          yPosition = 20;
-        }
-        
-        pdf.setFontSize(8);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`${index + 1}. ${despesa.categoria}: ${despesa.descricao} - R$ ${despesa.valor.toFixed(2)}`, 20, yPosition);
-        yPosition += 8;
-      });
-    }
-    
-    // Salvar PDF
-    const fileName = `relatorio_viagem_${data.numero}_${new Date().getTime()}.pdf`;
-    pdf.save(fileName);
   }
 }

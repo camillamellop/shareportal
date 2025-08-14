@@ -14,10 +14,7 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronRight,
-<<<<<<< HEAD
   Clock,
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -44,8 +41,8 @@ const menuGroups = [
         icon: Calendar,
         isExpandable: true,
         subItems: [
-          { title: "Contatos", href: "/agenda/contatos" },
-          { title: "Aniversários", href: "/agenda/aniversarios" },
+          { title: "Contatos", href: "/contatos" },
+          { title: "Aniversários", href: "/aniversarios" },
         ],
       },
     ],
@@ -58,16 +55,12 @@ const menuGroups = [
         icon: CreditCard,
         isExpandable: true,
         subItems: [
-          { title: "Conciliação Bancária", href: "/financeiro/conciliacao" },
-          { title: "Config. Empresa", href: "/financeiro/config" },
+          { title: "Conciliação Bancária", href: "/financeiro/conciliacao-bancaria" },
+          { title: "Config. Empresa", href: "/financeiro/config-empresa" },
           { title: "Emissão de Recibo", href: "/financeiro/recibo" },
-<<<<<<< HEAD
-          { title: "Relatório de Viagem", href: "/financeiro/relatorios-viagem" },
-=======
-          { title: "Relatório de Viagem", href: "/financeiro/viagem" },
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+          { title: "Relatório de Viagem", href: "/financeiro/relatorio-viagem" },
           { title: "Cobrança", href: "/financeiro/cobranca" },
-          { title: "Solicitação de Compras/Serviço", href: "/financeiro/compras" },
+          { title: "Solicitação de Compras/Serviço", href: "/financeiro/solicitacao-compras" },
         ],
       },
       {
@@ -91,10 +84,6 @@ const menuGroups = [
       },
     ],
   },
-<<<<<<< HEAD
-
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 ];
 
 export function Sidebar() {

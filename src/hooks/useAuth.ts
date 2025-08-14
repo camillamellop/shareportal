@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useState, useEffect, useCallback } from "react";
 import { User, signOut } from "firebase/auth";
 import { auth } from "@/integrations/firebase/config";
@@ -57,32 +56,13 @@ export const useAuth = () => {
         });
       }
     );
-=======
-import { useState, useEffect } from "react";
-import { User } from "firebase/auth";
-import { auth } from "@/integrations/firebase/config";
-
-export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-      setLoading(false);
-    });
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
     return () => unsubscribe();
   }, []);
 
-<<<<<<< HEAD
   return {
     ...state,
     logout,
     isAuthenticated: !!state.user,
   };
-=======
-  return { user, loading };
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-}; 
+};

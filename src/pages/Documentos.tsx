@@ -1,5 +1,4 @@
 import { Layout } from "@/components/layout/Layout";
-<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,19 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Folder, 
-  FileText, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  Upload, 
-  Download, 
-  Search, 
+import {
+  Folder,
+  FileText,
+  Plus,
+  Edit2,
+  Trash2,
+  Upload,
+  Download,
+  Search,
   Grid3X3,
   List,
-  MoreVertical,
-  X
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -44,7 +42,7 @@ export default function Documentos() {
   const [folders, setFolders] = useState<DocumentFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showAddFolderModal, setShowAddFolderModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState<DocumentFolder | null>(null);
@@ -58,54 +56,54 @@ export default function Documentos() {
   const loadFolders = async () => {
     try {
       setLoading(true);
-      // Simular carregamento de dados - substituir por chamada real do Firebase
+      // Simulação: substitua por carregamento real (ex.: Firebase)
       const mockFolders: DocumentFolder[] = [
         {
-          id: '1',
-          name: 'Manuais Técnicos',
+          id: "1",
+          name: "Manuais Técnicos",
           documents: [
             {
-              id: 'doc1',
-              name: 'Manual_Citation_CJ3.pdf',
-              size: '2.5 MB',
-              uploadedAt: new Date('2024-01-15'),
-              url: '#',
-              type: '.pdf'
-            }
+              id: "doc1",
+              name: "Manual_Citation_CJ3.pdf",
+              size: "2.5 MB",
+              uploadedAt: new Date("2024-01-15"),
+              url: "#",
+              type: ".pdf",
+            },
           ],
-          createdAt: new Date('2024-01-01'),
-          updatedAt: new Date('2024-01-15')
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-01-15"),
         },
         {
-          id: '2',
-          name: 'Certificações',
+          id: "2",
+          name: "Certificações",
           documents: [
             {
-              id: 'doc2',
-              name: 'Cert_ANAC_2024.pdf',
-              size: '1.8 MB',
-              uploadedAt: new Date('2024-01-10'),
-              url: '#',
-              type: '.pdf'
-            }
+              id: "doc2",
+              name: "Cert_ANAC_2024.pdf",
+              size: "1.8 MB",
+              uploadedAt: new Date("2024-01-10"),
+              url: "#",
+              type: ".pdf",
+            },
           ],
-          createdAt: new Date('2024-01-05'),
-          updatedAt: new Date('2024-01-10')
+          createdAt: new Date("2024-01-05"),
+          updatedAt: new Date("2024-01-10"),
         },
         {
-          id: '3',
-          name: 'Relatórios de Voo',
+          id: "3",
+          name: "Relatórios de Voo",
           documents: [],
-          createdAt: new Date('2024-01-15'),
-          updatedAt: new Date('2024-01-15')
+          createdAt: new Date("2024-01-15"),
+          updatedAt: new Date("2024-01-15"),
         },
         {
-          id: '4',
-          name: 'Procedimentos Operacionais',
+          id: "4",
+          name: "Procedimentos Operacionais",
           documents: [],
-          createdAt: new Date('2024-01-20'),
-          updatedAt: new Date('2024-01-20')
-        }
+          createdAt: new Date("2024-01-20"),
+          updatedAt: new Date("2024-01-20"),
+        },
       ];
       setFolders(mockFolders);
     } catch (error) {
@@ -127,10 +125,10 @@ export default function Documentos() {
       name: newFolderName.trim(),
       documents: [],
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
-    setFolders(prev => [...prev, newFolder]);
+    setFolders((prev) => [...prev, newFolder]);
     setNewFolderName("");
     setShowAddFolderModal(false);
     toast.success("Pasta criada com sucesso!");
@@ -148,9 +146,9 @@ export default function Documentos() {
       return;
     }
 
-    setFolders(prev => 
-      prev.map(folder => 
-        folder.id === editingFolder.id 
+    setFolders((prev) =>
+      prev.map((folder) =>
+        folder.id === editingFolder.id
           ? { ...folder, name: newFolderName.trim(), updatedAt: new Date() }
           : folder
       )
@@ -164,26 +162,30 @@ export default function Documentos() {
 
   const handleDeleteFolder = (folder: DocumentFolder) => {
     if (folder.documents.length > 0) {
-      if (!confirm(`Tem certeza que deseja excluir a pasta "${folder.name}" com ${folder.documents.length} documento(s)?`)) {
+      if (
+        !confirm(
+          `Tem certeza que deseja excluir a pasta "${folder.name}" com ${folder.documents.length} documento(s)?`
+        )
+      ) {
         return;
       }
     }
 
-    setFolders(prev => prev.filter(f => f.id !== folder.id));
+    setFolders((prev) => prev.filter((f) => f.id !== folder.id));
     toast.success("Pasta excluída!");
   };
 
   const handleFileUpload = (folderId: string, file: File) => {
-    // Validar tipo de arquivo
-    const allowedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt'];
-    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
-    
+    // Tipos permitidos
+    const allowedTypes = [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".txt"];
+    const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
+
     if (!allowedTypes.includes(fileExtension)) {
       toast.error("Tipo de arquivo não suportado. Use: PDF, DOC, DOCX, JPG, PNG, TXT");
       return;
     }
 
-    // Validar tamanho (máximo 10MB)
+    // Tamanho máx. 10 MB
     if (file.size > 10 * 1024 * 1024) {
       toast.error("Arquivo muito grande. Máximo 10MB permitido.");
       return;
@@ -195,16 +197,16 @@ export default function Documentos() {
       size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
       uploadedAt: new Date(),
       url: URL.createObjectURL(file),
-      type: fileExtension
+      type: fileExtension,
     };
 
-    setFolders(prev => 
-      prev.map(folder => 
-        folder.id === folderId 
-          ? { 
-              ...folder, 
+    setFolders((prev) =>
+      prev.map((folder) =>
+        folder.id === folderId
+          ? {
+              ...folder,
               documents: [...folder.documents, newDocument],
-              updatedAt: new Date()
+              updatedAt: new Date(),
             }
           : folder
       )
@@ -216,13 +218,13 @@ export default function Documentos() {
   };
 
   const handleDeleteDocument = (folderId: string, documentId: string) => {
-    setFolders(prev => 
-      prev.map(folder => 
-        folder.id === folderId 
-          ? { 
-              ...folder, 
-              documents: folder.documents.filter(doc => doc.id !== documentId),
-              updatedAt: new Date()
+    setFolders((prev) =>
+      prev.map((folder) =>
+        folder.id === folderId
+          ? {
+              ...folder,
+              documents: folder.documents.filter((doc) => doc.id !== documentId),
+              updatedAt: new Date(),
             }
           : folder
       )
@@ -232,14 +234,14 @@ export default function Documentos() {
 
   const getFileIcon = (type: string) => {
     switch (type) {
-      case '.pdf':
+      case ".pdf":
         return <FileText className="h-8 w-8 text-red-500" />;
-      case '.doc':
-      case '.docx':
+      case ".doc":
+      case ".docx":
         return <FileText className="h-8 w-8 text-blue-500" />;
-      case '.jpg':
-      case '.jpeg':
-      case '.png':
+      case ".jpg":
+      case ".jpeg":
+      case ".png":
         return <FileText className="h-8 w-8 text-green-500" />;
       default:
         return <FileText className="h-8 w-8 text-muted-foreground" />;
@@ -248,25 +250,25 @@ export default function Documentos() {
 
   const getFileTypeLabel = (type: string) => {
     switch (type) {
-      case '.pdf':
-        return 'PDF';
-      case '.doc':
-        return 'DOC';
-      case '.docx':
-        return 'DOCX';
-      case '.jpg':
-      case '.jpeg':
-        return 'JPG';
-      case '.png':
-        return 'PNG';
-      case '.txt':
-        return 'TXT';
+      case ".pdf":
+        return "PDF";
+      case ".doc":
+        return "DOC";
+      case ".docx":
+        return "DOCX";
+      case ".jpg":
+      case ".jpeg":
+        return "JPG";
+      case ".png":
+        return "PNG";
+      case ".txt":
+        return "TXT";
       default:
-        return type.toUpperCase().replace('.', '');
+        return type.toUpperCase().replace(".", "");
     }
   };
 
-  const filteredFolders = folders.filter(folder =>
+  const filteredFolders = folders.filter((folder) =>
     folder.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -276,7 +278,9 @@ export default function Documentos() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-6"></div>
-            <p className="text-lg text-muted-foreground font-medium">Carregando documentos...</p>
+            <p className="text-lg text-muted-foreground font-medium">
+              Carregando documentos...
+            </p>
           </div>
         </div>
       </Layout>
@@ -285,7 +289,7 @@ export default function Documentos() {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -298,10 +302,10 @@ export default function Documentos() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-              title={viewMode === 'grid' ? 'Visualização em lista' : 'Visualização em grade'}
+              onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+              title={viewMode === "grid" ? "Visualização em lista" : "Visualização em grade"}
             >
-              {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid3X3 className="h-4 w-4" />}
+              {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid3X3 className="h-4 w-4" />}
             </Button>
             <Button onClick={() => setShowAddFolderModal(true)}>
               <Plus className="h-4 w-4 mr-2" />
@@ -316,7 +320,7 @@ export default function Documentos() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <CardTitle>Buscar Documentos</CardTitle>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Buscar por nome da pasta..."
                   value={searchTerm}
@@ -329,11 +333,11 @@ export default function Documentos() {
         </Card>
 
         {/* Grid/Lista de Pastas */}
-        {viewMode === 'grid' ? (
+        {viewMode === "grid" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredFolders.map((folder) => (
-              <Card 
-                key={folder.id} 
+              <Card
+                key={folder.id}
                 className="hover:shadow-md transition-shadow cursor-pointer group"
                 onClick={() => setSelectedFolder(folder)}
               >
@@ -365,16 +369,17 @@ export default function Documentos() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="text-center">
                     <h3 className="font-semibold text-foreground mb-2 truncate">
                       {folder.name}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {folder.documents.length} documento{folder.documents.length !== 1 ? 's' : ''}
+                      {folder.documents.length} documento
+                      {folder.documents.length !== 1 ? "s" : ""}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Criado em {folder.createdAt.toLocaleDateString('pt-BR')}
+                      Criado em {folder.createdAt.toLocaleDateString("pt-BR")}
                     </p>
                   </div>
                 </CardContent>
@@ -384,8 +389,8 @@ export default function Documentos() {
         ) : (
           <div className="space-y-2">
             {filteredFolders.map((folder) => (
-              <Card 
-                key={folder.id} 
+              <Card
+                key={folder.id}
                 className="hover:shadow-md transition-shadow cursor-pointer group"
                 onClick={() => setSelectedFolder(folder)}
               >
@@ -396,8 +401,9 @@ export default function Documentos() {
                       <div>
                         <h3 className="font-semibold text-foreground">{folder.name}</h3>
                         <p className="text-sm text-muted-foreground">
-                          {folder.documents.length} documento{folder.documents.length !== 1 ? 's' : ''} • 
-                          Criado em {folder.createdAt.toLocaleDateString('pt-BR')}
+                          {folder.documents.length} documento
+                          {folder.documents.length !== 1 ? "s" : ""} • Criado em{" "}
+                          {folder.createdAt.toLocaleDateString("pt-BR")}
                         </p>
                       </div>
                     </div>
@@ -444,9 +450,7 @@ export default function Documentos() {
         <Dialog open={showAddFolderModal} onOpenChange={setShowAddFolderModal}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>
-                {editingFolder ? 'Editar Pasta' : 'Nova Pasta'}
-              </DialogTitle>
+              <DialogTitle>{editingFolder ? "Editar Pasta" : "Nova Pasta"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -457,7 +461,7 @@ export default function Documentos() {
                   onChange={(e) => setNewFolderName(e.target.value)}
                   placeholder="Digite o nome da pasta"
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       editingFolder ? handleUpdateFolder() : handleCreateFolder();
                     }
                   }}
@@ -465,8 +469,8 @@ export default function Documentos() {
                 />
               </div>
               <div className="flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setShowAddFolderModal(false);
                     setNewFolderName("");
@@ -476,7 +480,7 @@ export default function Documentos() {
                   Cancelar
                 </Button>
                 <Button onClick={editingFolder ? handleUpdateFolder : handleCreateFolder}>
-                  {editingFolder ? 'Atualizar' : 'Criar'}
+                  {editingFolder ? "Atualizar" : "Criar"}
                 </Button>
               </div>
             </div>
@@ -492,17 +496,13 @@ export default function Documentos() {
                   <Folder className="h-5 w-5 text-primary" />
                   {selectedFolder?.name}
                 </DialogTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowUploadModal(true)}
-                >
+                <Button variant="outline" size="sm" onClick={() => setShowUploadModal(true)}>
                   <Upload className="h-4 w-4 mr-2" />
                   Enviar Arquivo
                 </Button>
               </div>
             </DialogHeader>
-            
+
             <div className="space-y-4">
               {selectedFolder?.documents.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
@@ -518,18 +518,13 @@ export default function Documentos() {
                         <div className="flex items-center justify-between mb-3">
                           {getFileIcon(doc.type)}
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0"
-                              title="Download"
-                            >
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="Download">
                               <Download className="h-3 w-3" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleDeleteDocument(selectedFolder.id, doc.id)}
+                              onClick={() => selectedFolder && handleDeleteDocument(selectedFolder.id, doc.id)}
                               className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
                               title="Excluir"
                             >
@@ -537,7 +532,7 @@ export default function Documentos() {
                             </Button>
                           </div>
                         </div>
-                        
+
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm truncate">{doc.name}</h4>
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -545,7 +540,7 @@ export default function Documentos() {
                             <span>{doc.size}</span>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            Enviado em {doc.uploadedAt.toLocaleDateString('pt-BR')}
+                            Enviado em {doc.uploadedAt.toLocaleDateString("pt-BR")}
                           </p>
                         </div>
                       </CardContent>
@@ -584,15 +579,6 @@ export default function Documentos() {
             </div>
           </DialogContent>
         </Dialog>
-=======
-import { DocumentManager } from "@/components/documents/DocumentManager";
-
-export default function Documentos() {
-  return (
-    <Layout>
-      <div className="p-6">
-        <DocumentManager />
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       </div>
     </Layout>
   );

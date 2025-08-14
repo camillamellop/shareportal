@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { useState, useEffect, useCallback } from "react";
-=======
-import { useState, useEffect } from "react";
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +9,7 @@ import { toast } from "sonner";
 
 interface NotificacaoVoosProps {
   userId: string;
-  userType: 'coordenador' | 'cotista' | 'piloto';
+  userType: "coordenador" | "cotista" | "piloto";
 }
 
 export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
@@ -21,11 +17,7 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
   const [showNotificacoes, setShowNotificacoes] = useState(false);
   const [loading, setLoading] = useState(false);
 
-<<<<<<< HEAD
   const loadNotificacoes = useCallback(async () => {
-=======
-  const loadNotificacoes = async () => {
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     try {
       setLoading(true);
       // Temporariamente desabilitado devido a erro de índice
@@ -37,30 +29,22 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
     } finally {
       setLoading(false);
     }
-<<<<<<< HEAD
   }, [userId, userType]);
-=======
-  };
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   useEffect(() => {
     loadNotificacoes();
-    
+
     // Polling para novas notificações a cada 30 segundos
     const interval = setInterval(loadNotificacoes, 30000);
-    
+
     return () => clearInterval(interval);
-<<<<<<< HEAD
   }, [loadNotificacoes]);
-=======
-  }, [userId, userType, loadNotificacoes]);
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   const handleMarcarComoLida = async (id: string) => {
     try {
       await vooService.marcarNotificacaoComoLida(id);
-      setNotificacoes(prev => 
-        prev.map(n => n.id === id ? { ...n, lida: true } : n)
+      setNotificacoes((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, lida: true } : n))
       );
       toast.success("Notificação marcada como lida");
     } catch (error) {
@@ -69,34 +53,42 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
     }
   };
 
-  const notificacaoNaoLidas = notificacoes.filter(n => !n.lida);
-  
+  const notificacaoNaoLidas = notificacoes.filter((n) => !n.lida);
+
   const getNotificacaoIcon = (tipo: string) => {
     switch (tipo) {
-      case 'solicitacao_nova':
-        return '📝';
-      case 'voo_programado':
-        return '📅';
-      case 'voo_cancelado':
-        return '❌';
-      case 'voo_concluido':
-        return '✅';
+      case "solicitacao_nova":
+        return "📝";
+      case "voo_programado":
+        return "📅";
+      case "voo_cancelado":
+        return "❌";
+      case "voo_concluido":
+        return "✅";
       default:
-        return '📢';
+        return "📢";
     }
   };
 
-  const formatTimeAgo = (timestamp: Date | string | { toDate: () => Date }) => {
-    if (!timestamp) return '';
-    
+  const formatTimeAgo = (
+    timestamp: Date | string | { toDate: () => Date }
+  ) => {
+    if (!timestamp) return "";
+
     const now = new Date();
-    const notifTime = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const notifTime =
+      typeof timestamp === "string"
+        ? new Date(timestamp)
+        : "toDate" in timestamp
+        ? timestamp.toDate()
+        : timestamp;
+
     const diffMs = now.getTime() - notifTime.getTime();
     const diffMins = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffMins < 1) return 'agora';
+    if (diffMins < 1) return "agora";
     if (diffMins < 60) return `${diffMins}min atrás`;
     if (diffHours < 24) return `${diffHours}h atrás`;
     return `${diffDays}d atrás`;
@@ -112,9 +104,7 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
       >
         <Bell className="h-4 w-4" />
         {notificacaoNaoLidas.length > 0 && (
-          <Badge 
-            className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs"
-          >
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
             {notificacaoNaoLidas.length}
           </Badge>
         )}
@@ -148,9 +138,9 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
                 <div
                   key={notificacao.id}
                   className={`p-3 rounded-lg border transition-colors ${
-                    notificacao.lida 
-                      ? 'bg-muted/50 border-muted' 
-                      : 'bg-primary/5 border-primary/20'
+                    notificacao.lida
+                      ? "bg-muted/50 border-muted"
+                      : "bg-primary/5 border-primary/20"
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -174,7 +164,9 @@ export function NotificacaoVoos({ userId, userType }: NotificacaoVoosProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleMarcarComoLida(notificacao.id)}
+                            onClick={() =>
+                              handleMarcarComoLida(notificacao.id)
+                            }
                             className="h-6 px-2 text-xs"
                           >
                             <CheckCircle className="h-3 w-3 mr-1" />

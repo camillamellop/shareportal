@@ -105,7 +105,6 @@
   }
 }
 
-<<<<<<< HEAD
 @layer components {
   .animate-in {
     animation: animateIn 0.5s ease-out;
@@ -180,8 +179,6 @@
   }
 }
 
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 /* Animações para aviões voando */
 @keyframes fly-right {
   0% {

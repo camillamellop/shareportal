@@ -2,22 +2,18 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Cloud, 
-  Sun, 
-  CloudRain, 
-  CloudSnow, 
-  Wind, 
-  Thermometer, 
+import {
+  Cloud,
+  Sun,
+  CloudRain,
+  CloudSnow,
+  Wind,
+  Thermometer,
   Droplets,
   Eye,
-  Loader2
+  Loader2,
 } from "lucide-react";
-<<<<<<< HEAD
 import { getCurrentWeather, CurrentWeather } from "@/services/openweather";
-=======
-import { getCurrentWeather, CurrentWeather } from "@/services/meteoblue";
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
 interface WeatherWidgetProps {
   lat?: number;
@@ -25,7 +21,11 @@ interface WeatherWidgetProps {
   className?: string;
 }
 
-export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }: WeatherWidgetProps) => {
+export const WeatherWidget = ({
+  lat = -23.5505,
+  lon = -46.6333,
+  className = "",
+}: WeatherWidgetProps) => {
   const [showDetails, setShowDetails] = useState(false);
   const [weather, setWeather] = useState<CurrentWeather | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,35 +47,26 @@ export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }
     };
 
     fetchWeather();
-    
-    // Atualizar a cada 30 minutos
+
+    // Atualiza a cada 30 minutos
     const interval = setInterval(fetchWeather, 30 * 60 * 1000);
-    
     return () => clearInterval(interval);
   }, [lat, lon]);
 
-<<<<<<< HEAD
+  // OpenWeather weather codes
   const getWeatherIcon = (weatherId: number) => {
-    // Códigos da OpenWeatherMap
-    if (weatherId >= 200 && weatherId < 300) return <CloudRain className="h-4 w-4 text-blue-400" />;
-    if (weatherId >= 300 && weatherId < 400) return <CloudRain className="h-4 w-4 text-blue-400" />;
-    if (weatherId >= 500 && weatherId < 600) return <CloudRain className="h-4 w-4 text-blue-400" />;
-    if (weatherId >= 600 && weatherId < 700) return <CloudSnow className="h-4 w-4 text-blue-300" />;
-    if (weatherId >= 700 && weatherId < 800) return <Cloud className="h-4 w-4 text-gray-400" />;
-    if (weatherId === 800) return <Sun className="h-4 w-4 text-yellow-500" />;
-    if (weatherId >= 801 && weatherId <= 804) return <Cloud className="h-4 w-4 text-gray-400" />;
-=======
-  const getWeatherIcon = (pictocode: number) => {
-    if (pictocode <= 4) return <Sun className="h-4 w-4 text-yellow-500" />;
-    if (pictocode <= 20) return <Cloud className="h-4 w-4 text-gray-400" />;
-    if (pictocode <= 30) return <CloudRain className="h-4 w-4 text-blue-400" />;
-    if (pictocode <= 40) return <CloudSnow className="h-4 w-4 text-blue-300" />;
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+    if (weatherId >= 200 && weatherId < 300) return <CloudRain className="h-4 w-4 text-blue-400" />; // Trovoadas/chuva
+    if (weatherId >= 300 && weatherId < 400) return <CloudRain className="h-4 w-4 text-blue-400" />; // Chuvisco
+    if (weatherId >= 500 && weatherId < 600) return <CloudRain className="h-4 w-4 text-blue-400" />; // Chuva
+    if (weatherId >= 600 && weatherId < 700) return <CloudSnow className="h-4 w-4 text-blue-300" />; // Neve
+    if (weatherId >= 700 && weatherId < 800) return <Cloud className="h-4 w-4 text-gray-400" />;   // Névoa/poeira/etc.
+    if (weatherId === 800) return <Sun className="h-4 w-4 text-yellow-500" />;                       // Céu limpo
+    if (weatherId > 800 && weatherId <= 804) return <Cloud className="h-4 w-4 text-gray-400" />;     // Nuvens
     return <Cloud className="h-4 w-4 text-gray-400" />;
   };
 
   const getWindDirection = (degrees: number) => {
-    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
     const index = Math.round(degrees / 45) % 8;
     return directions[index];
   };
@@ -98,6 +89,9 @@ export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }
     );
   }
 
+  const weatherId = (weather as any)?.weatherId ?? 800; // fallback seguro
+  const precipitation = Math.round((weather.precipitation ?? 0) as number);
+
   return (
     <div className={`relative ${className}`}>
       <Button
@@ -106,7 +100,7 @@ export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }
         onClick={() => setShowDetails(!showDetails)}
         className="flex items-center gap-2 h-auto p-2"
       >
-        {getWeatherIcon(weather.pictocode)}
+        {getWeatherIcon(weatherId)}
         <div className="flex flex-col items-start">
           <span className="text-sm font-medium">
             {Math.round(weather.temperature)}°C
@@ -168,18 +162,18 @@ export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }
                   {getWindDirection(weather.windDirection)}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Índice UV</span>
-                <span className="font-medium">
-                  {Math.round(weather.uv)}
-                </span>
-              </div>
-              {weather.precipitation > 0 && (
+              {"uv" in weather && (
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Índice UV</span>
+                  <span className="font-medium">
+                    {Math.round((weather.uv as number) ?? 0)}
+                  </span>
+                </div>
+              )}
+              {precipitation > 0 && (
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Precipitação</span>
-                  <span className="font-medium">
-                    {Math.round(weather.precipitation)} mm
-                  </span>
+                  <span className="font-medium">{precipitation} mm</span>
                 </div>
               )}
             </div>
@@ -188,4 +182,4 @@ export const WeatherWidget = ({ lat = -23.5505, lon = -46.6333, className = "" }
       )}
     </div>
   );
-}; 
+};

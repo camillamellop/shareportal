@@ -8,65 +8,38 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CheckCircle, AlertCircle, Clock, Send, FileText, Users, Plus, Edit, Eye } from "lucide-react";
+import { CheckCircle, Clock, FileText, Users, Plus, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { conciliacaoService } from "@/services/conciliacaoService";
 import { DespesaPendente, STATUS_DESPESA_CONFIG, FORMAS_PAGAMENTO } from "@/types/conciliacao";
-<<<<<<< HEAD
-import { clienteService } from "@/services/firestore";
-import { Cliente } from "@/services/firestore";
 
 export function ConciliacaoClientes() {
   const [despesasClientes, setDespesasClientes] = useState<DespesaPendente[]>([]);
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-=======
-
-export function ConciliacaoClientes() {
-  const [despesasClientes, setDespesasClientes] = useState<DespesaPendente[]>([]);
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
   const [loading, setLoading] = useState(true);
   const [selectedDespesa, setSelectedDespesa] = useState<DespesaPendente | null>(null);
   const [showLancamentoModal, setShowLancamentoModal] = useState(false);
   const [showAtualizarModal, setShowAtualizarModal] = useState(false);
-<<<<<<< HEAD
-  const [showDetalhesModal, setShowDetalhesModal] = useState(false);
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
 
   // Formulário para lançamento manual
   const [lancamentoForm, setLancamentoForm] = useState({
-    cliente_nome: '',
-    descricao: '',
+    cliente_nome: "",
+    descricao: "",
     valor: 0,
-    data_ocorrencia: new Date().toISOString().split('T')[0],
-<<<<<<< HEAD
-    numero_documento_aeronave: '',
-    numero_documento: '',
-    data_vencimento: '',
-    observacoes: '',
-    arquivos: [] as File[]
-=======
-    observacoes: ''
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+    data_ocorrencia: new Date().toISOString().split("T")[0],
+    numero_documento_aeronave: "",
+    numero_documento: "",
+    data_vencimento: "",
+    observacoes: "",
+    arquivos: [] as File[],
   });
 
   // Formulário para atualizar status
   const [statusForm, setStatusForm] = useState({
-<<<<<<< HEAD
-    status: 'criada' as DespesaPendente['status'],
-    data_envio: '',
-    data_pagamento: '',
-    forma_pagamento: '',
-    observacoes: '',
-    comprovante_envio: null as File | null,
-    comprovante_pagamento: null as File | null
-=======
-    status: 'pendente_envio' as DespesaPendente['status'],
-    data_envio: '',
-    data_pagamento: '',
-    forma_pagamento: '',
-    observacoes: ''
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+    status: "pendente_envio" as DespesaPendente["status"],
+    data_envio: "",
+    data_pagamento: "",
+    forma_pagamento: "",
+    observacoes: "",
   });
 
   useEffect(() => {
@@ -76,15 +49,11 @@ export function ConciliacaoClientes() {
   const loadDespesasClientes = async () => {
     try {
       setLoading(true);
-      const despesas = await conciliacaoService.obterDespesasPendentes({ categoria: 'cliente' });
-<<<<<<< HEAD
-      console.log('Despesas carregadas:', despesas);
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+      const despesas = await conciliacaoService.obterDespesasPendentes({ categoria: "cliente" });
       setDespesasClientes(despesas);
     } catch (error) {
-      console.error('Erro ao carregar despesas de clientes:', error);
-      toast.error('Erro ao carregar despesas de clientes');
+      console.error("Erro ao carregar despesas de clientes:", error);
+      toast.error("Erro ao carregar despesas de clientes");
     } finally {
       setLoading(false);
     }
@@ -92,107 +61,77 @@ export function ConciliacaoClientes() {
 
   const handleCriarLancamento = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!lancamentoForm.cliente_nome || !lancamentoForm.descricao || !lancamentoForm.valor) {
-      toast.error('Preencha todos os campos obrigatórios');
+      toast.error("Preencha todos os campos obrigatórios");
       return;
     }
 
     try {
-<<<<<<< HEAD
-      console.log('Criando lançamento com dados:', {
-        categoria: 'cliente',
-        tipo: 'despesa',
-        pessoa_nome: lancamentoForm.cliente_nome,
-        descricao: lancamentoForm.descricao,
-        valor: lancamentoForm.valor,
-        data_ocorrencia: lancamentoForm.data_ocorrencia,
-        numero_documento_aeronave: lancamentoForm.numero_documento_aeronave,
-        numero_documento: lancamentoForm.numero_documento,
-        data_vencimento: lancamentoForm.data_vencimento,
-        observacoes: lancamentoForm.observacoes,
-        arquivos: lancamentoForm.arquivos,
-        gerar_despesa: true
-      });
-
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       await conciliacaoService.criarLancamentoManual({
-        categoria: 'cliente',
-        tipo: 'despesa',
+        categoria: "cliente",
+        tipo: "despesa",
         pessoa_nome: lancamentoForm.cliente_nome,
         descricao: lancamentoForm.descricao,
         valor: lancamentoForm.valor,
         data_ocorrencia: lancamentoForm.data_ocorrencia,
-<<<<<<< HEAD
         numero_documento_aeronave: lancamentoForm.numero_documento_aeronave,
         numero_documento: lancamentoForm.numero_documento,
         data_vencimento: lancamentoForm.data_vencimento,
         observacoes: lancamentoForm.observacoes,
         arquivos: lancamentoForm.arquivos,
-=======
-        observacoes: lancamentoForm.observacoes,
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-        gerar_despesa: true
+        gerar_despesa: true,
       });
 
-      toast.success('Lançamento criado e despesa pendente gerada!');
-      
+      toast.success("Lançamento criado e despesa pendente gerada!");
+
       setLancamentoForm({
-        cliente_nome: '',
-        descricao: '',
+        cliente_nome: "",
+        descricao: "",
         valor: 0,
-        data_ocorrencia: new Date().toISOString().split('T')[0],
-<<<<<<< HEAD
-        numero_documento_aeronave: '',
-        numero_documento: '',
-        data_vencimento: '',
-        observacoes: '',
-        arquivos: []
-=======
-        observacoes: ''
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+        data_ocorrencia: new Date().toISOString().split("T")[0],
+        numero_documento_aeronave: "",
+        numero_documento: "",
+        data_vencimento: "",
+        observacoes: "",
+        arquivos: [],
       });
-      
+
       setShowLancamentoModal(false);
       loadDespesasClientes();
-
     } catch (error) {
-      console.error('Erro ao criar lançamento:', error);
-      toast.error('Erro ao criar lançamento');
+      console.error("Erro ao criar lançamento:", error);
+      toast.error("Erro ao criar lançamento");
     }
   };
 
   const handleAtualizarStatus = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedDespesa) return;
 
     try {
-      const dados: any = {
-        observacoes: statusForm.observacoes
-      };
+      const dados: any = { observacoes: statusForm.observacoes };
 
-      if (statusForm.status === 'enviado' && statusForm.data_envio) {
+      if (statusForm.status === "enviado" && statusForm.data_envio) {
         dados.data_envio = statusForm.data_envio;
       }
 
-      if (statusForm.status === 'pago' && statusForm.data_pagamento) {
+      if (statusForm.status === "pago" && statusForm.data_pagamento) {
         dados.data_pagamento = statusForm.data_pagamento;
         dados.forma_pagamento = statusForm.forma_pagamento;
       }
 
       await conciliacaoService.atualizarStatusDespesa(selectedDespesa.id, statusForm.status, dados);
 
-      toast.success('Status atualizado com sucesso!');
-      
+      toast.success("Status atualizado com sucesso!");
+
       setShowAtualizarModal(false);
       setSelectedDespesa(null);
       loadDespesasClientes();
-
     } catch (error) {
-      console.error('Erro ao atualizar status:', error);
-      toast.error('Erro ao atualizar status');
+      console.error("Erro ao atualizar status:", error);
+      toast.error("Erro ao atualizar status");
     }
   };
 
@@ -200,10 +139,10 @@ export function ConciliacaoClientes() {
     setSelectedDespesa(despesa);
     setStatusForm({
       status: despesa.status,
-      data_envio: despesa.data_envio || '',
-      data_pagamento: despesa.data_pagamento || '',
-      forma_pagamento: despesa.forma_pagamento || '',
-      observacoes: despesa.observacoes || ''
+      data_envio: despesa.data_envio || "",
+      data_pagamento: despesa.data_pagamento || "",
+      forma_pagamento: despesa.forma_pagamento || "",
+      observacoes: despesa.observacoes || "",
     });
     setShowAtualizarModal(true);
   };
@@ -211,42 +150,22 @@ export function ConciliacaoClientes() {
   const getStatusBadge = (status: string) => {
     const config = STATUS_DESPESA_CONFIG[status as keyof typeof STATUS_DESPESA_CONFIG];
     if (!config) return null;
-    
     return (
-<<<<<<< HEAD
-      <div className="flex items-center gap-2">
-        <div 
-          className="w-3 h-3 rounded-full"
-          style={{ backgroundColor: config.color }}
-        />
-        <span className="text-sm">{config.label}</span>
-      </div>
-=======
-      <Badge className={`${config.bgColor} ${config.color}`}>
+      <Badge className={`${config.bgColor} ${config.color} gap-1`}>
         {config.icon} {config.label}
       </Badge>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
     );
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("pt-BR");
 
   const calcularResumo = () => {
-    const totalPago = despesasClientes
-      .filter(d => d.status === 'pago')
-      .reduce((sum, d) => sum + d.valor, 0);
-    
+    const totalPago = despesasClientes.filter((d) => d.status === "pago").reduce((sum, d) => sum + d.valor, 0);
     const totalPendente = despesasClientes
-      .filter(d => ['pendente_envio', 'enviado', 'pendente_pagamento'].includes(d.status))
+      .filter((d) => ["pendente_envio", "enviado", "pendente_pagamento"].includes(d.status))
       .reduce((sum, d) => sum + d.valor, 0);
 
     return { totalPago, totalPendente };
@@ -255,11 +174,7 @@ export function ConciliacaoClientes() {
   const { totalPago, totalPendente } = calcularResumo();
 
   return (
-<<<<<<< HEAD
-    <div className="space-y-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-400">
-=======
     <div className="space-y-6">
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
       {/* Resumo Clientes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
@@ -267,9 +182,7 @@ export function ConciliacaoClientes() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Pago</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {formatCurrency(totalPago)}
-                </p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(totalPago)}</p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
@@ -281,9 +194,7 @@ export function ConciliacaoClientes() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Pendente</p>
-                <p className="text-2xl font-bold text-yellow-600">
-                  {formatCurrency(totalPendente)}
-                </p>
+                <p className="text-2xl font-bold text-yellow-600">{formatCurrency(totalPendente)}</p>
               </div>
               <Clock className="h-8 w-8 text-yellow-600" />
             </div>
@@ -295,9 +206,7 @@ export function ConciliacaoClientes() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Despesas</p>
-                <p className="text-2xl font-bold text-primary">
-                  {despesasClientes.length}
-                </p>
+                <p className="text-2xl font-bold text-primary">{despesasClientes.length}</p>
               </div>
               <FileText className="h-8 w-8 text-primary" />
             </div>
@@ -313,6 +222,7 @@ export function ConciliacaoClientes() {
               <Users className="h-5 w-5" />
               Despesas de Clientes
             </CardTitle>
+
             <Dialog open={showLancamentoModal} onOpenChange={setShowLancamentoModal}>
               <DialogTrigger asChild>
                 <Button>
@@ -320,144 +230,127 @@ export function ConciliacaoClientes() {
                   Lançamento Manual
                 </Button>
               </DialogTrigger>
-<<<<<<< HEAD
+
               <DialogContent className="max-w-md sm:max-w-lg md:max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-=======
-              <DialogContent>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                 <DialogHeader>
                   <DialogTitle>Novo Lançamento - Cliente</DialogTitle>
                 </DialogHeader>
+
                 <form onSubmit={handleCriarLancamento} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="cliente_nome">Nome do Cliente *</Label>
-                    <Input 
+                    <Input
                       id="cliente_nome"
                       value={lancamentoForm.cliente_nome}
-                      onChange={(e) => setLancamentoForm(prev => ({ ...prev, cliente_nome: e.target.value }))}
+                      onChange={(e) => setLancamentoForm((p) => ({ ...p, cliente_nome: e.target.value }))}
                       placeholder="Nome do cliente"
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="descricao">Descrição *</Label>
-                    <Textarea 
+                    <Textarea
                       id="descricao"
                       value={lancamentoForm.descricao}
-                      onChange={(e) => setLancamentoForm(prev => ({ ...prev, descricao: e.target.value }))}
+                      onChange={(e) => setLancamentoForm((p) => ({ ...p, descricao: e.target.value }))}
                       placeholder="Descrição da despesa..."
                     />
                   </div>
-<<<<<<< HEAD
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-=======
-                  <div className="grid grid-cols-2 gap-4">
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
                     <div className="space-y-2">
                       <Label htmlFor="valor">Valor (R$) *</Label>
-                      <Input 
-                        id="valor" 
-                        type="number" 
+                      <Input
+                        id="valor"
+                        type="number"
                         step="0.01"
                         value={lancamentoForm.valor}
-                        onChange={(e) => setLancamentoForm(prev => ({ ...prev, valor: parseFloat(e.target.value) || 0 }))}
+                        onChange={(e) => setLancamentoForm((p) => ({ ...p, valor: parseFloat(e.target.value) || 0 }))}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="data_ocorrencia">Data da Ocorrência</Label>
-                      <Input 
-                        id="data_ocorrencia" 
+                      <Input
+                        id="data_ocorrencia"
                         type="date"
                         value={lancamentoForm.data_ocorrencia}
-                        onChange={(e) => setLancamentoForm(prev => ({ ...prev, data_ocorrencia: e.target.value }))}
+                        onChange={(e) => setLancamentoForm((p) => ({ ...p, data_ocorrencia: e.target.value }))}
                       />
                     </div>
                   </div>
-<<<<<<< HEAD
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="numero_documento_aeronave">AERONAVE</Label>
-                      <Input 
+                      <Input
                         id="numero_documento_aeronave"
                         value={lancamentoForm.numero_documento_aeronave}
-                        onChange={(e) => setLancamentoForm(prev => ({ ...prev, numero_documento_aeronave: e.target.value }))}
+                        onChange={(e) =>
+                          setLancamentoForm((p) => ({ ...p, numero_documento_aeronave: e.target.value }))
+                        }
                         placeholder="Número da aeronave"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="numero_documento">Nº do documento</Label>
-                      <Input 
+                      <Input
                         id="numero_documento"
-                        value={lancamentoForm.numero_documento || ''}
-                        onChange={(e) => setLancamentoForm(prev => ({ ...prev, numero_documento: e.target.value }))}
+                        value={lancamentoForm.numero_documento}
+                        onChange={(e) => setLancamentoForm((p) => ({ ...p, numero_documento: e.target.value }))}
                         placeholder="Número da nota fiscal ou recibo"
                       />
                     </div>
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="data_vencimento">Data de Vencimento</Label>
-                    <Input 
+                    <Input
                       id="data_vencimento"
                       type="date"
                       value={lancamentoForm.data_vencimento}
-                      onChange={(e) => setLancamentoForm(prev => ({ ...prev, data_vencimento: e.target.value }))}
+                      onChange={(e) => setLancamentoForm((p) => ({ ...p, data_vencimento: e.target.value }))}
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="arquivos">Anexos</Label>
-                    <Input 
-                      id="arquivos" 
-                      type="file" 
+                    <Input
+                      id="arquivos"
+                      type="file"
                       multiple
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                       onChange={(e) => {
                         const files = Array.from(e.target.files || []);
-                        setLancamentoForm(prev => ({ ...prev, arquivos: files }));
+                        setLancamentoForm((p) => ({ ...p, arquivos: files }));
                       }}
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Formatos aceitos: PDF, DOC, DOCX, JPG, JPEG, PNG
+                      Formatos aceitos: PDF, DOC, DOCX, JPG, JPEG, PNG (máx. 10MB cada)
                     </p>
                   </div>
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+
                   <div className="space-y-2">
                     <Label htmlFor="observacoes">Observações</Label>
-                    <Textarea 
+                    <Textarea
                       id="observacoes"
                       value={lancamentoForm.observacoes}
-                      onChange={(e) => setLancamentoForm(prev => ({ ...prev, observacoes: e.target.value }))}
+                      onChange={(e) => setLancamentoForm((p) => ({ ...p, observacoes: e.target.value }))}
                       placeholder="Observações adicionais..."
                     />
                   </div>
-<<<<<<< HEAD
+
                   <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setShowLancamentoModal(false)}
-                      className="w-full sm:w-auto"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button 
-                      type="submit"
-                      className="w-full sm:w-auto"
-                    >
-=======
-                  <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setShowLancamentoModal(false)}>
                       Cancelar
                     </Button>
-                    <Button type="submit">
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-                      Criar Lançamento
-                    </Button>
+                    <Button type="submit">Criar Lançamento</Button>
                   </div>
                 </form>
               </DialogContent>
             </Dialog>
           </div>
         </CardHeader>
+
         <CardContent>
           {loading ? (
             <div className="text-center py-8">
@@ -469,109 +362,63 @@ export function ConciliacaoClientes() {
               <p>Nenhuma despesa de cliente encontrada</p>
             </div>
           ) : (
-<<<<<<< HEAD
-            <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100 hover:scrollbar-thumb-blue-600">
+            <div className="overflow-x-auto">
               <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[100px]">Data</TableHead>
-                  <TableHead className="min-w-[150px]">Cliente</TableHead>
-                  <TableHead className="min-w-[200px]">Descrição</TableHead>
-                  <TableHead className="min-w-[120px] hidden lg:table-cell">Doc. Aeronave</TableHead>
-                  <TableHead className="min-w-[120px] hidden md:table-cell">Nº Documento</TableHead>
-                  <TableHead className="min-w-[120px] hidden lg:table-cell">Vencimento</TableHead>
-                  <TableHead className="min-w-[100px]">Valor</TableHead>
-                  <TableHead className="min-w-[120px]">Status</TableHead>
-                  <TableHead className="min-w-[100px]">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {despesasClientes.map((despesa) => {
-                  console.log('Exibindo despesa:', despesa);
-                  return (
-                  <TableRow key={despesa.id} className="hover:bg-muted/50">
-                    <TableCell>{formatDate(despesa.data_criacao)}</TableCell>
-                    <TableCell className="font-medium">{despesa.cliente_nome}</TableCell>
-                    <TableCell>{despesa.descricao}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{despesa.numero_documento_aeronave || '-'}</TableCell>
-                    <TableCell className="hidden md:table-cell">{despesa.numero_documento || '-'}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{despesa.data_vencimento ? formatDate(despesa.data_vencimento) : '-'}</TableCell>
-                    <TableCell className="font-semibold">{formatCurrency(despesa.valor)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(despesa.status)}
-                      </div>
-                    </TableCell>
-=======
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {despesasClientes.map((despesa) => (
-                  <TableRow key={despesa.id}>
-                    <TableCell>{formatDate(despesa.data_criacao)}</TableCell>
-                    <TableCell className="font-medium">{despesa.cliente_nome}</TableCell>
-                    <TableCell>{despesa.descricao}</TableCell>
-                    <TableCell className="font-semibold">{formatCurrency(despesa.valor)}</TableCell>
-                    <TableCell>{getStatusBadge(despesa.status)}</TableCell>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => abrirModalAtualizar(despesa)}
-<<<<<<< HEAD
-                          className="hover:bg-blue-50 hover:border-blue-300"
-=======
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-<<<<<<< HEAD
-                                      </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            </div>
-=======
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[100px]">Data</TableHead>
+                    <TableHead className="min-w-[150px]">Cliente</TableHead>
+                    <TableHead className="min-w-[220px]">Descrição</TableHead>
+                    <TableHead className="min-w-[120px] hidden lg:table-cell">Doc. Aeronave</TableHead>
+                    <TableHead className="min-w-[120px] hidden md:table-cell">Nº Documento</TableHead>
+                    <TableHead className="min-w-[120px] hidden lg:table-cell">Vencimento</TableHead>
+                    <TableHead className="min-w-[110px]">Valor</TableHead>
+                    <TableHead className="min-w-[140px]">Status</TableHead>
+                    <TableHead className="min-w-[100px]">Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
+                </TableHeader>
+                <TableBody>
+                  {despesasClientes.map((despesa) => (
+                    <TableRow key={despesa.id} className="hover:bg-muted/50">
+                      <TableCell>{formatDate(despesa.data_criacao)}</TableCell>
+                      <TableCell className="font-medium">{despesa.cliente_nome}</TableCell>
+                      <TableCell>{despesa.descricao}</TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        {despesa.numero_documento_aeronave || "-"}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">{despesa.numero_documento || "-"}</TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        {despesa.data_vencimento ? formatDate(despesa.data_vencimento) : "-"}
+                      </TableCell>
+                      <TableCell className="font-semibold">{formatCurrency(despesa.valor)}</TableCell>
+                      <TableCell>{getStatusBadge(despesa.status)}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" onClick={() => abrirModalAtualizar(despesa)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Modal para Atualizar Status */}
       <Dialog open={showAtualizarModal} onOpenChange={setShowAtualizarModal}>
-<<<<<<< HEAD
         <DialogContent className="max-w-md sm:max-w-lg md:max-w-xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-=======
-        <DialogContent>
->>>>>>> 5a2fe9f1e34455bb147758d3a5626f2981a36524
           <DialogHeader>
             <DialogTitle>Atualizar Status - {selectedDespesa?.cliente_nome}</DialogTitle>
           </DialogHeader>
+
           <form onSubmit={handleAtualizarStatus} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="status">Novo Status</Label>
-              <Select 
-                value={statusForm.status}
-                onValueChange={(value: any) => setStatusForm(prev => ({ ...prev, status: value }))}
-              >
+              <Select value={statusForm.status} onValueChange={(v: any) => setStatusForm((p) => ({ ...p, status: v }))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -585,40 +432,40 @@ export function ConciliacaoClientes() {
               </Select>
             </div>
 
-            {statusForm.status === 'enviado' && (
+            {statusForm.status === "enviado" && (
               <div className="space-y-2">
                 <Label htmlFor="data_envio">Data de Envio</Label>
-                <Input 
-                  id="data_envio" 
+                <Input
+                  id="data_envio"
                   type="date"
                   value={statusForm.data_envio}
-                  onChange={(e) => setStatusForm(prev => ({ ...prev, data_envio: e.target.value }))}
+                  onChange={(e) => setStatusForm((p) => ({ ...p, data_envio: e.target.value }))}
                 />
               </div>
             )}
 
-            {statusForm.status === 'pago' && (
+            {statusForm.status === "pago" && (
               <>
                 <div className="space-y-2">
                   <Label htmlFor="data_pagamento">Data de Pagamento</Label>
-                  <Input 
-                    id="data_pagamento" 
+                  <Input
+                    id="data_pagamento"
                     type="date"
                     value={statusForm.data_pagamento}
-                    onChange={(e) => setStatusForm(prev => ({ ...prev, data_pagamento: e.target.value }))}
+                    onChange={(e) => setStatusForm((p) => ({ ...p, data_pagamento: e.target.value }))}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="forma_pagamento">Forma de Pagamento</Label>
-                  <Select 
+                  <Select
                     value={statusForm.forma_pagamento}
-                    onValueChange={(value) => setStatusForm(prev => ({ ...prev, forma_pagamento: value }))}
+                    onValueChange={(v) => setStatusForm((p) => ({ ...p, forma_pagamento: v }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {FORMAS_PAGAMENTO.map(forma => (
+                      {FORMAS_PAGAMENTO.map((forma) => (
                         <SelectItem key={forma.value} value={forma.value}>
                           {forma.label}
                         </SelectItem>
@@ -631,10 +478,10 @@ export function ConciliacaoClientes() {
 
             <div className="space-y-2">
               <Label htmlFor="observacoes_status">Observações</Label>
-              <Textarea 
+              <Textarea
                 id="observacoes_status"
                 value={statusForm.observacoes}
-                onChange={(e) => setStatusForm(prev => ({ ...prev, observacoes: e.target.value }))}
+                onChange={(e) => setStatusForm((p) => ({ ...p, observacoes: e.target.value }))}
                 placeholder="Observações sobre a atualização..."
               />
             </div>
@@ -643,9 +490,7 @@ export function ConciliacaoClientes() {
               <Button type="button" variant="outline" onClick={() => setShowAtualizarModal(false)}>
                 Cancelar
               </Button>
-              <Button type="submit">
-                Atualizar Status
-              </Button>
+              <Button type="submit">Atualizar Status</Button>
             </div>
           </form>
         </DialogContent>
