@@ -4,21 +4,28 @@ import {
   Plane, Plus, Search, Eye,
   Edit, FileText, Receipt, Trash2, ChevronDown, X
 } from "lucide-react";
-import {
-  collection, addDoc, getDocs, doc,
-  updateDoc, query, where, orderBy, limit
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "@/integrations/firebase/config";
-import { RelatorioPreviewLayout } from '@/components/financeiro/RelatorioPreviewLayout';
-import { generateRelatorioViagemPDF } from '@/utils/generateRelatorioViagemPDF';
-import { empresaService } from "@/services/empresaService";
 
+// ==== Firestore & Storage (com tudo que é usado) ====
+import {
+  collection, addDoc, getDocs, getDoc, doc, updateDoc,
+  query, where, orderBy, startAt, endAt, limit as fbLimit,
+  runTransaction, serverTimestamp
+} from "firebase/firestore";
+import {
+  ref as storageRefFn,
+  uploadBytes,
+  getDownloadURL
+} from "firebase/storage";
+
+import { db, storage } from "@/integrations/firebase/config";
+import { RelatorioPreviewLayout } from "@/components/financeiro/RelatorioPreviewLayout";
+import { generateRelatorioViagemPDF } from "@/utils/generateRelatorioViagemPDF";
+import { empresaService } from "@/services/empresaService";
 import { toast } from "sonner";
 
-// TYPES
-export type StatusRelatorio = 'RASCUNHO' | 'SALVO' | 'ENVIADO' | 'EXCLUIDO';
-type ViewMode = 'list' | 'form' | 'preview';
+// ===== TYPES =====
+export type StatusRelatorio = "RASCUNHO" | "SALVO" | "ENVIADO" | "EXCLUIDO";
+type ViewMode = "list" | "form" | "preview";
 
 export interface DespesaViagem {
   id: string;
@@ -26,7 +33,7 @@ export interface DespesaViagem {
   descricao: string;
   valor: number;
   data: string; // ISO (yyyy-mm-dd)
-  pago_por: 'Tripulante' | 'Cotista' | 'Share Brasil';
+  pago_por: "Tripulante" | "Cotista" | "Share Brasil";
   comprovante_url?: string;
   comprovante_nome?: string;
   comprovante_file?: File;
@@ -36,7 +43,7 @@ export interface RelatorioViagem {
   id: string;
   numero: string;
   cotista: string;
-  matricula: string; // Campo aeronave
+  matricula: string; // aeronave
   tripulante: string;
   destino: string;
   data_inicio: any;
@@ -58,7 +65,7 @@ export interface RelatorioViagem {
 interface RelatorioViagemForm {
   numero: string;
   cotista: string;
-  matricula: string; // Campo aeronave
+  matricula: string; // aeronave
   tripulante: string;
   destino: string;
   data_inicio: string;
@@ -79,35 +86,41 @@ interface Cotista {
   tripulantes_ids?: string[];
 }
 
-interface Aeronave { 
-  id: string; 
+interface Aeronave {
+  id: string;
   matricula: string;
   modelo?: string;
 }
 
-interface Tripulante { 
-  id: string; 
-  nome: string; 
-  codigoanac?: string; 
-  funcao?: string 
+interface Tripulante {
+  id: string;
+  nome: string;
+  codigoanac?: string;
+  funcao?: string;
 }
 
-// ========================= CONSTANTES =========================
+// ===== CONSTANTES =====
 const CATEGORIAS_DESPESA_LIST = [
-  'Alimentação','Hospedagem','Transporte','Combustível',
-  'Taxas Aeroportuárias','Estacionamento','Outros'
+  "Alimentação", "Hospedagem", "Transporte", "Combustível",
+  "Taxas Aeroportuárias", "Estacionamento", "Outros"
 ];
-const PAGADORES_LIST: Array<'Tripulante' | 'Cotista' | 'Share Brasil'> = ['Tripulante','Cotista','Share Brasil'];
+const PAGADORES_LIST: Array<"Tripulante" | "Cotista" | "Share Brasil"> = ["Tripulante", "Cotista", "Share Brasil"];
 
 const WEBMAIL_URL_BASE = "https://webmail-seguro.com.br/sharebrasil.net.br/";
-const conciliacaoCollectionRef = collection(db, "conciliacao"); // ajuste o nome se for outro
 
-// ========================= AUTOCOMPLETE =========================
+// coleções (ajuste os nomes se no seu projeto forem outros)
+const relatoriosCollectionRef = collection(db, "relatorios");
+const cotistasCollectionRef  = collection(db, "clientes");
+const aeronavesCollectionRef = collection(db, "aeronaves");
+const tripulantesCollectionRef = collection(db, "tripulantes");
+const conciliacaoCollectionRef = collection(db, "conciliacao");
+
+// ===== AUTOCOMPLETE =====
 interface AutocompleteProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  options: Array<{id: string; label: string; [key: string]: any}>;
+  options: Array<{ id: string; label: string; [key: string]: any }>;
   placeholder: string;
   onSelect?: (item: any) => void;
   disabled?: boolean;
@@ -126,14 +139,14 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
     if (value) {
-      const filtered = options.filter(option => 
-        option.label && option.label.toLowerCase().includes(value.toLowerCase())
+      const filtered = options.filter(
+        (option) => option.label && option.label.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredOptions(filtered);
     } else {
@@ -165,18 +178,24 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
           className="w-full px-3 py-2 pr-10 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           placeholder={placeholder}
         />
-        <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
 
         {isOpen && (
           <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
-                <div key={option.id || index} className="px-3 py-2 cursor-pointer hover:bg-gray-700 text-white border-b border-gray-700 last:border-b-0" onClick={() => handleOptionClick(option)}>
+                <div
+                  key={option.id || index}
+                  className="px-3 py-2 cursor-pointer hover:bg-gray-700 text-white border-b border-gray-700 last:border-b-0"
+                  onClick={() => handleOptionClick(option)}
+                >
                   {option.label}
                 </div>
               ))
             ) : (
-              <div className="px-3 py-2 text-gray-400">Nenhuma opção encontrada. Você pode digitar manualmente.</div>
+              <div className="px-3 py-2 text-gray-400">
+                Nenhuma opção encontrada. Você pode digitar manualmente.
+              </div>
             )}
           </div>
         )}
@@ -185,27 +204,21 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
   );
 };
 
-// ========================= FIREBASE REFS =========================
-const relatoriosCollectionRef = collection(db, "relatorios");
-const cotistasCollectionRef = collection(db, "razao_social");
-const aeronavesCollectionRef = collection(db, "matricula");
-const tripulantesCollectionRef = collection(db, "tripulacao");
+// ===== HELPERS =====
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
 
-// ========================= HELPERS =========================
-const formatCurrency = (value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
-
-// SOMENTE 2 LETRAS
 const gerarPrefixoPadrao = (nome: string) =>
   (nome || "")
     .split(" ")
     .filter(Boolean)
-    .map(p => p[0])
+    .map((p) => p[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
 
 const generateReportNumberAtomic = async (prefixoCotista: string) => {
-  if (!prefixoCotista) return '';
+  if (!prefixoCotista) return "";
   const seqRef = doc(db, "sequencias_relatorios", prefixoCotista);
   const proximo = await runTransaction(db, async (transaction) => {
     const snap = await transaction.get(seqRef);
@@ -215,10 +228,9 @@ const generateReportNumberAtomic = async (prefixoCotista: string) => {
     transaction.set(seqRef, { ultimo: novo }, { merge: true });
     return novo;
   });
-  return `REL${prefixoCotista}-${String(proximo).padStart(3,'0')}`;
+  return `REL${prefixoCotista}-${String(proximo).padStart(3, "0")}`;
 };
 
-// ABRIR WEBMAIL EM BRANCO (SEM PREENCHER NADA)
 const openWebmailCompose = () => {
   const u = new URL(WEBMAIL_URL_BASE);
   u.searchParams.set("_task", "mail");
@@ -234,7 +246,6 @@ const uploadPdfToStorage = async (blob: Blob, filename: string, numero: string) 
   return { url, path };
 };
 
-// cria despesa em aberto na conciliação (base: total_cotista)
 const criarDespesaConciliacao = async (rel: RelatorioViagem, formatDate: (d: any) => string) => {
   const valor = rel.total_cotista ?? 0;
   const payload = {
@@ -243,7 +254,8 @@ const criarDespesaConciliacao = async (rel: RelatorioViagem, formatDate: (d: any
     relatorio_id: rel.id,
     relatorio_numero: rel.numero,
     cotista: rel.cotista,
-        descricao: `Relatório ${rel.numero} - ${rel.destino} (${formatDate(rel.data_inicio)} a ${formatDate(rel.data_fim)})`,
+    prefixo_cotista: rel.prefixo_cotista,
+    descricao: `Relatório ${rel.numero} - ${rel.destino} (${formatDate(rel.data_inicio)} a ${formatDate(rel.data_fim)})`,
     valor: Number(valor) || 0,
     status: "ABERTO",
     criado_em: serverTimestamp(),
@@ -252,7 +264,7 @@ const criarDespesaConciliacao = async (rel: RelatorioViagem, formatDate: (d: any
   await addDoc(conciliacaoCollectionRef, payload);
 };
 
-// ========================= COMPONENTE =========================
+// ===== COMPONENTE =====
 export default function RelatoriosViagem() {
   const [companyConfig, setCompanyConfig] = useState<any | null>(null);
 
@@ -267,7 +279,7 @@ export default function RelatoriosViagem() {
 
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterMatricula, setFilterMatricula] = useState("todas");
   const [filterStatus, setFilterStatus] = useState<StatusRelatorio | "todos">("todos");
@@ -283,7 +295,7 @@ export default function RelatoriosViagem() {
     despesas: [],
     observacoes: "",
     criado_por: "Usuário Atual",
-    prefixo_cotista: ""
+    prefixo_cotista: "",
   });
 
   const [novaDespesa, setNovaDespesa] = useState<Partial<DespesaViagem>>({
@@ -292,10 +304,10 @@ export default function RelatoriosViagem() {
     descricao: "",
     valor: 0,
     pago_por: "Tripulante",
-    comprovante_file: undefined
+    comprovante_file: undefined,
   });
 
-  // company config
+  // Config da empresa
   useEffect(() => {
     (async () => {
       try {
@@ -307,25 +319,36 @@ export default function RelatoriosViagem() {
     })();
   }, []);
 
-  // ========================= UTILS =========================
+  // ===== Utils =====
   const formatDate = (date: any) => {
-    if (!date) return 'N/A';
+    if (!date) return "N/A";
     const d = date?.toDate ? date.toDate() : new Date(date);
-    if (isNaN(d.getTime())) return 'Data inválida';
+    if (isNaN(d.getTime())) return "Data inválida";
     const userTimezoneOffset = d.getTimezoneOffset() * 60000;
-    return new Date(d.getTime() + userTimezoneOffset).toLocaleDateString('pt-BR');
+    return new Date(d.getTime() + userTimezoneOffset).toLocaleDateString("pt-BR");
+    // dica: para PDF padrão, você pode usar d.toLocaleDateString('pt-BR', { timeZone: 'UTC' })
   };
 
   const calcularTotaisDetalhados = () => {
-    const total_tripulante = formData.despesas.reduce((sum, d) => d.pago_por === 'Tripulante' ? sum + (d.valor || 0) : sum, 0);
-    const total_cotista = formData.despesas.reduce((sum, d) => d.pago_por === 'Cotista' ? sum + (d.valor || 0) : sum, 0);
-    const total_share_brasil = formData.despesas.reduce((sum, d) => d.pago_por === 'Share Brasil' ? sum + (d.valor || 0) : sum, 0);
+    const total_tripulante = formData.despesas.reduce(
+      (sum, d) => (d.pago_por === "Tripulante" ? sum + (d.valor || 0) : sum),
+      0
+    );
+    const total_cotista = formData.despesas.reduce(
+      (sum, d) => (d.pago_por === "Cotista" ? sum + (d.valor || 0) : sum),
+      0
+    );
+    const total_share_brasil = formData.despesas.reduce(
+      (sum, d) => (d.pago_por === "Share Brasil" ? sum + (d.valor || 0) : sum),
+      0
+    );
     const valor_total = total_tripulante + total_cotista + total_share_brasil;
     return { total_tripulante, total_cotista, total_share_brasil, valor_total };
   };
 
   const filteredRelatorios = relatorios.filter((relatorio) => {
-    const matchesSearch = searchTerm === "" ||
+    const matchesSearch =
+      searchTerm === "" ||
       relatorio.numero?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       relatorio.cotista?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       relatorio.destino?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -337,26 +360,30 @@ export default function RelatoriosViagem() {
 
   const getStatusColor = (status: StatusRelatorio) => {
     switch (status) {
-      case 'RASCUNHO': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
-      case 'SALVO': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'ENVIADO': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+      case "RASCUNHO":
+        return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
+      case "SALVO":
+        return "text-blue-400 bg-blue-400/10 border-blue-400/20";
+      case "ENVIADO":
+        return "text-green-400 bg-green-400/10 border-green-400/20";
+      default:
+        return "text-gray-400 bg-gray-400/10 border-gray-400/20";
     }
   };
 
   const resetForm = () => {
     setFormData({
       numero: "",
-      cliente: "",
+      cotista: "",
       matricula: "",
-      tripulacao: "",
+      tripulante: "",
       destino: "",
       data_inicio: new Date().toISOString().split("T")[0],
       data_fim: new Date().toISOString().split("T")[0],
       despesas: [],
       observacoes: "",
       criado_por: "Usuário Atual",
-    
+      prefixo_cotista: "",
     });
     setNovaDespesa({
       data: new Date().toISOString().split("T")[0],
@@ -364,7 +391,7 @@ export default function RelatoriosViagem() {
       descricao: "",
       valor: 0,
       pago_por: "Tripulante",
-      comprovante_file: undefined
+      comprovante_file: undefined,
     });
     setCotistaSelecionado(null);
     setAeronavesFiltradas(aeronaves);
@@ -373,7 +400,7 @@ export default function RelatoriosViagem() {
 
   // === Upload comprovante ===
   const uploadComprovante = async (file: File, relatorioNumero: string, despesaId: string) => {
-    const path = `relatorios/${relatorioNumero || 'sem-numero'}/despesas/${despesaId}/${file.name}`;
+    const path = `relatorios/${relatorioNumero || "sem-numero"}/despesas/${despesaId}/${file.name}`;
     const sref = storageRefFn(storage, path);
     await uploadBytes(sref, file);
     const url = await getDownloadURL(sref);
@@ -391,7 +418,11 @@ export default function RelatoriosViagem() {
 
     try {
       if (novaDespesa.comprovante_file) {
-        const uploaded = await uploadComprovante(novaDespesa.comprovante_file, formData.numero || 'novo', id);
+        const uploaded = await uploadComprovante(
+          novaDespesa.comprovante_file,
+          formData.numero || "novo",
+          id
+        );
         comprovante_url = uploaded.url;
         comprovante_nome = uploaded.nome;
       }
@@ -403,16 +434,16 @@ export default function RelatoriosViagem() {
         data: novaDespesa.data!,
         pago_por: novaDespesa.pago_por!,
         comprovante_nome,
-        comprovante_url
+        comprovante_url,
       };
-      setFormData(prev => ({ ...prev, despesas: [...prev.despesas, despesa] }));
+      setFormData((prev) => ({ ...prev, despesas: [...prev.despesas, despesa] }));
       setNovaDespesa({
         data: new Date().toISOString().split("T")[0],
         categoria: "",
         descricao: "",
         valor: 0,
         pago_por: "Tripulante",
-        comprovante_file: undefined
+        comprovante_file: undefined,
       });
       toast.success("Despesa adicionada com sucesso!");
     } catch (e) {
@@ -422,63 +453,72 @@ export default function RelatoriosViagem() {
   };
 
   const removerDespesa = (index: number) => {
-    setFormData(prev => ({ ...prev, despesas: prev.despesas.filter((_, i) => i !== index) }));
+    setFormData((prev) => ({ ...prev, despesas: prev.despesas.filter((_, i) => i !== index) }));
     toast.success("Despesa removida");
   };
 
-  // ========================= LOADERS =========================
+  // ===== LOADERS =====
   const loadCotistas = async () => {
     try {
       const snapshot = await getDocs(cotistasCollectionRef);
-      const data = snapshot.docs.map(d => {
+      const data = snapshot.docs.map((d) => {
         const x = d.data() as any;
         const razao = x.razao_social || x.nome || "";
         return {
           id: d.id,
-          razao_social:
+          razao_social: razao,
           nome: x.nome,
+          email: x.email,
           prefixo: x.prefixo || gerarPrefixoPadrao(razao),
-          matricula_ids: x.matricula_ids || x.matricula || [],
+          aeronaves_ids: x.aeronaves_ids || x.aeronaves || x.matricula_ids || [],
           tripulantes_ids: x.tripulantes_ids || x.tripulacao_ids || [],
         } as Cotista;
       });
       setCotistas(data);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const loadAeronaves = async () => {
     try {
       const snapshot = await getDocs(aeronavesCollectionRef);
-      const data = snapshot.docs.map(d => ({ 
-        id: d.id, 
-        matricula: d.data().matricula || '',
-        modelo: d.data().modelo || ''
-      })) as Aeronave[];
+      const data = snapshot.docs.map(
+        (d) =>
+          ({
+            id: d.id,
+            matricula: d.data().matricula || "",
+            modelo: d.data().modelo || "",
+          }) as Aeronave
+      );
       setAeronaves(data);
-    } catch (e) { 
-      console.error("Erro ao carregar aeronaves:", e); 
+    } catch (e) {
+      console.error("Erro ao carregar aeronaves:", e);
     }
   };
 
   const loadTripulantes = async () => {
     try {
       const snapshot = await getDocs(tripulantesCollectionRef);
-      const data = snapshot.docs.map(d => ({ 
-        id: d.id, 
-        nome: d.data().nome || '',
-        codigoanac: d.data().codigoanac || '',
-        funcao: d.data().funcao || ''
-      })) as Tripulante[];
+      const data = snapshot.docs.map(
+        (d) =>
+          ({
+            id: d.id,
+            nome: d.data().nome || "",
+            codigoanac: d.data().codigoanac || "",
+            funcao: d.data().funcao || "",
+          }) as Tripulante
+      );
       setTripulantes(data);
-    } catch (e) { 
-      console.error("Erro ao carregar tripulantes:", e); 
+    } catch (e) {
+      console.error("Erro ao carregar tripulantes:", e);
     }
   };
 
   const loadRelatorios = async () => {
     try {
       const snapshot = await getDocs(relatoriosCollectionRef);
-      const data = snapshot.docs.map(d => ({ id: d.id, ...(d.data() as any) })) as RelatorioViagem[];
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as RelatorioViagem[];
       setRelatorios(
         data.sort((a, b) => {
           const ad = a.criado_em?.toDate ? a.criado_em.toDate().getTime() : new Date(a.criado_em || 0).getTime();
@@ -506,7 +546,7 @@ export default function RelatoriosViagem() {
     setTripulantesFiltrados(tripulantes);
   }, [aeronaves, tripulantes]);
 
-  // ========================= INTELIGÊNCIA DO COTISTA =========================
+  // ===== INTELIGÊNCIA DO COTISTA =====
   const fetchCotistaByRazao = async (termo: string): Promise<Cotista | null> => {
     if (!termo) return null;
     const qy = query(
@@ -532,27 +572,24 @@ export default function RelatoriosViagem() {
     };
   };
 
-  // >>> NÃO AUTO-PREENCHER AERONAVE/TRIPULANTE <<<
   const aplicarCotista = async (cliente: Cotista) => {
     setCotistaSelecionado(cliente);
     const numero = await generateReportNumberAtomic(cliente.prefixo);
 
-    // Apenas filtra as listas conforme o cotista
     let novasAeronaves = aeronaves;
     let novosTrip = tripulantes;
 
     if (cliente.aeronaves_ids?.length) {
-      novasAeronaves = aeronaves.filter(a => cliente.aeronaves_ids!.includes(a.id));
+      novasAeronaves = aeronaves.filter((a) => cliente.aeronaves_ids!.includes(a.id));
     }
     if (cliente.tripulantes_ids?.length) {
-      novosTrip = tripulantes.filter(t => cliente.tripulantes_ids!.includes(t.id));
+      novosTrip = tripulantes.filter((t) => cliente.tripulantes_ids!.includes(t.id));
     }
 
     setAeronavesFiltradas(novasAeronaves);
     setTripulantesFiltrados(novosTrip);
 
-    // Mantém matrícula e tripulante atuais; não define defaults
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       cotista: cliente.razao_social || cliente.nome || prev.cotista,
       prefixo_cotista: cliente.prefixo,
@@ -566,57 +603,57 @@ export default function RelatoriosViagem() {
     const termo = (formData.cotista || "").trim();
     if (!termo) {
       setCotistaSelecionado(null);
-      setAeronavesFiltradas(aeronaves);      // nunca deixa null
-      setTripulantesFiltrados(tripulantes);  // idem
-      setFormData(prev => ({ ...prev, prefixo_cotista: "" })); // não zera numero, nem mexe em aeronave/tripulante
+      setAeronavesFiltradas(aeronaves);
+      setTripulantesFiltrados(tripulantes);
+      setFormData((prev) => ({ ...prev, prefixo_cotista: "" }));
       return;
     }
-    const local = cotistas.find(c =>
-      (c.razao_social || c.nome || "").toLowerCase() === termo.toLowerCase()
+    const local = cotistas.find(
+      (c) => (c.razao_social || c.nome || "").toLowerCase() === termo.toLowerCase()
     );
-    if (local) { 
-      await aplicarCotista({ ...local, razao_social: local.razao_social || local.nome || termo }); 
-      return; 
+    if (local) {
+      await aplicarCotista({ ...local, razao_social: local.razao_social || local.nome || termo });
+      return;
     }
     const remoto = await fetchCotistaByRazao(termo);
-    if (remoto) { 
-      await aplicarCotista(remoto); 
-      return; 
+    if (remoto) {
+      await aplicarCotista(remoto);
+      return;
     }
     const prefixo = gerarPrefixoPadrao(termo);
     setCotistaSelecionado(null);
     setAeronavesFiltradas(aeronaves);
     setTripulantesFiltrados(tripulantes);
-    setFormData(prev => ({ ...prev, prefixo_cotista: prefixo }));
+    setFormData((prev) => ({ ...prev, prefixo_cotista: prefixo }));
     toast.info(`Cotista não encontrado. Prefixo sugerido: ${prefixo}`);
   };
 
-  // ========================= OPÇÕES PARA AUTOCOMPLETE =========================
-  const cotistasOptions = cotistas.map(c => ({
+  // ===== OPÇÕES AUTOCOMPLETE =====
+  const cotistasOptions = cotistas.map((c) => ({
     id: c.id,
-    label: c.razao_social || c.nome || '',
+    label: c.razao_social || c.nome || "",
     nome: c.nome,
     prefixo: c.prefixo,
-    aeronaves_ids: c.aeronaves_ids,      // mantém para o aplicarCotista
-    tripulantes_ids: c.tripulantes_ids,  // mantém para o aplicarCotista
+    aeronaves_ids: c.aeronaves_ids,
+    tripulantes_ids: c.tripulantes_ids,
   }));
 
-  const aeronavesOptions = aeronavesFiltradas.map(a => ({
+  const aeronavesOptions = aeronavesFiltradas.map((a) => ({
     id: a.id,
-    label: a.matricula || '',
+    label: a.matricula || "",
     matricula: a.matricula,
-    modelo: a.modelo
+    modelo: a.modelo,
   }));
 
-  const tripulantesOptions = tripulantesFiltrados.map(t => ({
+  const tripulantesOptions = tripulantesFiltrados.map((t) => ({
     id: t.id,
-    label: t.nome || '',
+    label: t.nome || "",
     nome: t.nome,
     funcao: t.funcao,
-    codigoanac: t.codigoanac
+    codigoanac: t.codigoanac,
   }));
 
-  // ========================= AÇÕES PREVIEW =========================
+  // ===== AÇÕES PREVIEW =====
   const handleSaveAndPdf = async () => {
     if (!companyConfig) {
       toast.error("Configuração da empresa não carregada.");
@@ -632,7 +669,7 @@ export default function RelatoriosViagem() {
       if (!numeroFinal) {
         const prefixo = formData.prefixo_cotista || gerarPrefixoPadrao(formData.cotista);
         numeroFinal = await generateReportNumberAtomic(prefixo);
-        setFormData(prev => ({ ...prev, numero: numeroFinal }));
+        setFormData((prev) => ({ ...prev, numero: numeroFinal }));
       }
 
       const totals = calcularTotaisDetalhados();
@@ -640,7 +677,7 @@ export default function RelatoriosViagem() {
         ...formData,
         numero: numeroFinal,
         ...totals,
-        status: 'SALVO' as StatusRelatorio,
+        status: "SALVO" as StatusRelatorio,
         criado_em: serverTimestamp(),
         atualizado_em: serverTimestamp(),
       };
@@ -657,11 +694,15 @@ export default function RelatoriosViagem() {
       // baixar local
       const urlObj = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = urlObj; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+      a.href = urlObj;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
       URL.revokeObjectURL(urlObj);
 
       toast.success("Relatório salvo e PDF baixado!");
-      setViewMode('list');
+      setViewMode("list");
       loadRelatorios();
     } catch (e) {
       console.error(e);
@@ -671,26 +712,28 @@ export default function RelatoriosViagem() {
     }
   };
 
-  // ========================= RENDER =========================
+  // ===== RENDER =====
   return (
     <Layout>
       <div className="p-6">
-        {viewMode === 'preview' ? (
+        {viewMode === "preview" ? (
           <RelatorioPreviewLayout
             dadosEmpresa={companyConfig || {}}
             formData={formData}
             totals={calcularTotaisDetalhados()}
             formatDate={formatDate}
             formatCurrency={formatCurrency}
-            onBack={() => setViewMode('form')}
+            onBack={() => setViewMode("form")}
             onSaveAndPdf={handleSaveAndPdf}
             isSubmitting={isSubmitting}
           />
-        ) : viewMode === 'form' ? (
+        ) : viewMode === "form" ? (
           <div className="bg-gray-900 p-6 rounded-lg">
             <div className="flex items-center gap-3 mb-6">
               <Plane className="w-8 h-8 text-blue-400" />
-              <h1 className="text-2xl font-bold text-white">{formData.numero ? `Editando Relatório #${formData.numero}` : 'Novo Relatório de Viagem'}</h1>
+              <h1 className="text-2xl font-bold text-white">
+                {formData.numero ? `Editando Relatório #${formData.numero}` : "Novo Relatório de Viagem"}
+              </h1>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -699,7 +742,7 @@ export default function RelatoriosViagem() {
                 <input
                   type="text"
                   value={formData.numero}
-                  onChange={(e) => setFormData(prev => ({ ...prev, numero: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, numero: e.target.value }))}
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Será gerado automaticamente"
                   readOnly
@@ -710,7 +753,7 @@ export default function RelatoriosViagem() {
                 <Autocomplete
                   label="Cotista"
                   value={formData.cotista}
-                  onChange={(value) => setFormData(prev => ({ ...prev, cotista: value, prefixo_cotista: '' }))}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, cotista: value, prefixo_cotista: "" }))}
                   options={cotistasOptions}
                   placeholder="Digite a razão social do cotista"
                   onSelect={async (opt) => {
@@ -730,7 +773,7 @@ export default function RelatoriosViagem() {
               <Autocomplete
                 label="Matrícula da Aeronave"
                 value={formData.matricula}
-                onChange={(value) => setFormData(prev => ({ ...prev, matricula: value }))}
+                onChange={(value) => setFormData((prev) => ({ ...prev, matricula: value }))}
                 options={aeronavesOptions}
                 placeholder="Digite a matrícula da aeronave"
               />
@@ -738,7 +781,7 @@ export default function RelatoriosViagem() {
               <Autocomplete
                 label="Tripulante"
                 value={formData.tripulante}
-                onChange={(value) => setFormData(prev => ({ ...prev, tripulante: value }))}
+                onChange={(value) => setFormData((prev) => ({ ...prev, tripulante: value }))}
                 options={tripulantesOptions}
                 placeholder="Digite o nome do tripulante"
               />
@@ -748,7 +791,7 @@ export default function RelatoriosViagem() {
                 <input
                   type="text"
                   value={formData.destino}
-                  onChange={(e) => setFormData(prev => ({ ...prev, destino: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, destino: e.target.value }))}
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Cidade de destino"
                 />
@@ -759,7 +802,7 @@ export default function RelatoriosViagem() {
                 <input
                   type="date"
                   value={formData.data_inicio}
-                  onChange={(e) => setFormData(prev => ({ ...prev, data_inicio: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, data_inicio: e.target.value }))}
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -769,7 +812,7 @@ export default function RelatoriosViagem() {
                 <input
                   type="date"
                   value={formData.data_fim}
-                  onChange={(e) => setFormData(prev => ({ ...prev, data_fim: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, data_fim: e.target.value }))}
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -787,8 +830,8 @@ export default function RelatoriosViagem() {
                   <label className="block text-sm font-medium text-gray-300 mb-2">Data</label>
                   <input
                     type="date"
-                    value={novaDespesa.data || ''}
-                    onChange={(e) => setNovaDespesa(prev => ({ ...prev, data: e.target.value }))}
+                    value={novaDespesa.data || ""}
+                    onChange={(e) => setNovaDespesa((prev) => ({ ...prev, data: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -796,13 +839,15 @@ export default function RelatoriosViagem() {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Categoria</label>
                   <select
-                    value={novaDespesa.categoria || ''}
-                    onChange={(e) => setNovaDespesa(prev => ({ ...prev, categoria: e.target.value }))}
+                    value={novaDespesa.categoria || ""}
+                    onChange={(e) => setNovaDespesa((prev) => ({ ...prev, categoria: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Selecione</option>
-                    {CATEGORIAS_DESPESA_LIST.map(c => (
-                      <option key={c} value={c}>{c}</option>
+                    {CATEGORIAS_DESPESA_LIST.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -810,12 +855,14 @@ export default function RelatoriosViagem() {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Pago Por</label>
                   <select
-                    value={novaDespesa.pago_por || 'Tripulante'}
-                    onChange={(e) => setNovaDespesa(prev => ({ ...prev, pago_por: e.target.value as any }))}
+                    value={novaDespesa.pago_por || "Tripulante"}
+                    onChange={(e) => setNovaDespesa((prev) => ({ ...prev, pago_por: e.target.value as any }))}
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {PAGADORES_LIST.map(p => (
-                      <option key={p} value={p}>{p}</option>
+                    {PAGADORES_LIST.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -826,7 +873,7 @@ export default function RelatoriosViagem() {
                     type="number"
                     step="0.01"
                     value={Number(novaDespesa.valor) || 0}
-                    onChange={(e) => setNovaDespesa(prev => ({ ...prev, valor: Number(e.target.value) }))}
+                    onChange={(e) => setNovaDespesa((prev) => ({ ...prev, valor: Number(e.target.value) }))}
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0,00"
                   />
@@ -838,8 +885,8 @@ export default function RelatoriosViagem() {
                   <label className="block text-sm font-medium text-gray-300 mb-2">Descrição</label>
                   <input
                     type="text"
-                    value={novaDespesa.descricao || ''}
-                    onChange={(e) => setNovaDespesa(prev => ({ ...prev, descricao: e.target.value }))}
+                    value={novaDespesa.descricao || ""}
+                    onChange={(e) => setNovaDespesa((prev) => ({ ...prev, descricao: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Descrição da despesa"
                   />
@@ -849,7 +896,7 @@ export default function RelatoriosViagem() {
                   <label className="block text-sm font-medium text-gray-300 mb-2">Comprovante</label>
                   <input
                     type="file"
-                    onChange={(e) => setNovaDespesa(prev => ({ ...prev, comprovante_file: e.target.files?.[0] }))}
+                    onChange={(e) => setNovaDespesa((prev) => ({ ...prev, comprovante_file: e.target.files?.[0] }))}
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white file:mr-4 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-gray-600 file:text-white hover:file:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     accept="image/*,.pdf"
                   />
@@ -893,24 +940,41 @@ export default function RelatoriosViagem() {
                           <td className="p-3 text-gray-300">{d.categoria}</td>
                           <td className="p-3 text-white">{d.descricao}</td>
                           <td className="p-3">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              d.pago_por === 'Tripulante' ? 'bg-blue-500/20 text-blue-400' :
-                              d.pago_por === 'Cotista' ? 'bg-green-500/20 text-green-400' :
-                              'bg-purple-500/20 text-purple-400'
-                            }`}>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                d.pago_por === "Tripulante"
+                                  ? "bg-blue-500/20 text-blue-400"
+                                  : d.pago_por === "Cotista"
+                                  ? "bg-green-500/20 text-green-400"
+                                  : "bg-purple-500/20 text-purple-400"
+                              }`}
+                            >
                               {d.pago_por}
                             </span>
                           </td>
                           <td className="p-3 text-gray-300">
                             {d.comprovante_url ? (
-                              <a href={d.comprovante_url} target="_blank" rel="noreferrer" className="underline text-blue-300">abrir</a>
+                              <a
+                                href={d.comprovante_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="underline text-blue-300"
+                              >
+                                abrir
+                              </a>
                             ) : (
                               <span className="text-gray-500">—</span>
                             )}
                           </td>
-                          <td className="p-3 text-right font-medium text-green-400">{formatCurrency(d.valor)}</td>
+                          <td className="p-3 text-right font-medium text-green-400">
+                            {formatCurrency(d.valor)}
+                          </td>
                           <td className="p-3 text-center">
-                            <button onClick={() => removerDespesa(index)} className="text-red-400 hover:text-red-300 p-1" title="Remover despesa">
+                            <button
+                              onClick={() => removerDespesa(index)}
+                              className="text-red-400 hover:text-red-300 p-1"
+                              title="Remover despesa"
+                            >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </td>
@@ -923,7 +987,9 @@ export default function RelatoriosViagem() {
                 <div className="mt-4 p-4 bg-gray-700 rounded-lg">
                   <div className="flex justify-between items-center text-lg font-semibold">
                     <span className="text-white">Total Geral:</span>
-                    <span className="text-cyan-400">{formatCurrency(calcularTotaisDetalhados().valor_total)}</span>
+                    <span className="text-cyan-400">
+                      {formatCurrency(calcularTotaisDetalhados().valor_total)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -934,7 +1000,7 @@ export default function RelatoriosViagem() {
               <label className="block text-sm font-medium text-gray-300 mb-2">Observações</label>
               <textarea
                 value={formData.observacoes}
-                onChange={(e) => setFormData(prev => ({ ...prev, observacoes: e.target.value }))}
+                onChange={(e) => setFormData((prev) => ({ ...prev, observacoes: e.target.value }))}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={3}
                 placeholder="Observações adicionais sobre a viagem..."
@@ -943,8 +1009,19 @@ export default function RelatoriosViagem() {
 
             {/* AÇÕES */}
             <div className="flex gap-4 justify-end">
-              <button type="button" onClick={() => setViewMode('list')} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg">Cancelar</button>
-              <button type="button" onClick={() => setViewMode('preview')} disabled={formData.despesas.length === 0} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setViewMode("list")}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("preview")}
+                disabled={formData.despesas.length === 0}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg flex items-center gap-2"
+              >
                 <Eye className="w-4 h-4" /> Pré-visualizar
               </button>
             </div>
@@ -954,8 +1031,11 @@ export default function RelatoriosViagem() {
             {/* MODAL VISUALIZAR */}
             {relatorioVisualizar && (
               <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-                <div className="bg-gray-900 rounded-lg shadow-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
-                  <button onClick={() => setRelatorioVisualizar(null)} className="absolute top-4 right-4 text-gray-400 hover:text-white z-10">
+                <div className="bg-gray-900 rounded-lg shadow-lg p-6 max-w-4xl w/full max-h-[90vh] overflow-y-auto relative">
+                  <button
+                    onClick={() => setRelatorioVisualizar(null)}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
+                  >
                     <X className="w-6 h-6" />
                   </button>
                   <RelatorioPreviewLayout
@@ -984,7 +1064,13 @@ export default function RelatoriosViagem() {
                 <Plane className="w-8 h-8 text-blue-400" />
                 <h1 className="text-2xl font-bold text-white">Relatórios de Viagem</h1>
               </div>
-              <button onClick={() => { resetForm(); setViewMode('form'); }} className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white h-10 px-4">
+              <button
+                onClick={() => {
+                  resetForm();
+                  setViewMode("form");
+                }}
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white h-10 px-4"
+              >
                 <Plus className="w-4 h-4 mr-2" /> Novo Relatório
               </button>
             </div>
@@ -1004,11 +1090,23 @@ export default function RelatoriosViagem() {
                     />
                   </div>
                 </div>
-                <select value={filterMatricula} onChange={(e) => setFilterMatricula(e.target.value)} className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select
+                  value={filterMatricula}
+                  onChange={(e) => setFilterMatricula(e.target.value)}
+                  className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
                   <option value="todas">Todas as Matrículas</option>
-                  {aeronaves.map(a => (<option key={a.id} value={a.matricula}>{a.matricula}</option>))}
+                  {aeronaves.map((a) => (
+                    <option key={a.id} value={a.matricula}>
+                      {a.matricula}
+                    </option>
+                  ))}
                 </select>
-                <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)} className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value as any)}
+                  className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
                   <option value="todos">Todos os Status</option>
                   <option value="RASCUNHO">Rascunho</option>
                   <option value="SALVO">Salvo</option>
@@ -1019,7 +1117,9 @@ export default function RelatoriosViagem() {
 
             {/* LISTA */}
             {loading ? (
-              <div className="text-center py-10"><div className="text-white">Carregando...</div></div>
+              <div className="text-center py-10">
+                <div className="text-white">Carregando...</div>
+              </div>
             ) : (
               <div className="space-y-4">
                 {filteredRelatorios.length === 0 ? (
@@ -1031,25 +1131,32 @@ export default function RelatoriosViagem() {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="text-lg font-semibold text-white">Relatório #{relatorio.numero}</h3>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(relatorio.status)}`}>{relatorio.status}</span>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(relatorio.status)}`}>
+                              {relatorio.status}
+                            </span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-300">
                             <div><strong>Cotista:</strong> {relatorio.cotista}</div>
                             <div><strong>Matrícula:</strong> {relatorio.matricula}</div>
                             <div><strong>Destino:</strong> {relatorio.destino}</div>
                             <div><strong>Tripulante:</strong> {relatorio.tripulante}</div>
-                            <div><strong>Período:</strong> {formatDate(relatorio.data_inicio)} a {formatDate(relatorio.data_fim)}</div>
+                            <div>
+                              <strong>Período:</strong> {formatDate(relatorio.data_inicio)} a {formatDate(relatorio.data_fim)}
+                            </div>
                             <div><strong>Total:</strong> {formatCurrency(relatorio.valor_total)}</div>
                           </div>
                         </div>
 
                         <div className="flex flex-col items-end gap-2 mt-4 md:mt-0">
                           <div className="flex gap-2">
-                            <button onClick={() => setRelatorioVisualizar(relatorio)} className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white h-9 px-3">
+                            <button
+                              onClick={() => setRelatorioVisualizar(relatorio)}
+                              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white h-9 px-3"
+                            >
                               <Eye className="w-4 h-4 mr-2" /> Ver
                             </button>
 
-                            {(relatorio.status === 'RASCUNHO' || relatorio.status === 'SALVO') && (
+                            {(relatorio.status === "RASCUNHO" || relatorio.status === "SALVO") && (
                               <button
                                 onClick={() => {
                                   setFormData({
@@ -1058,14 +1165,18 @@ export default function RelatoriosViagem() {
                                     matricula: relatorio.matricula,
                                     tripulante: relatorio.tripulante,
                                     destino: relatorio.destino,
-                                    data_inicio: relatorio.data_inicio?.toDate ? relatorio.data_inicio.toDate().toISOString().split('T')[0] : relatorio.data_inicio,
-                                    data_fim: relatorio.data_fim?.toDate ? relatorio.data_fim.toDate().toISOString().split('T')[0] : relatorio.data_fim,
+                                    data_inicio: relatorio.data_inicio?.toDate
+                                      ? relatorio.data_inicio.toDate().toISOString().split("T")[0]
+                                      : relatorio.data_inicio,
+                                    data_fim: relatorio.data_fim?.toDate
+                                      ? relatorio.data_fim.toDate().toISOString().split("T")[0]
+                                      : relatorio.data_fim,
                                     despesas: relatorio.despesas,
                                     observacoes: relatorio.observacoes,
                                     criado_por: relatorio.criado_por,
-                                    prefixo_cotista: relatorio.prefixo_cotista
+                                    prefixo_cotista: relatorio.prefixo_cotista,
                                   });
-                                  setViewMode('form');
+                                  setViewMode("form");
                                 }}
                                 className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-yellow-600 hover:bg-yellow-700 text-white h-9 px-3"
                               >
@@ -1073,7 +1184,7 @@ export default function RelatoriosViagem() {
                               </button>
                             )}
 
-                            {/* PDF sempre */}
+                            {/* PDF */}
                             <button
                               onClick={async () => {
                                 try {
@@ -1089,7 +1200,11 @@ export default function RelatoriosViagem() {
                                   );
                                   const urlObj = URL.createObjectURL(blob);
                                   const a = document.createElement("a");
-                                  a.href = urlObj; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+                                  a.href = urlObj;
+                                  a.download = filename;
+                                  document.body.appendChild(a);
+                                  a.click();
+                                  a.remove();
                                   URL.revokeObjectURL(urlObj);
                                 } catch (error) {
                                   console.error("Erro ao gerar PDF:", error);
@@ -1101,7 +1216,7 @@ export default function RelatoriosViagem() {
                               <FileText className="w-4 h-4 mr-2" /> PDF
                             </button>
 
-                            {/* Enviar por e-mail (apenas abre o webmail em branco) */}
+                            {/* Enviar por e-mail */}
                             <button
                               onClick={async () => {
                                 try {
@@ -1109,7 +1224,6 @@ export default function RelatoriosViagem() {
                                     toast.error("Configuração da empresa não carregada.");
                                     return;
                                   }
-                                  // opcional: gerar/subir o PDF antes (para já ficar salvo no Storage)
                                   const { blob, filename } = await generateRelatorioViagemPDF(
                                     relatorio,
                                     {
@@ -1121,8 +1235,7 @@ export default function RelatoriosViagem() {
                                     companyConfig
                                   );
                                   await uploadPdfToStorage(blob, filename, relatorio.numero);
-
-                                  openWebmailCompose(); // em branco
+                                  openWebmailCompose();
                                   toast.success("Webmail aberto. Anexe o PDF manualmente.");
                                 } catch (error) {
                                   console.error(error);
@@ -1134,13 +1247,16 @@ export default function RelatoriosViagem() {
                               Enviar por e-mail
                             </button>
 
-                            {relatorio.status === 'RASCUNHO' && (
+                            {relatorio.status === "RASCUNHO" && (
                               <button
                                 onClick={async () => {
                                   if (confirm("Tem certeza que deseja excluir este relatório?")) {
                                     try {
                                       const docRef = doc(db, "relatorios", relatorio.id);
-                                      await updateDoc(docRef, { status: 'EXCLUIDO', atualizado_em: serverTimestamp() });
+                                      await updateDoc(docRef, {
+                                        status: "EXCLUIDO",
+                                        atualizado_em: serverTimestamp(),
+                                      });
                                       toast.success("Relatório excluído com sucesso!");
                                       loadRelatorios();
                                     } catch (error) {
@@ -1161,14 +1277,14 @@ export default function RelatoriosViagem() {
                             <input
                               type="checkbox"
                               className="w-4 h-4 accent-green-500"
-                              checked={relatorio.status === 'ENVIADO'}
+                              checked={relatorio.status === "ENVIADO"}
                               onChange={async (e) => {
                                 const marcado = e.target.checked;
                                 try {
                                   const docRef = doc(db, "relatorios", relatorio.id);
                                   if (marcado) {
                                     await updateDoc(docRef, {
-                                      status: 'ENVIADO',
+                                      status: "ENVIADO",
                                       enviado_em: serverTimestamp(),
                                       atualizado_em: serverTimestamp(),
                                       enviado_marcado_manual: true,
@@ -1177,7 +1293,7 @@ export default function RelatoriosViagem() {
                                     toast.success("Marcado como ENVIADO e criada despesa em aberto na conciliação.");
                                   } else {
                                     await updateDoc(docRef, {
-                                      status: 'SALVO',
+                                      status: "SALVO",
                                       atualizado_em: serverTimestamp(),
                                       enviado_marcado_manual: false,
                                     });
