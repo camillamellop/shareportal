@@ -12,6 +12,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/integrations/firebase/config";
 import { RelatorioPreviewLayout } from '@/components/financeiro/RelatorioPreviewLayout';
 import { generateRelatorioViagemPDF } from '@/utils/generateRelatorioViagemPDF';
+import { empresaService } from "@/services/empresaService";
+
 import { toast } from "sonner";
 
 // TYPES
@@ -98,6 +100,7 @@ const CATEGORIAS_DESPESA_LIST = [
 const PAGADORES_LIST: Array<'Tripulante' | 'Cotista' | 'Share Brasil'> = ['Tripulante','Cotista','Share Brasil'];
 
 const WEBMAIL_URL_BASE = "https://webmail-seguro.com.br/sharebrasil.net.br/";
+const conciliacaoCollectionRef = collection(db, "conciliacao"); // ajuste o nome se for outro
 
 // ========================= AUTOCOMPLETE =========================
 interface AutocompleteProps {
@@ -184,9 +187,9 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
 
 // ========================= FIREBASE REFS =========================
 const relatoriosCollectionRef = collection(db, "relatorios");
-const cotistasCollectionRef = collection(db, "clientes");
-const aeronavesCollectionRef = collection(db, "aeronaves");
-const tripulantesCollectionRef = collection(db, "tripulantes");
+const cotistasCollectionRef = collection(db, "razao_social");
+const aeronavesCollectionRef = collection(db, "matricula");
+const tripulantesCollectionRef = collection(db, "tripulacao");
 
 // ========================= HELPERS =========================
 const formatCurrency = (value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
@@ -240,8 +243,7 @@ const criarDespesaConciliacao = async (rel: RelatorioViagem, formatDate: (d: any
     relatorio_id: rel.id,
     relatorio_numero: rel.numero,
     cotista: rel.cotista,
-    prefixo_cotista: rel.prefixo_cotista,
-    descricao: `Relatório ${rel.numero} - ${rel.destino} (${formatDate(rel.data_inicio)} a ${formatDate(rel.data_fim)})`,
+        descricao: `Relatório ${rel.numero} - ${rel.destino} (${formatDate(rel.data_inicio)} a ${formatDate(rel.data_fim)})`,
     valor: Number(valor) || 0,
     status: "ABERTO",
     criado_em: serverTimestamp(),
@@ -345,16 +347,16 @@ export default function RelatoriosViagem() {
   const resetForm = () => {
     setFormData({
       numero: "",
-      cotista: "",
+      cliente: "",
       matricula: "",
-      tripulante: "",
+      tripulacao: "",
       destino: "",
       data_inicio: new Date().toISOString().split("T")[0],
       data_fim: new Date().toISOString().split("T")[0],
       despesas: [],
       observacoes: "",
       criado_por: "Usuário Atual",
-      prefixo_cotista: ""
+    
     });
     setNovaDespesa({
       data: new Date().toISOString().split("T")[0],
@@ -433,11 +435,10 @@ export default function RelatoriosViagem() {
         const razao = x.razao_social || x.nome || "";
         return {
           id: d.id,
-          razao_social: razao,
+          razao_social:
           nome: x.nome,
-          email: x.email,
           prefixo: x.prefixo || gerarPrefixoPadrao(razao),
-          aeronaves_ids: x.aeronaves_ids || x.aeronaves || [],
+          matricula_ids: x.matricula_ids || x.matricula || [],
           tripulantes_ids: x.tripulantes_ids || x.tripulacao_ids || [],
         } as Cotista;
       });
