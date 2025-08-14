@@ -45,7 +45,7 @@ export interface RelatorioViagem {
   numero: string;
   cotista: string;
   matricula: string; // aeronave
-  tripulante: string;
+  tripulancao: string;
   destino: string;
   data_inicio: any;
   data_fim: any;
@@ -112,8 +112,8 @@ const WEBMAIL_URL_BASE = "https://webmail-seguro.com.br/sharebrasil.net.br/";
 // coleções (ajuste os nomes se no seu projeto forem outros)
 const relatoriosCollectionRef   = collection(db, "relatorios");
 const cotistasCollectionRef     = collection(db, "clientes");
-const aeronavesCollectionRef    = collection(db, "aeronaves");
-const tripulantesCollectionRef  = collection(db, "tripulantes");
+const aeronavesCollectionRef    = collection(db, "matricula");
+const tripulantesCollectionRef  = collection(db, "tripulancao");
 const conciliacaoCollectionRef  = collection(db, "conciliacao");
 
 // ===== AUTOCOMPLETE =====
@@ -312,7 +312,7 @@ export default function RelatoriosViagem() {
     numero: "",
     cotista: "",
     matricula: "",
-    tripulante: "",
+    tripulacao: "",
     destino: "",
     data_inicio: new Date().toISOString().split("T")[0],
     data_fim: new Date().toISOString().split("T")[0],
@@ -399,7 +399,7 @@ export default function RelatoriosViagem() {
       numero: "",
       cotista: "",
       matricula: "",
-      tripulante: "",
+      tripulacao: "",
       destino: "",
       data_inicio: new Date().toISOString().split("T")[0],
       data_fim: new Date().toISOString().split("T")[0],
@@ -494,7 +494,7 @@ export default function RelatoriosViagem() {
           email: x.email,
           prefixo: x.prefixo || gerarPrefixoPadrao(razao),
           aeronaves_ids: x.aeronaves_ids || x.aeronaves || x.matricula_ids || [],
-          tripulantes_ids: x.tripulantes_ids || x.tripulacao_ids || [],
+          tripulacao_ids: x.tripulacao_ids || x.tripulacao_ids || [],
         } as Cotista;
       });
       setCotistas(data);
@@ -532,7 +532,7 @@ export default function RelatoriosViagem() {
             funcao: d.data().funcao || "",
           }) as Tripulante
       );
-      setTripulantes(data);
+      setTripulacao(data);
     } catch (e) {
       console.error("Erro ao carregar tripulantes:", e);
     }
@@ -668,9 +668,9 @@ export default function RelatoriosViagem() {
     modelo: a.modelo,
   }));
 
-  const tripulantesOptions = tripulantesFiltrados.map((t) => ({
+  const tripulacaoOptions = tripulacaoFiltrados.map((t) => ({
     id: t.id,
-    label: t.nome || "",
+    label: t.tripulacao || "",
     nome: t.nome,
     funcao: t.funcao,
     codigoanac: t.codigoanac,
@@ -814,9 +814,9 @@ export default function RelatoriosViagem() {
               />
 
               <Autocomplete
-                label="Tripulante"
-                value={formData.tripulante}
-                onChange={(value) => setFormData((prev) => ({ ...prev, tripulante: value }))}
+                label="Tripulacao"
+                value={formData.tripulacao}
+                onChange={(value) => setFormData((prev) => ({ ...prev, tripulacao: value }))}
                 options={tripulantesOptions}
                 placeholder="Digite o nome do tripulante"
               />
