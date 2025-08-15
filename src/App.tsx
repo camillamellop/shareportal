@@ -33,16 +33,7 @@ const DiarioDetalhes = React.lazy(() => import("./pages/DiarioDetalhes"));
 const AdicionarVoo = React.lazy(() => import("./pages/AdicionarVoo"));
 const AgendamentoVoo = React.lazy(() => import("./pages/AgendamentoVoo"));    
 const CoordenacaoVoos = React.lazy(() => import("./pages/CoordenacaoVoos"));
-const ControleAbastecimento = React.lazy(() => import("./pages/ControleAbastecimento"));
-<<<<<<< HEAD
-const CartaoAlimentacao = React.lazy(() => import("./pages/CartaoAlimentacao.tsx"));
-const CartaoCombustivel = React.lazy(() => import("./pages/CartaoCombustivel.tsx"));
-const Documentos = React.lazy(() => import("./pages/Documentos"));
-=======
-const CartaoAlimentacao = React.lazy(() => import("./pages/CartaoAlimentacao"));
-const CartaoCombustivel = React.lazy(() => import("./pages/CartaoCombustivel"));
-
->>>>>>> 34cea0240ca3ba598c03146761b4feac6cb3d355
+const ControleAbastecimento = React.lazy(() => import("./pages/ControleAbastecimento"))
 
 
 // Configuração otimizada do QueryClient
@@ -203,12 +194,12 @@ function App() {
                 } />
                 <Route path="/cartao/alimentacao" element={
                   <ProtectedRoute>
-                    <CartaoAlimentacao />
+                    <valeAlimentacao />
                   </ProtectedRoute>
                 } />
                 <Route path="/cartao/combustivel" element={
                   <ProtectedRoute>
-                    <CartaoCombustivel />
+                    <valeCombustivel />
                   </ProtectedRoute>
                 } />
                          <Route path="*" element={<NotFound />} />
