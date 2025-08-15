@@ -14,7 +14,7 @@ import {
   Calculator
 } from "lucide-react";
 import { toast } from "sonner";
-import { horasVooTripulanteService, HorasVooTripulante, ResumoHorasTripulante } from "@/services/horasVooTripulanteService";
+import { horasVooTripulanteService, HorasVooTripulante as HorasVooTripulanteType, ResumoHorasTripulante } from "@/services/horasVooTripulanteService";
 import { tripulacaoService, Tripulante } from "@/services/tripulacaoService";
 import "@/utils/seedHorasVooTripulante";
 

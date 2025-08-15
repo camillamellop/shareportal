@@ -32,6 +32,8 @@ export interface EmpresaInfo {
     cidade: string;
     estado: string;
     cep: string;
+    logoUrl?: string;
+    inscricaoMunicipal?: string;
 }
 
 // --- Configurações de Tema e Layout ---
@@ -56,28 +58,34 @@ const brDate = (d: string | Date) => new Date(d).toLocaleDateString("pt-BR", { t
 // --- Funções de Desenho do PDF ---
 
 function addHeaderAndBackground(doc: jsPDF, empresa: EmpresaInfo) {
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Fundo da página
-    doc.setFillColor(THEME.BACKGROUND);
-    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+        // Fundo da página
+        doc.setFillColor(THEME.BACKGROUND);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    // Cabeçalho
-    const logoUrl = "https://i.ibb.co/qL88CDcV/Logo-Share.png";
-    doc.addImage(logoUrl, "PNG", pageWidth - MARGIN - 100, MARGIN - 10, 100, 40, "", "FAST");
+        // Cabeçalho
+        const logoUrl = empresa.logoUrl || "/Jmyhn6NBKpaClc49QvXQacgMfan2_1754083342769_logo.share.png";
+        try {
+            doc.addImage(logoUrl, "PNG", pageWidth - MARGIN - 100, MARGIN - 10, 100, 40, "", "FAST");
+        } catch (e) {
+            // Se não conseguir carregar a logo, ignora
+        }
 
-    doc.setFontSize(9);
-    doc.setTextColor(THEME.TEXT_SECONDARY);
-    doc.text(empresa.razaoSocial, MARGIN, MARGIN);
-    doc.text(`CNPJ: ${empresa.cnpj}`, MARGIN, MARGIN + 12);
-    doc.text(empresa.endereco, MARGIN, MARGIN + 24);
-    doc.text(`${empresa.cidade}, ${empresa.estado} - CEP: ${empresa.cep}`, MARGIN, MARGIN + 36);
+        doc.setFontSize(9);
+        doc.setTextColor(THEME.TEXT_SECONDARY);
+        doc.text(empresa.razaoSocial, MARGIN, MARGIN);
+        if (empresa.cnpj) doc.text(`CNPJ: ${empresa.cnpj}`, MARGIN, MARGIN + 12);
+        if (empresa.inscricaoMunicipal) doc.text(`Inscrição Municipal: ${empresa.inscricaoMunicipal}`, MARGIN, MARGIN + 20);
+        if (empresa.endereco) doc.text(empresa.endereco, MARGIN, MARGIN + 28);
+        if (empresa.cidade && empresa.estado && empresa.cep)
+            doc.text(`${empresa.cidade}, ${empresa.estado} - CEP: ${empresa.cep}`, MARGIN, MARGIN + 36);
 
-    // Linha separadora
-    doc.setDrawColor(THEME.BORDER);
-    doc.setLineWidth(0.5);
-    doc.line(MARGIN, MARGIN + 50, pageWidth - MARGIN, MARGIN + 50);
+        // Linha separadora
+        doc.setDrawColor(THEME.BORDER);
+        doc.setLineWidth(0.5);
+        doc.line(MARGIN, MARGIN + 50, pageWidth - MARGIN, MARGIN + 50);
 }
 
 function addReportInfo(doc: jsPDF, relatorio: RelatorioViagemForm) {

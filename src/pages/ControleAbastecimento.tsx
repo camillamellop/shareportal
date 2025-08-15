@@ -13,7 +13,6 @@ import { Fuel, Plus, Search, Filter, Download, Upload, Calendar, DollarSign, Fil
 import { toast } from 'sonner';
 import { logger } from '@/utils/logger';
 import { abastecimentoService, Abastecimento as AbastecimentoType } from '@/services/abastecimentoService';
-import { executarSeedAbastecimento } from '@/utils/seedAbastecimento';
 
 interface Abastecimento {
   id: string;
@@ -36,6 +35,24 @@ interface Abastecimento {
 }
 
 export default function ControleAbastecimento() {
+  // Limpar todos os abastecimentos
+  const handleLimparTodos = async () => {
+    try {
+      setLoading(true);
+      const todos = await abastecimentoService.getAll();
+      for (const item of todos) {
+        await abastecimentoService.delete(item.id);
+      }
+      setAbastecimentos([]);
+      toast.success('Todos os abastecimentos foram removidos!');
+      logger.info('Todos os abastecimentos removidos');
+    } catch (error) {
+      logger.error('Erro ao limpar abastecimentos', error);
+      toast.error('Erro ao limpar abastecimentos');
+    } finally {
+      setLoading(false);
+    }
+  };
   const [abastecimentos, setAbastecimentos] = useState<Abastecimento[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -110,7 +127,13 @@ export default function ControleAbastecimento() {
       try {
         setLoading(true);
         const data = await abastecimentoService.getAll();
-        setAbastecimentos(data);
+        setAbastecimentos(
+          data.map(item => ({
+            ...item,
+            createdAt: item.createdAt instanceof Date ? item.createdAt : item.createdAt?.toDate?.() || new Date(),
+            updatedAt: item.updatedAt instanceof Date ? item.updatedAt : item.updatedAt?.toDate?.() || new Date(),
+          }))
+        );
         logger.info('Dados de abastecimento carregados do Firestore', { count: data.length });
       } catch (error) {
         logger.error('Erro ao carregar dados de abastecimento', error);
@@ -189,22 +212,6 @@ export default function ControleAbastecimento() {
     }
   };
 
-  const handleSeedData = async () => {
-    try {
-      setLoading(true);
-      const result = await executarSeedAbastecimento();
-      toast.success(`Seed concluído: ${result.sucessos} sucessos, ${result.erros} erros`);
-      
-      // Recarregar dados
-      const data = await abastecimentoService.getAll();
-      setAbastecimentos(data);
-    } catch (error) {
-      logger.error('Erro ao executar seed', error);
-      toast.error('Erro ao executar seed');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -229,7 +236,6 @@ export default function ControleAbastecimento() {
               <p className="text-muted-foreground">Gerencie os registros de abastecimento das aeronaves</p>
             </div>
           </div>
-          
           <div className="flex gap-2">
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
               <DialogTrigger asChild>
@@ -253,14 +259,6 @@ export default function ControleAbastecimento() {
               </DialogContent>
             </Dialog>
             
-            <Button 
-              variant="outline" 
-              onClick={handleSeedData}
-              disabled={loading}
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Popular Dados
-            </Button>
           </div>
         </div>
 

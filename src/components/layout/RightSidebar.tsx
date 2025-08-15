@@ -1,4 +1,13 @@
+  const communicationsMenu = [
+    {
+      label: "Comunicações",
+      icon: MessageSquare,
+      color: "primary",
+      onClick: () => navigate("/recados")
+    }
+  ];
 import { Clock, Calendar, Plane, MapPin, Users, Settings, Wrench, CheckCircle, FileText, Fuel, AlertTriangle, WrenchIcon, Folder, Plus, Edit2, Upload, X } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,42 +45,7 @@ export function RightSidebar() {
     day: 'numeric'
   }));
 
-  const [documentFolders, setDocumentFolders] = useState<DocumentFolder[]>([
-    {
-      id: '1',
-      name: 'Manuais Técnicos',
-      documents: [
-        {
-          id: 'doc1',
-          name: 'Manual_Citation_CJ3.pdf',
-          size: '2.5 MB',
-          uploadedAt: new Date('2024-01-15'),
-          url: '#'
-        }
-      ],
-      isEditing: false
-    },
-    {
-      id: '2',
-      name: 'Certificações',
-      documents: [
-        {
-          id: 'doc2',
-          name: 'Cert_ANAC_2024.pdf',
-          size: '1.8 MB',
-          uploadedAt: new Date('2024-01-10'),
-          url: '#'
-        }
-      ],
-      isEditing: false
-    },
-    {
-      id: '3',
-      name: 'Relatórios de Voo',
-      documents: [],
-      isEditing: false
-    }
-  ]);
+  const [documentFolders, setDocumentFolders] = useState<DocumentFolder[]>([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -148,27 +122,27 @@ export function RightSidebar() {
     label: "Solicitar Voo",
     icon: Calendar,
     color: "primary",
-    onClick: () => navigate("/agendamento")
+    onClick: () => navigate("/agendamento-voo")
   }, {
     label: "Coordenação Voos",
     icon: Settings,
     color: "secondary",
-    onClick: () => navigate("/coordenacao")
+    onClick: () => navigate("/coordenacao-voos")
   }, {
     label: "Diário de Bordo",
     icon: Plane,
     color: "accent",
-    onClick: () => navigate("/diario")
+    onClick: () => navigate("/diario-aeronaves")
   }, {
     label: "Controle de Abastecimento",
     icon: Fuel,
     color: "primary",
-    onClick: () => navigate("/abastecimento")
+    onClick: () => navigate("/controle-abastecimento")
   }, {
     label: "Gestão de Tripulação",
     icon: Users,
     color: "secondary",
-    onClick: () => navigate("/tripulacao")
+    onClick: () => navigate("/gestao-tripulacao")
   }, {
     label: "Documentos",
     icon: FileText,
@@ -176,35 +150,8 @@ export function RightSidebar() {
     onClick: () => navigate("/documentos")
   }];
 
-  const aircraftMaintenance = [
-    {
-      registration: "PR-MDL",
-      model: "Citation CJ3+",
-      status: "active",
-      lastMaintenance: "2024-12-15",
-      nextMaintenance: "2025-03-15",
-      hours: 1250,
-      priority: "normal"
-    },
-    {
-      registration: "PT-OPC",
-      model: "King Air 350",
-      status: "active",
-      lastMaintenance: "2024-11-20",
-      nextMaintenance: "2025-02-20",
-      hours: 2100,
-      priority: "normal"
-    },
-    {
-      registration: "PS-AVE",
-      model: "Phenom 300E",
-      status: "active",
-      lastMaintenance: "2024-12-01",
-      nextMaintenance: "2025-03-01",
-      hours: 890,
-      priority: "normal"
-    },
-  ];
+  const aircraftMaintenance = [];
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -284,144 +231,29 @@ export function RightSidebar() {
           </CardContent>
         </Card>
 
-        {/* Manutenção de Aeronaves */}
+        {/* Comunicações */}
         <Card className="bg-gradient-card border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <WrenchIcon className="w-5 h-5 text-primary" />
-              Manutenção de Aeronaves
+              <MessageSquare className="w-5 h-5 text-primary" />
+              Comunicações
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {aircraftMaintenance.map((aircraft, index) => (
-              <div key={index} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-semibold text-foreground">{aircraft.registration}</h4>
-                  <Badge className={getStatusColor(aircraft.status)}>
-                    {aircraft.status === 'active' ? 'Ativo' : 'Manutenção'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">{aircraft.model}</p>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{aircraft.hours}h</span>
-                  <div className="flex items-center gap-1">
-                    {getPriorityIcon(aircraft.priority)}
-                    <span className={getPriorityColor(aircraft.priority).split(' ')[1]}>
-                      {aircraft.priority === 'normal' ? 'Normal' : 'Urgente'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Documentos */}
-        <Card className="bg-gradient-card border-border">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" />
-                Documentos
-              </CardTitle>
+          <CardContent className="space-y-2">
+            {communicationsMenu.map((item, index) => (
               <Button
+                key={index}
                 variant="outline"
-                size="sm"
-                onClick={addNewFolder}
-                className="h-8 px-2"
+                className="w-full justify-start border-border hover:bg-accent hover:border-primary transition-colors"
+                onClick={item.onClick}
               >
-                <Plus className="h-3 w-3" />
+                <item.icon className="mr-3 h-4 w-4" />
+                {item.label}
               </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {documentFolders.map((folder) => (
-              <div key={folder.id} className="p-3 border border-border rounded-lg bg-card hover:bg-accent transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 flex-1">
-                    <Folder className="h-4 w-4 text-muted-foreground" />
-                    {folder.isEditing ? (
-                      <Input
-                        value={folder.name}
-                        onChange={(e) => updateFolderName(folder.id, e.target.value)}
-                        onBlur={() => toggleFolderEdit(folder.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            toggleFolderEdit(folder.id);
-                          }
-                        }}
-                        className="h-6 text-sm"
-                        autoFocus
-                      />
-                    ) : (
-                      <span className="text-sm font-medium text-foreground truncate">
-                        {folder.name}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleFolderEdit(folder.id)}
-                      className="h-6 w-6 p-0"
-                      title="Editar nome"
-                    >
-                      <Edit2 className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deleteFolder(folder.id)}
-                      className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-                      title="Excluir pasta"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  {folder.documents.length > 0 ? (
-                    folder.documents.map((doc) => (
-                      <div key={doc.id} className="flex items-center gap-2 p-2 bg-background rounded text-xs">
-                        <FileText className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-muted-foreground truncate flex-1">{doc.name}</span>
-                        <span className="text-muted-foreground">{doc.size}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-2 text-xs text-muted-foreground">
-                      Nenhum documento
-                    </div>
-                  )}
-                  
-                  <div className="relative">
-                    <input
-                      type="file"
-                      id={`upload-${folder.id}`}
-                      className="hidden"
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          handleFileUpload(folder.id, file);
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor={`upload-${folder.id}`}
-                      className="flex items-center justify-center gap-1 w-full h-8 px-2 border border-border rounded bg-background hover:bg-accent transition-colors cursor-pointer text-xs text-muted-foreground"
-                    >
-                      <Upload className="h-3 w-3" />
-                      Anexar
-                    </label>
-                  </div>
-                </div>
-              </div>
             ))}
           </CardContent>
         </Card>
+  {/* ...apenas relógio/data e operações de voo... */}
       </div>
     </aside>
   );

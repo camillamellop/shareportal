@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Edit } from "lucide-react";
+import { CheckCircle, Edit, FileText } from "lucide-react";
 
 interface DespesaViagem {
   id: string;
@@ -83,11 +83,13 @@ export const RelatorioPreviewLayout: React.FC<RelatorioViagemPreviewProps> = ({
             <p>{dadosEmpresa.endereco}</p>
             <p>{dadosEmpresa.cidade}, {dadosEmpresa.estado} - CEP: {dadosEmpresa.cep}</p>
           </div>
-          <img
-            src="https://i.ibb.co/qL88CDcV/Logo-Share.png"
-            alt="Logo da Empresa"
-            className="w-32 h-auto"
-          />
+          <div className="flex items-center justify-center min-h-[64px] min-w-[64px] max-h-24 max-w-40 p-2">
+            <img
+              src="https://Jmyhn6NBKpaClc49QvXQacgMfan2_1754083342769_logo.share.png"
+              alt="Logo da Empresa"
+              className="object-contain max-h-24 max-w-40"
+            />
+          </div>
         </div>
 
         {/* Informações principais */}
@@ -160,6 +162,21 @@ export const RelatorioPreviewLayout: React.FC<RelatorioViagemPreviewProps> = ({
               disabled={isSubmitting}
             >
               <CheckCircle className="mr-2 w-4 h-4" /> {isSubmitting ? 'Salvando...' : 'Confirmar e Salvar'}
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                // Chame a função de salvar (handleSubmit) e depois gere o PDF
+                await handleSubmit();
+                // Aguarde o status mudar para SALVO antes de gerar o PDF, se necessário
+                // Gere o PDF aqui (ajuste conforme sua função utilitária)
+                // Exemplo:
+                // await generateRelatorioViagemPDF(...);
+              }}
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white h-10 py-2 px-4"
+              disabled={isSubmitting}
+            >
+              <FileText className="mr-2 w-4 h-4" /> Salvar e Baixar PDF
             </button>
           </div>
         )}

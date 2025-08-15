@@ -1,3 +1,4 @@
+// ...existing code...
 // Lazy load das páginas para melhor performance
 import React, { Suspense } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -35,13 +36,13 @@ const AdicionarVoo = React.lazy(() => import("./pages/AdicionarVoo"));
 const AgendamentoVoo = React.lazy(() => import("./pages/AgendamentoVoo"));    
 const CoordenacaoVoos = React.lazy(() => import("./pages/CoordenacaoVoos"));
 const ControleAbastecimento = React.lazy(() => import("./pages/ControleAbastecimento"));
-const CartaoAlimentacao = React.lazy(() => import("./pages/CartaoAlimentacao"));
-const CartaoCombustivel = React.lazy(() => import("./pages/CartaoCombustivel"));
+const CartaoAlimentacao = React.lazy(() => import("./pages/CartaoAlimentacao.tsx"));
+const CartaoCombustivel = React.lazy(() => import("./pages/CartaoCombustivel.tsx"));
 const Documentos = React.lazy(() => import("./pages/Documentos"));
 
 
 // Configuração otimizada do QueryClient
-const queryClient = new QueryClient(queryConfig);
+const queryClient = new QueryClient({ defaultOptions: { queries: queryConfig } });
 
 // Componente de loading global
 const PageLoader = () => (
@@ -182,6 +183,11 @@ function App() {
                   </ProtectedRoute>
                 } />
                 <Route path="/adicionar-voo" element={
+                  <ProtectedRoute>
+                    <AdicionarVoo />
+                  </ProtectedRoute>
+                } />
+                <Route path="/diario/adicionar-voo/:matricula" element={
                   <ProtectedRoute>
                     <AdicionarVoo />
                   </ProtectedRoute>

@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import DiarioDetalhes from "./DiarioDetalhes";
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ export default function DiarioAeronaves() {
   const [aeronaves, setAeronaves] = useState<Aeronave[]>([]);
   const [loading, setLoading] = useState(true);
   const [executandoSeed, setExecutandoSeed] = useState(false); // usado apenas internamente
+  const [aeronaveSelecionada, setAeronaveSelecionada] = useState<Aeronave | null>(null);
 
   // Carregar aeronaves do Firebase
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function DiarioAeronaves() {
   }, []);
 
   const handleAeronaveClick = (aeronave: Aeronave) => {
-    navigate(`/diario/detalhes/${aeronave.matricula}`);
+    setAeronaveSelecionada(aeronave);
   };
 
   const handleAddAeronave = () => {
@@ -103,6 +105,10 @@ export default function DiarioAeronaves() {
         </div>
       </Layout>
     );
+  }
+
+  if (aeronaveSelecionada) {
+    return <DiarioDetalhes matricula={aeronaveSelecionada.matricula} onVoltar={() => setAeronaveSelecionada(null)} />;
   }
 
   return (

@@ -25,11 +25,17 @@ export default function Recados() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [newMessage, setNewMessage] = useState({
+  const [newMessage, setNewMessage] = useState<{
+    title: string;
+    content: string;
+    priority: "low" | "medium" | "high";
+    recipients: string[];
+    isPinned: boolean;
+  }>({
     title: "",
     content: "",
-    priority: "medium" as const,
-    recipients: [] as string[],
+    priority: "medium",
+    recipients: [],
     isPinned: false
   });
   const [showForm, setShowForm] = useState(false);
@@ -92,6 +98,34 @@ export default function Recados() {
     } catch (error) {
       toast.error("Erro ao marcar como lida");
       console.error("Erro ao marcar como lida:", error);
+    }
+  };
+
+  // Handler para editar mensagem
+  const handleEditMessage = (message: Message) => {
+    setShowForm(true);
+    setNewMessage({
+      title: message.title,
+      content: message.content,
+      priority: message.priority,
+      recipients: message.recipients,
+      isPinned: message.priority === 'high',
+    });
+    // Pode-se adicionar lógica para armazenar o id da mensagem em edição
+    // e atualizar ao salvar
+    // Exemplo: setEditingMessageId(message.id)
+  };
+
+  // Handler para excluir mensagem
+  const handleDeleteMessage = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir este recado?')) return;
+    try {
+      await messageServiceSpecific.delete(id);
+      toast.success('Recado excluído com sucesso!');
+      loadMessages();
+    } catch (error) {
+      toast.error('Erro ao excluir recado');
+      console.error('Erro ao excluir recado:', error);
     }
   };
 
@@ -303,8 +337,19 @@ export default function Recados() {
                                   Marcar como lida
                                 </Button>
                               )}
-                              <Button variant="outline" size="sm">
-                                <MoreVertical className="h-4 w-4" />
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleEditMessage(message)}
+                              >
+                                Editar
+                              </Button>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => handleDeleteMessage(message.id)}
+                              >
+                                Excluir
                               </Button>
                             </div>
                           </div>

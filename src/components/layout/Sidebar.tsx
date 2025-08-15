@@ -74,16 +74,6 @@ const menuGroups = [
       },
     ],
   },
-  {
-    title: "Comunicação",
-    items: [
-      {
-        title: "Recados",
-        icon: MessageSquare,
-        href: "/recados",
-      },
-    ],
-  },
 ];
 
 export function Sidebar() {

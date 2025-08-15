@@ -910,64 +910,45 @@ export default function RelatoriosViagem() {
                           <Eye className="w-4 h-4 mr-2" />
                           Ver
                         </button>
-                        {relatorio.status === 'RASCUNHO' && (
-                          <button
-                            onClick={() => { setViewMode('form'); setFormData(relatorio); }}
-                            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-yellow-500 hover:bg-yellow-600 text-white h-9 px-3"
-                          >
-                            <Edit className="w-4 h-4 mr-2" />
-                            Editar
-                          </button>
-                        )}
-                        {relatorio.status === 'SALVO' && (
-                          <>
-                            <button 
-                              onClick={() => handleSendEmail(relatorio)} 
-                              disabled={isSubmitting} 
-                              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-cyan-500 hover:bg-cyan-600 text-white h-9 px-3 disabled:opacity-50"
-                            >
-                              <Send className="w-4 h-4 mr-2" />
-                              {isSubmitting ? 'Enviando...' : 'Enviar por Email'}
-                            </button>
-                            <button
-                              onClick={() => {/* Função de exclusão aqui */}}
-                              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-red-600 hover:bg-red-700 text-white h-9 px-3"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Excluir
-                            </button>
-                          </>
-                        )}
-                        {relatorio.status === 'ENVIADO' && (
-                          <button
-                            onClick={async () => {
-                              await generateRelatorioViagemPDF(
-                                {
-                                  numero: relatorio.numero,
-                                  cotista: relatorio.cotista,
-                                  aeronave: relatorio.aeronave,
-                                  tripulante: relatorio.tripulante,
-                                  destino: relatorio.destino,
-                                  data_inicio: relatorio.data_inicio,
-                                  data_fim: relatorio.data_fim,
-                                  despesas: relatorio.despesas,
-                                  observacoes: relatorio.observacoes,
-                                },
-                                {
-                                  total_tripulante: relatorio.total_tripulante,
-                                  total_cotista: relatorio.total_cotista,
-                                  total_share_brasil: relatorio.total_share_brasil,
-                                  valor_total: relatorio.valor_total,
-                                },
-                                DADOS_EMPRESA
-                              );
-                            }}
-                            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-green-600 hover:bg-green-700 text-white h-9 px-3"
-                          >
-                            <FileText className="w-4 h-4 mr-2" />
-                            Baixar PDF
-                          </button>
-                        )}
+                        <button 
+                          onClick={() => setRelatorioVisualizar(relatorio)} 
+                          className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-gray-600 bg-gray-700 hover:bg-gray-600 text-gray-200 h-9 px-3"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visualizar
+                        </button>
+                        <button
+                          onClick={async () => {
+                            await generateRelatorioViagemPDF(
+                              {
+                                numero: relatorio.numero,
+                                cotista: relatorio.cotista,
+                                aeronave: relatorio.aeronave,
+                                tripulante: relatorio.tripulante,
+                                destino: relatorio.destino,
+                                data_inicio: relatorio.data_inicio,
+                                data_fim: relatorio.data_fim,
+                                despesas: relatorio.despesas,
+                                observacoes: relatorio.observacoes,
+                              },
+                              {
+                                total_tripulante: relatorio.total_tripulante,
+                                total_cotista: relatorio.total_cotista,
+                                total_share_brasil: relatorio.total_share_brasil,
+                                valor_total: relatorio.valor_total,
+                              },
+                              {
+                                ...DADOS_EMPRESA,
+                                // Se quiser adicionar logo personalizada:
+                                // logoUrl: '/logo-sharebrasil.png'
+                              }
+                            );
+                          }}
+                          className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-green-600 hover:bg-green-700 text-white h-9 px-3"
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          Baixar PDF
+                        </button>
                       </div>
                     </div>
                   </div>

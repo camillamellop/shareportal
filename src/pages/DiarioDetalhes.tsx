@@ -51,9 +51,15 @@ interface MesAno {
   ano: number;
 }
 
-export default function DiarioDetalhes() {
-  const { matricula } = useParams();
+interface DiarioDetalhesProps {
+  matricula?: string;
+  onVoltar?: () => void;
+}
+
+export default function DiarioDetalhes({ matricula: matriculaProp, onVoltar }: DiarioDetalhesProps) {
+  const params = useParams();
   const navigate = useNavigate();
+  const matricula = matriculaProp || params.matricula;
   const [aeronave, setAeronave] = useState<Aeronave | null>(null);
   const [voos, setVoos] = useState<Voo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +84,11 @@ export default function DiarioDetalhes() {
         
         if (!aeronaveData) {
           toast.error("Aeronave não encontrada");
-          navigate("/diario");
+          if (onVoltar) {
+            onVoltar();
+          } else {
+            navigate("/diario");
+          }
           return;
         }
         setAeronave(aeronaveData);
@@ -266,7 +276,7 @@ export default function DiarioDetalhes() {
               <Plane className="w-12 h-12 text-slate-400 mx-auto mb-4" />
               <p className="text-slate-400">Aeronave não encontrada</p>
               <Button 
-                onClick={() => navigate("/diario")}
+                onClick={onVoltar ? onVoltar : () => navigate("/diario")}
                 className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 Voltar ao Diário
@@ -287,7 +297,7 @@ export default function DiarioDetalhes() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/diario")}
+              onClick={onVoltar ? onVoltar : () => navigate("/diario")}
               className="text-slate-300 hover:text-white hover:bg-slate-700"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

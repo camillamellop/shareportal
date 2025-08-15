@@ -294,9 +294,9 @@ export function MainContent() {
                   variant="outline" 
                   size="sm" 
                   className="mt-3"
-                  onClick={() => navigate('/agendamento')}
+                  onClick={() => navigate('/agendamento-voo')}
                 >
-                  Agendar Voo
+                  Solicitar Voo
                 </Button>
               </div>
             )}

@@ -10,7 +10,7 @@ const ValeCombustivel = () => {
       <div className="p-6">
         <BenefitCalculator
           title="Cartão Combustível"
-          month="Janeiro 2024"
+          month="2025"
           initialBalance={initialBalance}
           onInitialBalanceChange={setInitialBalance}
           editable={true}
