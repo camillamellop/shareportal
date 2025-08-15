@@ -1,12 +1,7 @@
 import React from "react";
-<<<<<<< HEAD
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Edit, FileText } from "lucide-react";
-=======
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download } from "lucide-react";
->>>>>>> 34cea0240ca3ba598c03146761b4feac6cb3d355
 
 interface DespesaViagem {
   id: string;
@@ -18,6 +13,7 @@ interface DespesaViagem {
   comprovante_url?: string;
   comprovante_nome?: string;
 }
+
 interface CompanyConfig {
   razaoSocial: string;
   cnpj: string;
@@ -31,6 +27,7 @@ interface CompanyConfig {
   website?: string;
   logo?: string;
 }
+
 interface RelatorioViagemForm {
   numero: string;
   cotista: string;
@@ -48,7 +45,12 @@ interface RelatorioViagemForm {
 interface Props {
   dadosEmpresa: CompanyConfig;
   formData: RelatorioViagemForm | any;
-  totals: { total_tripulante: number; total_cotista: number; total_share_brasil: number; valor_total: number; };
+  totals: { 
+    total_tripulante: number; 
+    total_cotista: number; 
+    total_share_brasil: number; 
+    valor_total: number; 
+  };
   formatDate: (d: any) => string;
   formatCurrency: (n: number) => string;
   isSubmitting?: boolean;
@@ -91,37 +93,6 @@ export const RelatorioPreviewLayout: React.FC<Props> = ({
               </p>
             )}
           </div>
-<<<<<<< HEAD
-          <div className="flex items-center justify-center min-h-[64px] min-w-[64px] max-h-24 max-w-40 p-2">
-            <img
-              src="https://Jmyhn6NBKpaClc49QvXQacgMfan2_1754083342769_logo.share.png"
-              alt="Logo da Empresa"
-              className="object-contain max-h-24 max-w-40"
-            />
-          </div>
-        </div>
-
-        {/* Informações principais */}
-        <div>
-          <h3 className="text-xl font-semibold text-white mb-4 border-b border-gray-700 pb-2">
-            {formData.numero} - {formData.destino}
-          </h3>
-          <div className="grid md:grid-cols-3 gap-4 text-sm">
-            <div><p className="text-gray-400">Cotista</p><p className="text-white font-medium">{formData.cotista}</p></div>
-            <div><p className="text-gray-400">Tripulante</p><p className="text-white font-medium">{formData.tripulante}</p></div>
-            <div><p className="text-gray-400">Aeronave</p><p className="text-white font-medium">{formData.aeronave}</p></div>
-            <div><p className="text-gray-400">Período</p><p className="text-white font-medium">{formatDate(formData.data_inicio)} a {formatDate(formData.data_fim)}</p></div>
-          </div>
-          {formData.observacoes && (
-            <div className="mt-4">
-              <p className="text-gray-400">Observações</p>
-              <p className="text-white whitespace-pre-wrap">{formData.observacoes}</p>
-            </div>
-=======
-          {dadosEmpresa?.logo && (
-            <img src={dadosEmpresa.logo} alt="Logo" className="h-16 w-auto object-contain" />
->>>>>>> 34cea0240ca3ba598c03146761b4feac6cb3d355
-          )}
         </div>
       </div>
 
@@ -193,45 +164,6 @@ export const RelatorioPreviewLayout: React.FC<Props> = ({
             </div>
           </div>
 
-<<<<<<< HEAD
-        {/* Botões */}
-        {status === 'RASCUNHO' && (
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={() => setViewMode('form')}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-gray-600 bg-transparent hover:bg-gray-700 text-gray-200 h-10 py-2 px-4"
-            >
-              <Edit className="mr-2 w-4 h-4" /> Voltar e Editar
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-green-600 hover:bg-green-700 text-white h-10 py-2 px-4 disabled:opacity-50"
-              disabled={isSubmitting}
-            >
-              <CheckCircle className="mr-2 w-4 h-4" /> {isSubmitting ? 'Salvando...' : 'Confirmar e Salvar'}
-            </button>
-            <button
-              type="button"
-              onClick={async () => {
-                // Chame a função de salvar (handleSubmit) e depois gere o PDF
-                await handleSubmit();
-                // Aguarde o status mudar para SALVO antes de gerar o PDF, se necessário
-                // Gere o PDF aqui (ajuste conforme sua função utilitária)
-                // Exemplo:
-                // await generateRelatorioViagemPDF(...);
-              }}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white h-10 py-2 px-4"
-              disabled={isSubmitting}
-            >
-              <FileText className="mr-2 w-4 h-4" /> Salvar e Baixar PDF
-            </button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-=======
           {/* Observações */}
           {formData?.observacoes && (
             <div className="mt-4 p-4 bg-gray-700/60 rounded-lg">
@@ -257,6 +189,5 @@ export const RelatorioPreviewLayout: React.FC<Props> = ({
         Comprovantes PDF aparecem listados como link.
       </p>
     </div>
->>>>>>> 34cea0240ca3ba598c03146761b4feac6cb3d355
   );
 };
